@@ -1,1 +1,5150 @@
-# World-Star-Go-Academy
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>World Star Go Academy (Puchong · Setapak · Rawang) | Inspiring Logical Thinking & Resilience Through Go</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet">
+  <!-- ONNX Runtime Web for KataGo Neural Network -->
+  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js"></script>
+  <style>
+    :root {
+      --bg-warm: #FAF6F0;        /* Warm cream background */
+      --bg-card: #FFFFFF;        /* Pure white card */
+      --bg-stone: #F2EAE0;       /* Soft wood-tone background */
+      --text-main: #2C221E;      /* Deep walnut brown text */
+      --text-muted: #645650;     /* Muted taupe secondary text */
+      --accent-amber: #D97706;   /* Warm amber primary accent */
+      --accent-hover: #B45309;   /* Deep amber hover */
+      --accent-green: #3D6352;   /* Pine green badge accent */
+      --border-soft: #E6DCD2;    /* Soft border */
+      --shadow-sm: 0 4px 15px rgba(44, 34, 30, 0.05);
+      --shadow-md: 0 10px 30px rgba(44, 34, 30, 0.09);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      max-width: 100vw;
+      overflow-x: hidden;
+      -webkit-text-size-adjust: 100%;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-warm);
+      color: var(--text-main);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, h4, .serif {
+      font-family: 'Noto Serif SC', serif;
+      line-height: 1.35;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 clamp(14px, 4vw, 24px);
+    }
+
+    /* Sticky Top Navigation */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(250, 246, 240, 0.96);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-soft);
+      padding: 10px 0;
+    }
+
+    .nav-wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-main);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .brand-stones {
+      display: flex;
+      align-items: center;
+    }
+
+    .stone-b, .stone-w {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .stone-b {
+      background: radial-gradient(circle at 35% 35%, #555, #111);
+      box-shadow: 1px 2px 5px rgba(0,0,0,0.3);
+    }
+
+    .stone-w {
+      background: radial-gradient(circle at 35% 35%, #fff, #dcdcdc);
+      border: 1px solid #ccc;
+      margin-left: -7px;
+      box-shadow: 1px 2px 5px rgba(0,0,0,0.15);
+    }
+
+    .brand-title {
+      font-weight: 700;
+      font-size: 1.08rem;
+      letter-spacing: 0.3px;
+    }
+
+    .brand-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      display: block;
+      font-weight: 400;
+    }
+
+    /* Dual-View Tab Switcher */
+    .view-tabs {
+      display: inline-flex;
+      background: var(--bg-stone);
+      border: 1.5px solid var(--border-soft);
+      border-radius: 999px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .view-tab-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 700;
+      padding: 7px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.22s ease;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .view-tab-btn:hover {
+      color: var(--text-main);
+    }
+
+    .view-tab-btn.active {
+      background: var(--accent-amber);
+      color: #FFFFFF;
+      box-shadow: 0 3px 10px rgba(217, 119, 6, 0.3);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: color 0.2s;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent-amber);
+    }
+
+    /* Language Switcher Pill */
+    .lang-switch {
+      display: inline-flex;
+      background: var(--bg-stone);
+      border: 1px solid var(--border-soft);
+      border-radius: 999px;
+      padding: 3px;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .lang-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 5px 9px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .lang-btn.active {
+      background: var(--text-main);
+      color: #FFFFFF;
+      box-shadow: 0 2px 6px rgba(44, 34, 30, 0.2);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background-color: var(--accent-amber);
+      color: #FFFFFF !important;
+      padding: 10px 20px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+
+    .btn:hover {
+      background-color: var(--accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(217, 119, 6, 0.35);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      color: var(--text-main) !important;
+      border: 1.5px solid var(--text-main);
+      box-shadow: none;
+    }
+
+    .btn-outline:hover {
+      background-color: var(--text-main);
+      color: #FFFFFF !important;
+    }
+
+    /* View Switching Animation */
+    .app-view {
+      display: none;
+      animation: fadeInView 0.25s ease;
+    }
+
+    .app-view.active-view {
+      display: block;
+    }
+
+    @keyframes fadeInView {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Hero Banner */
+    .hero {
+      padding: clamp(36px, 6vw, 64px) 0 clamp(36px, 5vw, 56px);
+      background:
+        radial-gradient(circle at 85% 20%, rgba(217, 119, 6, 0.08), transparent 40%),
+        radial-gradient(circle at 10% 80%, rgba(61, 99, 82, 0.08), transparent 40%);
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .tag-badge {
+      display: inline-block;
+      background-color: #E8F0EC;
+      color: var(--accent-green);
+      font-size: 0.84rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.7rem, 5.2vw, 2.5rem);
+      color: var(--text-main);
+      margin-bottom: 18px;
+    }
+
+    .hero h1 span {
+      color: var(--accent-amber);
+    }
+
+    .hero p {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-bottom: 30px;
+      max-width: 560px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 36px;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-soft);
+    }
+
+    .stat-num {
+      font-size: clamp(1.1rem, 3.2vw, 1.35rem);
+      font-weight: 700;
+      color: var(--text-main);
+      font-family: 'Noto Serif SC', serif;
+    }
+
+    .stat-label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* Hero Visual Card */
+    .hero-visual {
+      background: var(--bg-stone);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-soft);
+      position: relative;
+    }
+
+    .hero-img-box {
+      width: 100%;
+      height: 360px;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      background-color: #DEC8A8;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 20px;
+    }
+
+    .hero-img-box img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+    }
+
+    .hero-quote-card {
+      position: relative;
+      z-index: 2;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      padding: 16px 20px;
+      border-radius: 14px;
+      box-shadow: var(--shadow-sm);
+      border-left: 4px solid var(--accent-amber);
+    }
+
+    .hero-quote-card p {
+      font-size: 0.92rem;
+      color: var(--text-main);
+      margin: 0;
+      font-weight: 500;
+    }
+
+    .hero-quote-card span {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* Section Headers */
+    section {
+      padding: clamp(44px, 7vw, 74px) 0;
+    }
+
+    .section-alt {
+      background-color: var(--bg-stone);
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 42px;
+    }
+
+    .section-header h2 {
+      font-size: clamp(1.48rem, 4.5vw, 1.95rem);
+      margin-bottom: 12px;
+      color: var(--text-main);
+    }
+
+    .section-header p {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    /* Grids & Cards */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 30px 26px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-soft);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .icon-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background-color: #FEF3C7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 20px;
+    }
+
+    .card h3 {
+      font-size: 1.22rem;
+      margin-bottom: 12px;
+      color: var(--text-main);
+    }
+
+    .card p {
+      color: var(--text-muted);
+      font-size: 0.94rem;
+    }
+
+    /* Program Cards */
+    .course-card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 30px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-soft);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .course-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .course-tag {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: #F3ECE1;
+      color: var(--text-main);
+      margin-bottom: 14px;
+    }
+
+    .course-card h3 {
+      font-size: 1.28rem;
+      margin-bottom: 10px;
+    }
+
+    .course-list {
+      list-style: none;
+      margin: 16px 0 24px;
+    }
+
+    .course-list li {
+      position: relative;
+      padding-left: 22px;
+      margin-bottom: 10px;
+      font-size: 0.94rem;
+      color: var(--text-muted);
+    }
+
+    .course-list li::before {
+      content: "●";
+      position: absolute;
+      left: 0;
+      color: var(--accent-amber);
+      font-size: 0.8rem;
+    }
+
+    /* Coaches Section */
+    .teacher-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 14px;
+    }
+
+    .t-badge {
+      font-size: 0.82rem;
+      background: #FAF6F0;
+      border: 1px solid var(--border-soft);
+      padding: 5px 12px;
+      border-radius: 8px;
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .teacher-highlight {
+      background: #FFFBEB;
+      border-top: 3px solid var(--accent-amber);
+      padding: 16px 22px;
+      border-radius: 14px;
+      max-width: 780px;
+      margin: 32px auto 0;
+      text-align: center;
+      font-weight: 600;
+      color: var(--text-main);
+      font-size: 0.96rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Moments & Events */
+    .events-subhead {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .events-subhead h3 {
+      font-size: 1.35rem;
+      color: var(--text-main);
+    }
+
+    .events-subhead span {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .event-card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 26px;
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .event-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .event-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+      width: fit-content;
+    }
+
+    .status-hot { background: #FEF3C7; color: #B45309; }
+    .status-tourney { background: #E8F0EC; color: var(--accent-green); }
+    .status-regular { background: #F3ECE1; color: var(--text-main); }
+
+    .event-card h4 {
+      font-size: 1.16rem;
+      margin-bottom: 10px;
+      color: var(--text-main);
+    }
+
+    .event-card p {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+
+    .event-meta {
+      font-size: 0.84rem;
+      color: var(--text-main);
+      background: var(--bg-warm);
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border-soft);
+    }
+
+    /* 4-Column Gallery Grid */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .gallery-card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .gallery-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .gallery-img-wrap {
+      width: 100%;
+      aspect-ratio: 4/3;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 16px;
+    }
+
+    .gallery-img-wrap.bg-1 { background: linear-gradient(135deg, #F3E5D0 0%, #E2C9A6 100%); }
+    .gallery-img-wrap.bg-2 { background: linear-gradient(135deg, #E3EFEA 0%, #C5DDD3 100%); }
+    .gallery-img-wrap.bg-3 { background: linear-gradient(135deg, #FDECC8 0%, #F5D491 100%); }
+    .gallery-img-wrap.bg-4 { background: linear-gradient(135deg, #EAE4DC 0%, #D4C8B8 100%); }
+
+    .gallery-img-wrap img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 2;
+      transition: transform 0.4s ease;
+    }
+
+    .gallery-card:hover .gallery-img-wrap img {
+      transform: scale(1.04);
+    }
+
+    .gallery-placeholder-tag {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      z-index: 3;
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      padding: 4px 12px;
+      border-radius: 999px;
+      box-shadow: 0 2px 8px rgba(44, 34, 30, 0.12);
+    }
+
+    .gallery-caption {
+      padding: 18px 18px 20px;
+    }
+
+    .gallery-caption h4 {
+      font-size: 1.04rem;
+      margin-bottom: 6px;
+      color: var(--text-main);
+    }
+
+    .gallery-caption p {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* 30-Sec Trial Booking Form */
+    .booking-grid {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 36px;
+      align-items: start;
+    }
+
+    .trial-steps-card {
+      background: var(--bg-stone);
+      border-radius: 22px;
+      padding: 34px 28px;
+      border: 1px solid var(--border-soft);
+    }
+
+    .trial-steps-card h3 {
+      font-size: 1.38rem;
+      margin-bottom: 12px;
+    }
+
+    .trial-steps-card > p {
+      font-size: 0.94rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .step-item {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--accent-amber);
+      color: #FFFFFF;
+      font-weight: 700;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .step-text h4 {
+      font-size: 1.02rem;
+      margin-bottom: 4px;
+    }
+
+    .step-text p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .form-card {
+      background: var(--bg-card);
+      border-radius: 22px;
+      padding: 34px 32px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-soft);
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 7px;
+      color: var(--text-main);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border-soft);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      background-color: var(--bg-warm);
+      color: var(--text-main);
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--accent-amber);
+      background-color: #FFFFFF;
+    }
+
+    .form-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .trait-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .trait-chip {
+      border: 1px solid var(--border-soft);
+      background: var(--bg-warm);
+      color: var(--text-muted);
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-size: 0.83rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+
+    .trait-chip:hover {
+      border-color: var(--accent-amber);
+    }
+
+    .trait-chip.selected {
+      background: #FEF3C7;
+      border-color: var(--accent-amber);
+      color: #B45309;
+      font-weight: 600;
+    }
+
+    .form-note {
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 12px;
+    }
+
+    .gform-iframe-wrap {
+      display: none;
+      width: 100%;
+      min-height: 580px;
+      border: none;
+      border-radius: 12px;
+    }
+
+    /* FAQ Accordion */
+    .faq-wrap {
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    details {
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      border-radius: 14px;
+      margin-bottom: 16px;
+      padding: 20px 24px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+
+    details[open] {
+      border-color: var(--accent-amber);
+    }
+
+    summary {
+      font-weight: 700;
+      font-size: 1.04rem;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-main);
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary::after {
+      content: "+";
+      font-size: 1.4rem;
+      color: var(--accent-amber);
+      font-weight: 400;
+      margin-left: 12px;
+      flex-shrink: 0;
+    }
+
+    details[open] summary::after {
+      content: "−";
+    }
+
+    .faq-ans {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-soft);
+      color: var(--text-muted);
+      font-size: 0.94rem;
+    }
+
+    /* =====================================================
+       View 2: Interactive Go Board & Graded AI
+       ===================================================== */
+    .kifu-view-sec {
+      padding: 24px 0 60px;
+      min-height: calc(100vh - 180px);
+    }
+
+    .kifu-container {
+      max-width: 1260px;
+    }
+
+    .kifu-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .kifu-app-grid {
+      display: grid;
+      grid-template-columns: 1.38fr 0.72fr;
+      gap: 24px;
+      align-items: start;
+      transition: all 0.25s ease;
+    }
+
+    .kifu-app-grid.board-zoomed {
+      grid-template-columns: minmax(0, 860px);
+      justify-content: center;
+    }
+
+    .kifu-app-grid.board-zoomed #kifuRightPanel {
+      display: none;
+    }
+
+    .kifu-panel {
+      background: var(--bg-card);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-soft);
+    }
+
+    .kifu-top-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .pill-group {
+      display: inline-flex;
+      align-items: center;
+      background: var(--bg-warm);
+      border: 1px solid var(--border-soft);
+      border-radius: 999px;
+      padding: 5px 11px;
+      gap: 6px;
+    }
+
+    .pill-group.highlight-ai {
+      background: #FEF3C7;
+      border-color: var(--accent-amber);
+    }
+
+    .pill-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      padding-right: 6px;
+      border-right: 1px solid var(--border-soft);
+    }
+
+    .pill-select {
+      background: transparent;
+      border: none;
+      font-weight: 700;
+      color: var(--text-main);
+      font-size: 0.86rem;
+      cursor: pointer;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .top-ctrl-btns {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .snd-toggle-btn {
+      background: var(--bg-warm);
+      border: 1px solid var(--border-soft);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .snd-toggle-btn:hover {
+      border-color: var(--accent-amber);
+      background: #FEF3C7;
+    }
+
+    .snd-toggle-btn.zoom-active {
+      background: var(--accent-amber);
+      color: #FFFFFF;
+      border-color: var(--accent-amber);
+      box-shadow: 0 3px 10px rgba(217, 119, 6, 0.28);
+    }
+
+    /* Scoreboard */
+    .score-box {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      background: var(--bg-warm);
+      border-radius: 16px;
+      padding: 10px 18px;
+      margin-bottom: 14px;
+      border: 1px solid var(--border-soft);
+    }
+
+    .score-side {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: opacity 0.25s;
+    }
+
+    .score-side.right {
+      justify-content: flex-end;
+    }
+
+    .score-side.inactive {
+      opacity: 0.42;
+    }
+
+    .score-stone {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 1px 2px 6px rgba(0,0,0,0.22);
+    }
+
+    .score-stone.black {
+      background: radial-gradient(circle at 35% 35%, #555, #111);
+    }
+
+    .score-stone.white {
+      background: radial-gradient(circle at 35% 35%, #fff, #dcdcdc);
+      border: 1px solid #ccc;
+    }
+
+    .score-meta {
+      line-height: 1.25;
+    }
+
+    .score-name {
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: var(--text-main);
+    }
+
+    .score-caps {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .score-center {
+      text-align: center;
+      padding: 0 12px;
+    }
+
+    .move-badge {
+      display: inline-block;
+      background: #FEF3C7;
+      color: #B45309;
+      font-weight: 800;
+      font-size: 0.92rem;
+      padding: 2px 12px;
+      border-radius: 999px;
+      border: 1px solid #F59E0B;
+    }
+
+    .move-status-text {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin-top: 3px;
+    }
+
+    /* Board Canvas Wrapper */
+    .board-wrapper {
+      width: 100%;
+      max-width: min(100%, 80vh);
+      margin: 0 auto;
+      aspect-ratio: 1/1;
+      background: #E4BC79;
+      border-radius: 14px;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.18), 0 6px 20px rgba(44, 34, 30, 0.1);
+      overflow: hidden;
+      position: relative;
+      touch-action: manipulation;
+      transition: max-width 0.25s ease;
+    }
+
+    .kifu-app-grid.board-zoomed .board-wrapper {
+      max-width: min(100%, 84vh);
+    }
+
+    #goBoard {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: pointer;
+    }
+
+    /* Pass & Game-Over Overlay Notice */
+    .board-pass-notice {
+      position: absolute;
+      inset: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .board-pass-notice[hidden] {
+      display: none !important;
+    }
+
+    .pass-notice-card {
+      pointer-events: auto;
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 2.5px solid var(--accent-amber);
+      border-radius: 18px;
+      padding: 18px 20px;
+      max-width: 340px;
+      width: 92%;
+      text-align: center;
+      box-shadow: 0 14px 34px rgba(44, 34, 30, 0.28);
+      animation: popPassCard 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes popPassCard {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .pass-notice-icon {
+      font-size: 2rem;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .pass-notice-title {
+      font-size: 1.06rem;
+      font-weight: 800;
+      color: #B45309;
+      margin-bottom: 6px;
+    }
+
+    .pass-notice-desc {
+      font-size: 0.85rem;
+      color: var(--text-main);
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+
+    .pass-notice-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .pass-btn-primary {
+      background: var(--accent-amber);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 4px 12px rgba(217, 119, 6, 0.28);
+      transition: background 0.2s;
+    }
+
+    .pass-btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .pass-btn-secondary {
+      background: var(--bg-warm);
+      color: var(--text-main);
+      border: 1.5px solid var(--border-soft);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .pass-btn-secondary:hover {
+      border-color: var(--accent-amber);
+      background: #FEF3C7;
+    }
+
+    /* Navigation Playbar */
+    .nav-playbar {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr) 1.45fr;
+      gap: 6px;
+      margin-top: 14px;
+    }
+
+    .nav-play-btn {
+      background: var(--bg-warm);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      height: 38px;
+      font-weight: 800;
+      font-size: 0.84rem;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      font-family: inherit;
+      white-space: nowrap;
+      padding: 0 6px;
+    }
+
+    .nav-play-btn:hover {
+      background: #FEF3C7;
+      border-color: var(--accent-amber);
+    }
+
+    .nav-play-btn.active {
+      background: var(--text-main);
+      color: #FFFFFF;
+      border-color: var(--text-main);
+    }
+
+    .nav-play-btn.mode-last {
+      background: #FEF3C7;
+      color: #B45309;
+      border-color: #F59E0B;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .slider-row input[type="range"] {
+      flex: 1;
+      accent-color: var(--accent-amber);
+      height: 24px;
+      cursor: pointer;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .btn-action {
+      padding: 10px 8px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.86rem;
+      border: 1px solid var(--border-soft);
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--bg-warm);
+      color: var(--text-main);
+      font-family: inherit;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .btn-action:hover {
+      background: #F3ECE1;
+      border-color: var(--accent-amber);
+    }
+
+    .btn-action.active-est {
+      background: #1A9CC8;
+      color: #FFFFFF;
+      border-color: #1A9CC8;
+    }
+
+    .btn-action.playing-active {
+      background: var(--accent-amber);
+      color: #FFFFFF;
+      border-color: var(--accent-amber);
+    }
+
+    .btn-action.pass-highlight {
+      background: #FEF3C7;
+      border-color: #F59E0B;
+      color: #B45309;
+      animation: pulsePassBtn 1.5s infinite;
+    }
+
+    @keyframes pulsePassBtn {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.45); }
+      50% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+    }
+
+    /* Score Estimation Panel */
+    .est-panel {
+      margin-top: 16px;
+      background: #EEF9FD;
+      border: 2px solid #1A9CC8;
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .est-lead-text {
+      font-size: 1.12rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .est-winbar {
+      height: 12px;
+      border: 1.5px solid var(--text-main);
+      border-radius: 999px;
+      background: #FFFFFF;
+      overflow: hidden;
+      margin: 6px 0;
+    }
+
+    .est-winbar-fill {
+      height: 100%;
+      background: #2C221E;
+      width: 50%;
+      transition: width 0.3s ease;
+    }
+
+    .est-wintxt {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .est-newgame-wrap {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px dashed rgba(26, 156, 200, 0.35);
+    }
+
+    .btn-new-game {
+      width: 100%;
+      background: var(--accent-amber);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 999px;
+      padding: 11px 18px;
+      font-size: 0.94rem;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .btn-new-game:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(217, 119, 6, 0.4);
+    }
+
+    .meta-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .sgf-textarea {
+      width: 100%;
+      height: 105px;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border-soft);
+      border-radius: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.82rem;
+      background-color: var(--bg-warm);
+      color: var(--text-main);
+      resize: vertical;
+      outline: none;
+      margin-bottom: 12px;
+    }
+
+    .sgf-textarea:focus {
+      border-color: var(--accent-amber);
+      background: #FFFFFF;
+    }
+
+    /* Footer */
+    .cta-footer {
+      background: #2C221E;
+      color: #FAF6F0;
+      padding: 64px 0 44px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 48px;
+      align-items: center;
+      padding-bottom: 44px;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .cta-footer h2 {
+      font-size: clamp(1.55rem, 4.5vw, 2rem);
+      color: #FFFFFF;
+      margin-bottom: 16px;
+    }
+
+    .cta-footer p {
+      color: #D5C7B8;
+      margin-bottom: 28px;
+      font-size: 1rem;
+    }
+
+    .contact-card {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      padding: 28px;
+    }
+
+    .contact-item {
+      margin-bottom: 16px;
+      font-size: 0.95rem;
+      color: #EAE0D5;
+    }
+
+    .contact-item strong {
+      color: #FFFFFF;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .copyright {
+      text-align: center;
+      padding-top: 28px;
+      font-size: 0.85rem;
+      color: #9E8F85;
+    }
+
+    /* Toast Notification */
+    .toast-msg {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(44, 34, 30, 0.95);
+      color: #FFFFFF;
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.22);
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s ease;
+      text-align: center;
+      max-width: 90vw;
+    }
+
+    .toast-msg.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Responsive Media Queries */
+    @media (max-width: 1020px) {
+      .nav-links {
+        display: none;
+      }
+      .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .kifu-app-grid {
+        grid-template-columns: 1fr;
+      }
+      .board-wrapper {
+        max-width: min(100%, 78vh);
+      }
+    }
+
+    @media (max-width: 860px) {
+      .hero-grid,
+      .grid-3,
+      .grid-2,
+      .booking-grid,
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-img-box {
+        height: 300px;
+      }
+
+      .form-card,
+      .trial-steps-card,
+      .kifu-panel {
+        padding: 20px 14px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .nav-wrap {
+        justify-content: space-between;
+      }
+      .view-tabs {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        margin-top: 4px;
+      }
+      .view-tab-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 8px 10px;
+        font-size: 0.85rem;
+      }
+      .gallery-grid,
+      .form-row-2,
+      .meta-grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .action-buttons {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .brand-sub {
+        display: none;
+      }
+      .nav-CtaBtn {
+        padding: 6px 12px;
+        font-size: 0.78rem;
+      }
+      .board-wrapper {
+        max-width: 100%;
+      }
+      .form-control,
+      .sgf-textarea {
+        font-size: 16px !important;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .brand-title {
+        font-size: 0.96rem;
+      }
+      .nav-CtaBtn {
+        display: none;
+      }
+      .pill-group {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .pill-select {
+        flex: 1;
+        text-align: right;
+      }
+      .score-box {
+        padding: 8px 10px;
+      }
+      .score-name {
+        font-size: 0.85rem;
+      }
+      .nav-play-btn {
+        height: 34px;
+        font-size: 0.75rem;
+      }
+      .btn-action {
+        font-size: 0.8rem;
+        padding: 9px 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Header (with Dual-View Tabs & EN/ZH Switcher) -->
+  <header>
+    <div class="container nav-wrap">
+      <a onclick="switchMainView('home')" class="brand">
+        <div class="brand-stones">
+          <span class="stone-b"></span>
+          <span class="stone-w"></span>
+        </div>
+        <div>
+          <span class="brand-title">World Star Go 世星围棋</span>
+          <span class="brand-sub" data-i18n="nav_sub">Puchong · Setapak · Rawang</span>
+        </div>
+      </a>
+
+      <!-- Main View Switcher Tabs -->
+      <div class="view-tabs" role="tablist">
+        <button type="button" class="view-tab-btn active" id="tab-home" onclick="switchMainView('home')" data-i18n="tab_home">
+          🏫 Programs & Trial
+        </button>
+        <button type="button" class="view-tab-btn" id="tab-kifu" onclick="switchMainView('kifu')" data-i18n="tab_kifu">
+          ⚫⚪ Go Board & AI
+        </button>
+      </div>
+
+      <div class="nav-right">
+        <nav class="nav-links" id="home-sub-nav">
+          <a onclick="scrollToSection('philosophy')" data-i18n="nav_phil">Philosophy</a>
+          <a onclick="scrollToSection('courses')" data-i18n="nav_course">Programs</a>
+          <a onclick="scrollToSection('instructor')" data-i18n="nav_coach">Our Coaches</a>
+          <a onclick="scrollToSection('moments')" data-i18n="nav_moments">Moments & Events</a>
+          <a onclick="scrollToSection('faq')" data-i18n="nav_faq">FAQ</a>
+        </nav>
+
+        <!-- EN / 中文 Language Switcher (EN Default Active) -->
+        <div class="lang-switch" aria-label="Language Switcher">
+          <button type="button" class="lang-btn active" onclick="setLanguage('en')" id="btn-en">EN</button>
+          <button type="button" class="lang-btn" onclick="setLanguage('zh')" id="btn-zh">中文</button>
+        </div>
+
+        <button type="button" onclick="scrollToSection('booking')" class="btn nav-CtaBtn" data-i18n="nav_cta">Book a Trial</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       View 1: Academy Programs & Trial Booking (Default View)
+       ========================================================= -->
+  <main id="view-home" class="app-view active-view">
+
+    <!-- Section 1: Hero Banner -->
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <span class="tag-badge" data-i18n="hero_badge">📍 Puchong · Setapak · Rawang · Mind Sports & Character Building</span>
+          <h1 data-i18n="hero_title">Beyond Black & White:<br>Inspiring <span>Logical Thinking & Resilience</span></h1>
+          <p data-i18n="hero_desc">
+            We teach far more than just winning on the board. Established in 2011, our warm, interactive classes help <strong>complete beginners to Dan-level players</strong> (kids & adults) build deep focus, strategic reasoning, and emotional resilience.
+          </p>
+          <div class="hero-actions">
+            <button type="button" onclick="scrollToSection('booking')" class="btn" data-i18n="hero_btn_form">
+              📝 30-Sec Trial Registration
+            </button>
+            <button type="button" onclick="switchMainView('kifu')" class="btn btn-outline" data-i18n="hero_btn_sgf">
+              ⚫⚪ Play AI / Record Game
+            </button>
+            <a id="wa-hero" href="https://wa.me/60169541603?text=Hi%20Coach%20Meng%20Chun%2C%20I%20would%20like%20to%20enquire%20about%20booking%20a%20Go%20trial%20class%20at%20World%20Star%20Go." target="_blank" rel="noopener noreferrer" class="btn btn-outline" data-i18n="hero_btn_wa">
+              💬 Chat via WhatsApp
+            </a>
+          </div>
+          <div class="hero-stats">
+            <div>
+              <div class="stat-num" data-i18n="stat1_num">Since 2011</div>
+              <div class="stat-label" data-i18n="stat1_lbl">Dedicated to Go Education</div>
+            </div>
+            <div>
+              <div class="stat-num" data-i18n="stat2_num">Beginner~Dan</div>
+              <div class="stat-label" data-i18n="stat2_lbl">Structured Step-by-Step Curriculum</div>
+            </div>
+            <div>
+              <div class="stat-num" data-i18n="stat3_num">Small Groups</div>
+              <div class="stat-label" data-i18n="stat3_lbl">Cognitive & Emotional Guidance</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Visual Card -->
+        <div class="hero-visual">
+          <div class="hero-img-box">
+            <img src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'%3E%3Cdefs%3E%3ClinearGradient id='board' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23E8CFA8'/%3E%3Cstop offset='100%25' stop-color='%23D2B07E'/%3E%3C/linearGradient%3E%3CradialGradient id='bStone' cx='35%25' cy='30%25' r='65%25'%3E%3Cstop offset='0%25' stop-color='%23555'/%3E%3Cstop offset='40%25' stop-color='%23222'/%3E%3Cstop offset='100%25' stop-color='%23080808'/%3E%3C/radialGradient%3E%3CradialGradient id='wStone' cx='35%25' cy='30%25' r='65%25'%3E%3Cstop offset='0%25' stop-color='%23FFFFFF'/%3E%3Cstop offset='70%25' stop-color='%23F0ECE1'/%3E%3Cstop offset='100%25' stop-color='%23D6CFC2'/%3E%3C/radialGradient%3E%3Cfilter id='sh' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeDropShadow dx='3' dy='6' stdDeviation='5' flood-color='%232C221E' flood-opacity='0.28'/%3E%3C/filter%3E%3C/defs%3E%3Crect width='800' height='600' fill='url(%23board)'/%3E%3Cg stroke='%235C4328' stroke-width='1.8' opacity='0.45'%3E%3Cline x1='100' y1='0' x2='100' y2='600'/%3E%3Cline x1='220' y1='0' x2='220' y2='600'/%3E%3Cline x1='340' y1='0' x2='340' y2='600'/%3E%3Cline x1='460' y1='0' x2='460' y2='600'/%3E%3Cline x1='580' y1='0' x2='580' y2='600'/%3E%3Cline x1='700' y1='0' x2='700' y2='600'/%3E%3Cline x1='0' y1='80' x2='800' y2='80'/%3E%3Cline x1='0' y1='200' x2='800' y2='200'/%3E%3Cline x1='0' y1='320' x2='800' y2='320'/%3E%3Cline x1='0' y1='440' x2='800' y2='440'/%3E%3Cline x1='0' y1='560' x2='800' y2='560'/%3E%3C/g%3E%3Ccircle cx='220' cy='200' r='5.5' fill='%234A3520' opacity='0.65'/%3E%3Ccircle cx='580' cy='200' r='5.5' fill='%234A3520' opacity='0.65'/%3E%3Ccircle cx='220' cy='440' r='5.5' fill='%234A3520' opacity='0.65'/%3E%3Ccircle cx='580' cy='440' r='5.5' fill='%234A3520' opacity='0.65'/%3E%3Cg filter='url(%23sh)'%3E%3Ccircle cx='220' cy='200' r='44' fill='url(%23bStone)'/%3E%3Ccircle cx='460' cy='200' r='44' fill='url(%23bStone)'/%3E%3Ccircle cx='340' cy='320' r='44' fill='url(%23bStone)'/%3E%3Ccircle cx='580' cy='320' r='44' fill='url(%23bStone)'/%3E%3Ccircle cx='340' cy='200' r='44' fill='url(%23wStone)'/%3E%3Ccircle cx='460' cy='320' r='44' fill='url(%23wStone)'/%3E%3Ccircle cx='220' cy='320' r='44' fill='url(%23wStone)'/%3E%3Ccircle cx='580' cy='200' r='44' fill='url(%23wStone)'/%3E%3Ccircle cx='460' cy='80' r='44' fill='url(%23bStone)'/%3E%3C/g%3E%3Ccircle cx='340' cy='320' r='14' fill='none' stroke='%23D97706' stroke-width='3.5' opacity='0.9'/%3E%3C/svg%3E" alt="World Star Go Academy Classroom Vision">
+            <div class="hero-quote-card">
+              <p data-i18n="hero_quote">"Every game of Go is a journey of independent problem-solving. Learning how to handle mistakes is far more valuable than winning a single match."</p>
+              <span data-i18n="hero_quote_sub">— Core Philosophy of World Star Go</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Philosophy -->
+    <section id="philosophy">
+      <div class="container">
+        <div class="section-header">
+          <span class="tag-badge">OUR PHILOSOPHY</span>
+          <h2 data-i18n="phil_title">Why Learn Go (Weiqi)? We Focus on Lifelong Growth</h2>
+          <p data-i18n="phil_sub">No rigid rote memorization. With patient and encouraging guidance, every lesson is a training ground for critical thinking and character.</p>
+        </div>
+
+        <div class="grid-3">
+          <div class="card">
+            <div class="icon-circle">💡</div>
+            <h3 data-i18n="phil1_t">Spark Logical Thinking, Not Rote Memory</h3>
+            <p data-i18n="phil1_d">We don't train robotic memorizers. Through guided questions and scenario breakdowns, we teach students to observe the whole board, weigh trade-offs, and reason independently.</p>
+          </div>
+
+          <div class="card">
+            <div class="icon-circle">🌱</div>
+            <h3 data-i18n="phil2_t">Build Adversity Quotient (AQ) & Resilience</h3>
+            <p data-i18n="phil2_d">Many children fear losing and get frustrated easily when behind. Through supportive post-game reviews, we guide students to embrace mistakes calmly and turn setbacks into the courage to try again.</p>
+          </div>
+
+          <div class="card">
+            <div class="icon-circle">🤝</div>
+            <h3 data-i18n="phil3_t">Warm & Engaging Small-Group Classes</h3>
+            <p data-i18n="phil3_d">Teaching since 2011, we understand every child's attention span. Interactive challenges keep active kids engaged and help them fall in love with deep focus.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Programs -->
+    <section id="courses" class="section-alt">
+      <div class="container">
+        <div class="section-header">
+          <span class="tag-badge">PROGRAMS</span>
+          <h2 data-i18n="crs_title">Tailored Programs for Kids & Adults</h2>
+          <p data-i18n="crs_sub">Whether you are a complete novice or an advancing player aiming for Dan ranks, we have the right class for you.</p>
+        </div>
+
+        <div class="grid-2">
+          <div class="course-card">
+            <div>
+              <span class="course-tag" data-i18n="c1_tag">For: Kids Aged 5+ (Complete Beginners)</span>
+              <h3 data-i18n="c1_title">🌟 Kids Beginner Class (Foundation)</h3>
+              <ul class="course-list">
+                <li data-i18n="c1_b1">Master Go rules, board etiquette, and capturing techniques through fun stories & games</li>
+                <li data-i18n="c1_b2">Gradually extend attention span and calm focus in a supportive environment</li>
+                <li data-i18n="c1_b3">Develop spatial awareness and enjoy playing real games from the very first lesson</li>
+              </ul>
+            </div>
+            <button type="button" onclick="prefillCourse('beginner')" class="btn btn-outline" data-i18n="c1_btn">Book Beginner Trial</button>
+          </div>
+
+          <div class="course-card">
+            <div>
+              <span class="course-tag" data-i18n="c2_tag">For: Kids from Basic to Dan Level</span>
+              <h3 data-i18n="c2_title">🚀 Kids Intermediate & Dan-Level Class</h3>
+              <ul class="course-list">
+                <li data-i18n="c2_b1">Master opening strategy, middle-game tactics, life-and-death calculation & endgame</li>
+                <li data-i18n="c2_b2">In-depth game reviews to sharpen multi-step reading and logical deduction</li>
+                <li data-i18n="c2_b3">Preparation for youth tournaments and Kyu/Dan grading tests while building mental toughness</li>
+              </ul>
+            </div>
+            <button type="button" onclick="prefillCourse('intermediate')" class="btn btn-outline" data-i18n="c2_btn">Book Level Assessment</button>
+          </div>
+
+          <div class="course-card">
+            <div>
+              <span class="course-tag" data-i18n="c3_tag">For: Adult Beginners & Enthusiasts</span>
+              <h3 data-i18n="c3_title">🍵 Adult Beginner & Interest Class</h3>
+              <ul class="course-list">
+                <li data-i18n="c3_b1">Learn Go through clear, structured logic—free from confusing jargon</li>
+                <li data-i18n="c3_b2">Unwind after work in a friendly, mindful atmosphere over the Go board</li>
+                <li data-i18n="c3_b3">Ideal for adults seeking a rewarding mental hobby or parents learning alongside their kids</li>
+              </ul>
+            </div>
+            <button type="button" onclick="prefillCourse('adult')" class="btn btn-outline" data-i18n="c3_btn">Enquire Adult Class</button>
+          </div>
+
+          <div class="course-card">
+            <div>
+              <span class="course-tag" data-i18n="c4_tag">For: School Holidays & Remote Students</span>
+              <h3 data-i18n="c4_title">🏕️ Holiday Camps & Interactive Online Classes</h3>
+              <ul class="course-list">
+                <li data-i18n="c4_b1">School Holiday Camps: Intensive themed training, team relays, and tactical puzzles</li>
+                <li data-i18n="c4_b2">Live Online Classes (Small Group / 1-on-1): Learn and review effectively from home</li>
+                <li data-i18n="c4_b3">Regular in-house matches and mind-sports events to celebrate progress</li>
+              </ul>
+            </div>
+            <button type="button" onclick="prefillCourse('camp')" class="btn btn-outline" data-i18n="c4_btn">Enquire Holiday Camp / Online</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Meet Our Coaches -->
+    <section id="instructor">
+      <div class="container">
+        <div class="section-header">
+          <span class="tag-badge">MEET OUR COACHES</span>
+          <h2 data-i18n="coach_title">Meet Our Coaching Team</h2>
+          <p data-i18n="coach_sub">Dedicated to Go education since 2011, our experienced coaches guide students step-by-step from complete beginners to Dan ranks.</p>
+        </div>
+
+        <div class="grid-3">
+          <!-- Coach 1: Cheng Khai Yong -->
+          <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 18px;">
+                <div class="icon-circle" style="margin-bottom: 0; background: #2C221E; color: #FAF6F0; font-family: 'Noto Serif SC', serif; font-weight: 700; font-size: 1.3rem; flex-shrink: 0;">5D</div>
+                <div>
+                  <h3 style="margin-bottom: 2px; font-size: 1.25rem;" data-i18n="c_ky_name">Coach Cheng Khai Yong</h3>
+                  <div style="font-size: 0.84rem; color: var(--text-muted); font-weight: 500;">钟凯荣 老师</div>
+                </div>
+              </div>
+              <div class="teacher-badges">
+                <span class="t-badge" style="background: #FEF3C7; border-color: #F59E0B; color: #B45309; font-weight: 700;" data-i18n="c_ky_rank">✦ Amateur 5-Dan</span>
+                <span class="t-badge" data-i18n="c_ky_role">✦ Advanced Strategy & Dan Promotion</span>
+              </div>
+              <p data-i18n="c_ky_desc">Backed by strong tournament experience, Coach Khai Yong specializes in middle-game tactics, deep life-and-death calculation, and whole-board judgment for advancing students.</p>
+            </div>
+          </div>
+
+          <!-- Coach 2: Cheng Qing Xiang -->
+          <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 18px;">
+                <div class="icon-circle" style="margin-bottom: 0; background: #E8F0EC; color: var(--accent-green); font-family: 'Noto Serif SC', serif; font-weight: 700; font-size: 1.3rem; flex-shrink: 0;">1D</div>
+                <div>
+                  <h3 style="margin-bottom: 2px; font-size: 1.25rem;" data-i18n="c_qx_name">Coach Cheng Qing Xiang</h3>
+                  <div style="font-size: 0.84rem; color: var(--text-muted); font-weight: 500;">曾庆祥 老师</div>
+                </div>
+              </div>
+              <div class="teacher-badges">
+                <span class="t-badge" style="background: #FEF3C7; border-color: #F59E0B; color: #B45309; font-weight: 700;" data-i18n="c_qx_rank">✦ Amateur 1-Dan</span>
+                <span class="t-badge" data-i18n="c_qx_role">✦ Beginner Foundation & Kyu Training</span>
+              </div>
+              <p data-i18n="c_qx_desc">Patient, warm, and engaging, Coach Qing Xiang uses interactive challenges and stories to spark beginners' interest while building rock-solid fundamentals.</p>
+            </div>
+          </div>
+
+          <!-- Coach 3: Lim Meng Chun -->
+          <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 18px;">
+                <div class="icon-circle" style="margin-bottom: 0; background: #FEF3C7; color: #B45309; font-family: 'Noto Serif SC', serif; font-weight: 700; font-size: 1.3rem; flex-shrink: 0;">1D</div>
+                <div>
+                  <h3 style="margin-bottom: 2px; font-size: 1.25rem;" data-i18n="c_mc_name">Coach Lim Meng Chun</h3>
+                  <div style="font-size: 0.84rem; color: var(--text-muted); font-weight: 500;">林明俊 老师</div>
+                </div>
+              </div>
+              <div class="teacher-badges">
+                <span class="t-badge" style="background: #FEF3C7; border-color: #F59E0B; color: #B45309; font-weight: 700;" data-i18n="c_mc_rank">✦ Amateur 1-Dan</span>
+                <span class="t-badge" data-i18n="c_mc_role">✦ Secretary, Malaysia Weiqi Association</span>
+              </div>
+              <p data-i18n="c_mc_desc">Teaching full-time since 2011, Coach Meng Chun focuses on inspiring logical thinking and cultivating Adversity Quotient (AQ) through supportive post-game reviews.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="teacher-highlight" data-i18n="coach_quote">
+          "We look forward to welcoming you and your child to the Go board!"
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Moments & Events -->
+    <section id="moments" class="section-alt">
+      <div class="container">
+        <div class="section-header">
+          <span class="tag-badge">MOMENTS & EVENTS</span>
+          <h2 data-i18n="mom_title">Classroom Moments & Tournament Highlights</h2>
+          <p data-i18n="mom_sub">From quiet contemplation in class to courageous matches at national tournaments, we celebrate every step of our students' growth.</p>
+        </div>
+
+        <div class="events-subhead">
+          <h3 data-i18n="ev_head">📅 Upcoming Events & Tournaments</h3>
+          <span data-i18n="ev_sub">Contact Coach Meng Chun for the latest schedule & slots</span>
+        </div>
+
+        <div class="grid-3">
+          <div class="event-card">
+            <div>
+              <span class="event-status status-hot" data-i18n="ev1_tag">🔥 Open for Registration · School Holidays</span>
+              <h4 data-i18n="ev1_t">School Holiday Go Intensive Camp</h4>
+              <p data-i18n="ev1_d">Immersive holiday training combining tactical puzzle challenges, team matches, and guided game reviews—helping kids sharpen calculation and make great friends.</p>
+            </div>
+            <div class="event-meta" data-i18n="ev1_m">
+              <strong>🎯 For:</strong> Complete Beginners to Dan-Level Groups<br>
+              <strong>📍 Locations:</strong> Puchong ／ Setapak ／ Rawang
+            </div>
+          </div>
+
+          <div class="event-card">
+            <div>
+              <span class="event-status status-tourney" data-i18n="ev2_tag">🏆 Official Tournaments · Real Experience</span>
+              <h4 data-i18n="ev2_t">MWA Tournaments & Youth Mind Sports Events</h4>
+              <p data-i18n="ev2_d">We regularly lead students to participate in national championships, inter-school cups, and mall mind-sports tournaments (U9 / U12 / U18) to build sportsmanship and poise under pressure.</p>
+            </div>
+            <div class="event-meta" data-i18n="ev2_m">
+              <strong>🎯 Support:</strong> Pre-tournament mock matches & mindset coaching<br>
+              <strong>🤝 Organizer/Partner:</strong> Malaysia Weiqi Association (MWA)
+            </div>
+          </div>
+
+          <div class="event-card">
+            <div>
+              <span class="event-status status-regular" data-i18n="ev3_tag">✨ Open Year-Round · Progressive Learning</span>
+              <h4 data-i18n="ev3_t">Weekly Regular Classes & In-House Grading</h4>
+              <p data-i18n="ev3_d">Weekly small-group sessions complemented by regular internal practice matches and rank assessments, giving every student clear milestones and steady confidence.</p>
+            </div>
+            <div class="event-meta" data-i18n="ev3_m">
+              <strong>🎯 Schedule:</strong> Weekend & Weekday slots available<br>
+              <strong>💬 Booking:</strong> Register via the 30-sec form or WhatsApp
+            </div>
+          </div>
+        </div>
+
+        <div class="events-subhead" style="margin-top: 52px; margin-bottom: 8px;">
+          <h3 data-i18n="gal_head">📸 Classroom & Tournament Gallery</h3>
+          <span data-i18n="gal_sub">Capturing moments of focus, reflection, and growth</span>
+        </div>
+
+        <div class="gallery-grid">
+          <div class="gallery-card">
+            <div class="gallery-img-wrap bg-1">
+              <img src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 450'%3E%3Cdefs%3E%3ClinearGradient id='g1' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23F3E5D0'/%3E%3Cstop offset='100%25' stop-color='%23DEC29B'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='600' height='450' fill='url(%23g1)'/%3E%3Crect x='110' y='65' width='380' height='290' rx='18' fill='%23E5C494' stroke='%23B8925A' stroke-width='5'/%3E%3Cg stroke='%236E5028' stroke-width='2' opacity='0.45'%3E%3Cline x1='190' y1='65' x2='190' y2='355'/%3E%3Cline x1='270' y1='65' x2='270' y2='355'/%3E%3Cline x1='350' y1='65' x2='350' y2='355'/%3E%3Cline x1='430' y1='65' x2='430' y2='355'/%3E%3Cline x1='110' y1='135' x2='490' y2='135'/%3E%3Cline x1='110' y1='210' x2='490' y2='210'/%3E%3Cline x1='110' y1='285' x2='490' y2='285'/%3E%3C/g%3E%3Ccircle cx='270' cy='210' r='28' fill='%231E1A17'/%3E%3Ccircle cx='350' cy='135' r='28' fill='%231E1A17'/%3E%3Ccircle cx='190' cy='210' r='28' fill='%23FFFFFF' stroke='%23D0C8BE' stroke-width='2'/%3E%3Ccircle cx='350' cy='210' r='28' fill='%23FFFFFF' stroke='%23D0C8BE' stroke-width='2'/%3E%3Ccircle cx='270' cy='135' r='28' fill='%23FFFFFF' stroke='%23D0C8BE' stroke-width='2'/%3E%3Ccircle cx='270' cy='285' r='28' fill='%231E1A17'/%3E%3Ccircle cx='270' cy='210' r='10' fill='none' stroke='%23D97706' stroke-width='3'/%3E%3C/svg%3E" alt="Interactive Go Classroom Focus">
+              <span class="gallery-placeholder-tag" data-i18n="g1_tag">Interactive Classes</span>
+            </div>
+            <div class="gallery-caption">
+              <h4 data-i18n="g1_t">Deep Focus in Action</h4>
+              <p data-i18n="g1_d">In our warm small-group setting, active kids gradually learn to calm down, observe carefully, and think several moves ahead.</p>
+            </div>
+          </div>
+
+          <div class="gallery-card">
+            <div class="gallery-img-wrap bg-2">
+              <img src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 450'%3E%3Cdefs%3E%3ClinearGradient id='g2' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23E3EFEA'/%3E%3Cstop offset='100%25' stop-color='%23B8D8CA'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='600' height='450' fill='url(%23g2)'/%3E%3Ccircle cx='300' cy='205' r='125' fill='%23FFFFFF' opacity='0.85'/%3E%3Cpath d='M300 285 L300 165' stroke='%233D6352' stroke-width='8' stroke-linecap='round'/%3E%3Cpath d='M300 220 C255 220 235 180 235 150 C275 150 300 180 300 220 Z' fill='%23528770'/%3E%3Cpath d='M300 195 C345 195 365 155 365 125 C325 125 300 155 300 195 Z' fill='%233D6352'/%3E%3Ccircle cx='220' cy='275' r='26' fill='%23222'/%3E%3Ccircle cx='380' cy='275' r='26' fill='%23FFF' stroke='%23CCC' stroke-width='3'/%3E%3Cpath d='M255 265 Q300 235 345 265' fill='none' stroke='%23D97706' stroke-width='4' stroke-dasharray='7,7'/%3E%3C/svg%3E" alt="Post-Game Review and Resilience Coaching">
+              <span class="gallery-placeholder-tag" data-i18n="g2_tag">Game Review & AQ</span>
+            </div>
+            <div class="gallery-caption">
+              <h4 data-i18n="g2_t">Grace in Winning & Learning from Defeat</h4>
+              <p data-i18n="g2_d">Post-game review matters more than the score. We listen to each child's thought process and turn mistakes into curiosity.</p>
+            </div>
+          </div>
+
+          <div class="gallery-card">
+            <div class="gallery-img-wrap bg-3">
+              <img src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 450'%3E%3Cdefs%3E%3ClinearGradient id='g3' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23FDECC8'/%3E%3Cstop offset='100%25' stop-color='%23F3CE83'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='600' height='450' fill='url(%23g3)'/%3E%3Ccircle cx='470' cy='95' r='38' fill='%23F59E0B' opacity='0.35'/%3E%3Cpolygon points='300,85 160,295 440,295' fill='%23D97706' stroke='%23FFFFFF' stroke-width='6' stroke-linejoin='round'/%3E%3Cpolygon points='300,85 300,295 440,295' fill='%23B45309' opacity='0.35'/%3E%3Cpolygon points='300,195 255,295 345,295' fill='%232C221E'/%3E%3Ccircle cx='185' cy='310' r='22' fill='%23222'/%3E%3Ccircle cx='415' cy='310' r='22' fill='%23FFF' stroke='%23CCC' stroke-width='2'/%3E%3C/svg%3E" alt="School Holiday Go Intensive Camp">
+              <span class="gallery-placeholder-tag" data-i18n="g3_tag">Holiday Camp</span>
+            </div>
+            <div class="gallery-caption">
+              <h4 data-i18n="g3_t">Joyful Holiday Training Camps</h4>
+              <p data-i18n="g3_d">Away from digital screens, students enjoy team challenges, capturing games, and collaborative learning with peers.</p>
+            </div>
+          </div>
+
+          <div class="gallery-card">
+            <div class="gallery-img-wrap bg-4">
+              <img src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 450'%3E%3Cdefs%3E%3ClinearGradient id='g4' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23EAE4DC'/%3E%3Cstop offset='100%25' stop-color='%23CFC3B2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='600' height='450' fill='url(%23g4)'/%3E%3Ccircle cx='300' cy='200' r='120' fill='%23FAF6F0'/%3E%3Cpath d='M235 125 H365 V195 C365 240 300 265 300 265 C300 265 235 240 235 195 Z' fill='%23F59E0B' stroke='%23B45309' stroke-width='5'/%3E%3Cpath d='M235 145 H205 C205 185 235 195 235 195' fill='none' stroke='%23B45309' stroke-width='6'/%3E%3Cpath d='M365 145 H395 C395 185 365 195 365 195' fill='none' stroke='%23B45309' stroke-width='6'/%3E%3Crect x='282' y='265' width='36' height='35' fill='%23B45309'/%3E%3Crect x='245' y='300' width='110' height='20' rx='6' fill='%232C221E'/%3E%3Ccircle cx='282' cy='182' r='15' fill='%23222'/%3E%3Ccircle cx='318' cy='182' r='15' fill='%23FFF' stroke='%23B45309' stroke-width='2'/%3E%3C/svg%3E" alt="Malaysia Go Tournament Participation">
+              <span class="gallery-placeholder-tag" data-i18n="g4_tag">Tournament Spirit</span>
+            </div>
+            <div class="gallery-caption">
+              <h4 data-i18n="g4_t">Courage on the Tournament Floor</h4>
+              <p data-i18n="g4_d">Representing the academy in regional and national youth tournaments with proper etiquette and resilience.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 6: 30-Second Online Trial Booking Form -->
+    <section id="booking">
+      <div class="container">
+        <div class="section-header">
+          <span class="tag-badge">BOOK A TRIAL</span>
+          <h2 data-i18n="bk_title">Book a Trial Class in 30 Seconds</h2>
+          <p data-i18n="bk_sub">Fill in the quick form below and Coach Meng Chun will arrange the most suitable trial slot for you.</p>
+        </div>
+
+        <div class="booking-grid">
+          <div class="trial-steps-card">
+            <h3 data-i18n="bk_left_t">🎯 What Happens in a Trial Session?</h3>
+            <p data-i18n="bk_left_p">Every trial class is designed to be fun and meaningful for the student while giving parents clear insights:</p>
+
+            <div class="step-item">
+              <div class="step-num">1</div>
+              <div class="step-text">
+                <h4 data-i18n="st1_t">Fun Ice-Breaker & Interactive Rules (15 mins)</h4>
+                <p data-i18n="st1_d">Engaging introduction to the board, stones, and liberties that sparks instant curiosity.</p>
+              </div>
+            </div>
+
+            <div class="step-item">
+              <div class="step-num">2</div>
+              <div class="step-text">
+                <h4 data-i18n="st2_t">Hands-On Mini-Board Match (20 mins)</h4>
+                <p data-i18n="st2_d">Real gameplay to observe the student's focus, spatial observation, and emotional response.</p>
+              </div>
+            </div>
+
+            <div class="step-item" style="margin-bottom: 0;">
+              <div class="step-num">3</div>
+              <div class="step-text">
+                <h4 data-i18n="st3_t">1-on-1 Post-Class Consultation (10 mins)</h4>
+                <p data-i18n="st3_d">Coach Meng Chun shares personalized feedback with parents and recommends the ideal learning pathway.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-card">
+            <form id="quickTrialForm" onsubmit="submitTrialForm(event)">
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="parentName" data-i18n="f_name_lbl">Parent / Student Name *</label>
+                  <input type="text" id="parentName" class="form-control" required placeholder="e.g., Mr. Tan / Mrs. Lim">
+                </div>
+                <div class="form-group">
+                  <label for="studentAge" data-i18n="f_age_lbl">Student's Age *</label>
+                  <input type="text" id="studentAge" class="form-control" required placeholder="e.g., 7 years old / Adult">
+                </div>
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="courseSelect" data-i18n="f_crs_lbl">Interested Program *</label>
+                  <select id="courseSelect" class="form-control" required>
+                    <option value="beginner" data-i18n="opt_c1">🌟 Kids Beginner Class (Zero Foundation)</option>
+                    <option value="intermediate" data-i18n="opt_c2">🚀 Kids Intermediate / Dan Class</option>
+                    <option value="adult" data-i18n="opt_c3">🍵 Adult Beginner / Interest Class</option>
+                    <option value="camp" data-i18n="opt_c4">🏕️ Holiday Camp / Online Interactive Class</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="timeSelect" data-i18n="f_time_lbl">Preferred Location & Mode *</label>
+                  <select id="timeSelect" class="form-control" required>
+                    <option value="weekend" data-i18n="opt_t1">Puchong Physical Class</option>
+                    <option value="weekday" data-i18n="opt_t2">Setapak / Rawang Physical Class</option>
+                    <option value="online" data-i18n="opt_t3">Live Online Class</option>
+                    <option value="flexible" data-i18n="opt_t4">Flexible — Please Recommend</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label data-i18n="f_trait_lbl">Student Traits / Goals (Click to select multiple):</label>
+                <div class="trait-tags" id="traitContainer">
+                  <span class="trait-chip" onclick="toggleTrait(this)" data-i18n="tr_1">Complete Beginner</span>
+                  <span class="trait-chip" onclick="toggleTrait(this)" data-i18n="tr_2">Active / Improve Focus</span>
+                  <span class="trait-chip" onclick="toggleTrait(this)" data-i18n="tr_3">Afraid of Losing / Build Resilience</span>
+                  <span class="trait-chip" onclick="toggleTrait(this)" data-i18n="tr_4">Loves Puzzles & Strategy</span>
+                  <span class="trait-chip" onclick="toggleTrait(this)" data-i18n="tr_5">Advancing Toward Dan Level</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="extraNotes" data-i18n="f_note_lbl">Additional Notes or Questions (Optional)</label>
+                <input type="text" id="extraNotes" class="form-control" placeholder="e.g., Any slots available in Puchong / Setapak / Rawang?">
+              </div>
+
+              <button type="submit" class="btn" style="width: 100%; padding: 14px; font-size: 1rem;" data-i18n="f_submit_btn">
+                🚀 Generate Trial Pass & Send via WhatsApp
+              </button>
+              <div class="form-note" data-i18n="f_foot_note">
+                🔒 Clicking submit formats your details and opens WhatsApp (+60 16-954 1603) for instant confirmation
+              </div>
+            </form>
+
+            <iframe id="googleFormIframe" class="gform-iframe-wrap" title="Trial Class Registration Form"></iframe>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 7: FAQ -->
+    <section id="faq" class="section-alt">
+      <div class="container">
+        <div class="section-header">
+          <span class="tag-badge">FAQ</span>
+          <h2 data-i18n="faq_title">Frequently Asked Questions</h2>
+          <p data-i18n="faq_sub">Answers to common questions from parents and new students:</p>
+        </div>
+
+        <div class="faq-wrap">
+          <details open>
+            <summary data-i18n="q1_q">Q1: My child is a complete beginner and very active. Will they be able to sit still?</summary>
+            <div class="faq-ans" data-i18n="q1_a">
+              Absolutely! For beginners, we avoid dry lectures and instead use interactive challenges, storytelling, and fast-paced capturing games to naturally stretch their attention span.
+            </div>
+          </details>
+
+          <details>
+            <summary data-i18n="q2_q">Q2: My child hates losing and gets upset easily when defeated. Can Go help?</summary>
+            <div class="faq-ans" data-i18n="q2_a">
+              That is precisely why Go is so valuable. Cultivating Adversity Quotient (AQ) is at the heart of our teaching. We gently guide children to shift focus from "I lost" to "What move could work better next time?" in a safe, encouraging environment.
+            </div>
+          </details>
+
+          <details>
+            <summary data-i18n="q3_q">Q3: What is the best age to start? Can adults with zero experience learn too?</summary>
+            <div class="faq-ans" data-i18n="q3_a">
+              Children can start from <strong>age 5 and above</strong>. And for adults, any age is a great age to start! Our adult sessions break down concepts using clear, practical logic so you can enjoy real games right from Lesson 1.
+            </div>
+          </details>
+
+          <details>
+            <summary data-i18n="q4_q">Q4: Can we book a trial class before committing to a full term?</summary>
+            <div class="faq-ans" data-i18n="q4_a">
+              Yes! We warmly welcome parents and children to experience our classroom atmosphere first. Simply fill out the 30-second booking form above to schedule your slot.
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================
+       View 2: Online Game Recorder, Graded KataGo AI & 100 Beginner Puzzles
+       ========================================================= -->
+  <main id="view-kifu" class="app-view">
+    <section class="kifu-view-sec">
+      <div class="container kifu-container">
+        <div class="kifu-top-bar">
+          <div>
+            <span class="tag-badge" style="margin-bottom: 6px;">INTERACTIVE BOARD & GRADED AI</span>
+            <h2 style="font-size: 1.65rem;" data-i18n="sgf_title">⚫⚪ Online Game Recorder & Graded AI</h2>
+            <p style="font-size: 0.92rem; color: var(--text-muted);" data-i18n="sgf_sub">Switch between 5x5 to 19x19 boards, 5 AI difficulty levels, or 100 Beginner Puzzles. Record SGF or send to your coach for review.</p>
+          </div>
+          <button type="button" class="btn btn-outline" onclick="switchMainView('home')" data-i18n="back_home_btn">
+            ← Back to Programs & Trial Booking
+          </button>
+        </div>
+
+        <div class="kifu-app-grid" id="kifuAppGrid">
+          <!-- Left Column: Go Board & Controls -->
+          <div class="kifu-panel">
+            <div class="kifu-top-pills">
+              <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                <!-- Board Size Selector (5/7/9/13/19) -->
+                <div class="pill-group" id="boardSizeGroup">
+                  <span class="pill-label" data-i18n="lbl_size">Board</span>
+                  <select id="boardSizeSelect" class="pill-select" onchange="changeBoardSize()">
+                    <option value="5" data-i18n="sz_opt_5">5x5 (Kids Intro)</option>
+                    <option value="7" data-i18n="sz_opt_7">7x7 (Capture Practice)</option>
+                    <option value="9" selected data-i18n="sz_opt_9">9x9 (Beginner)</option>
+                    <option value="13" data-i18n="sz_opt_13">13x13 (Intermediate)</option>
+                    <option value="19" data-i18n="sz_opt_19">19x19 (Standard)</option>
+                  </select>
+                </div>
+
+                <!-- Mode Selector (Includes 100 Beginner Puzzles) -->
+                <div class="pill-group">
+                  <span class="pill-label" data-i18n="lbl_mode">Mode</span>
+                  <select id="opponentSelect" class="pill-select" onchange="changeOpponent()">
+                    <option value="human" data-i18n="md_opt_human">👥 2-Player / Free Record</option>
+                    <option value="ai" data-i18n="md_opt_ai">🤖 vs Computer AI (White)</option>
+                    <option value="puzzle" data-i18n="md_opt_puzzle">🧩 100 Beginner Puzzles</option>
+                  </select>
+                </div>
+
+                <!-- AI Difficulty Selector -->
+                <div class="pill-group highlight-ai" id="aiLevelGroup" style="display: none;">
+                  <span class="pill-label" data-i18n="lbl_level">Level</span>
+                  <select id="aiLevelSelect" class="pill-select" onchange="changeAILevel()">
+                    <option value="1" selected data-i18n="lv_opt_1">🌱 Lv.1 Gentle (For Novices)</option>
+                    <option value="2" data-i18n="lv_opt_2">🐣 Lv.2 Easy (~18k)</option>
+                    <option value="3" data-i18n="lv_opt_3">⚔️ Lv.3 Medium (~10k)</option>
+                    <option value="4" data-i18n="lv_opt_4">🔥 Lv.4 Strong (~5k)</option>
+                    <option value="5" data-i18n="lv_opt_5">👑 Lv.5 Master KataGo (Dan)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Top Right Controls: Enlarge Board + Sound -->
+              <div class="top-ctrl-btns">
+                <button type="button" id="zoomBoardBtn" class="snd-toggle-btn" onclick="toggleBoardZoom()">🔍 Enlarge Board</button>
+                <button type="button" id="sndBtn" class="snd-toggle-btn" onclick="toggleSound()">🔊 Sound</button>
+              </div>
+            </div>
+
+            <!-- Speed Go Intro (Upper / Middle / Lower) 144 Puzzles Control Bar -->
+            <div id="puzzleCtrlBar" style="display: none; background: #FFFBEB; border: 2px solid #F59E0B; border-radius: 16px; padding: 12px 16px; margin-bottom: 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
+                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                  <span style="font-weight: 800; color: #B45309; font-size: 0.9rem;" id="pzStageBadge">📘 入门(上)</span>
+                  <select id="puzzleBookSelect" class="pill-select" style="background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 8px; padding: 4px 8px; font-size: 0.84rem; color: #B45309;" onchange="filterPuzzleByBook(this.value)">
+                    <option value="all">📚 All 3 Books (144)</option>
+                    <option value="1">📘 Book 1: Intro Upper (1-48)</option>
+                    <option value="2">📗 Book 2: Intro Middle (49-96)</option>
+                    <option value="3">📙 Book 3: Intro Lower (97-144)</option>
+                  </select>
+                  <select id="puzzleSelect" class="pill-select" style="background: #FFFFFF; border: 1px solid #F59E0B; border-radius: 8px; padding: 4px 10px; font-size: 0.84rem;" onchange="loadPuzzleByIndex(this.value)"></select>
+                </div>
+                <div style="display: flex; gap: 6px;">
+                  <button type="button" class="snd-toggle-btn" onclick="stepPuzzle(-1)" id="pzPrevBtn">⬅️ Prev</button>
+                  <button type="button" class="snd-toggle-btn" style="background: #FEF3C7; border-color: #F59E0B; color: #B45309;" onclick="showPuzzleHint()" id="pzHintBtn">💡 Hint</button>
+                  <button type="button" class="snd-toggle-btn" onclick="stepPuzzle(1)" id="pzNextBtn">Next ➡️</button>
+                </div>
+              </div>
+              <div id="puzzlePromptText" style="font-size: 0.92rem; font-weight: 700; color: var(--text-main);">
+                🎯 Black to play: Find the key point!
+              </div>
+            </div>
+
+            <!-- Scoreboard -->
+            <div class="score-box">
+              <div class="score-side" id="player-black">
+                <div class="score-stone black"></div>
+                <div class="score-meta">
+                  <div class="score-name" id="dispPB">Black</div>
+                  <div class="score-caps"><span data-i18n="lbl_caps">Captures</span>: <span id="capB">0</span></div>
+                </div>
+              </div>
+
+              <div class="score-center">
+                <div class="move-badge"><span id="curMoveNum">0</span> / <span id="totMoveNum">0</span></div>
+                <div class="move-status-text" id="moveInfo">⚫ Black to play</div>
+              </div>
+
+              <div class="score-side right inactive" id="player-white">
+                <div class="score-meta" style="text-align: right;">
+                  <div class="score-name" id="dispPW">White</div>
+                  <div class="score-caps"><span data-i18n="lbl_caps">Captures</span>: <span id="capW">0</span></div>
+                </div>
+                <div class="score-stone white"></div>
+              </div>
+            </div>
+
+            <!-- Board Canvas & Pass Overlay -->
+            <div class="board-wrapper">
+              <canvas id="goBoard" width="660" height="660"></canvas>
+
+              <!-- Pass / Game Over Notice Card -->
+              <div id="boardPassNotice" class="board-pass-notice" hidden>
+                <div class="pass-notice-card">
+                  <div class="pass-notice-icon" id="passNoticeIcon">⏸️</div>
+                  <div class="pass-notice-title" id="passNoticeTitle">🤖 Computer AI Passed!</div>
+                  <div class="pass-notice-desc" id="passNoticeDesc">
+                    The AI thinks the game is finished. If you agree there are no more useful moves, click below to Pass and see the final score; otherwise, just keep playing on the board!
+                  </div>
+                  <div class="pass-notice-actions" id="passNoticeActions">
+                    <button type="button" class="pass-btn-primary" id="passConfirmEndBtn" onclick="passTurn(false)">
+                      ⏭️ Pass Too (End Game & Count Score)
+                    </button>
+                    <button type="button" class="pass-btn-primary" id="passNewGameBtn" style="display: none;" onclick="startNewGame()">
+                      ✨ New Game / Play Again
+                    </button>
+                    <button type="button" class="pass-btn-secondary" id="passContinueBtn" onclick="hidePassNotice()">
+                      👀 Keep Playing (Close Notice)
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Navigation Playbar -->
+            <div class="nav-playbar">
+              <button type="button" class="nav-play-btn" id="navBtnFirst" title="First Move" onclick="navStep(-9999)">|&lt;</button>
+              <button type="button" class="nav-play-btn" id="navBtnBack10" title="Back 10 Moves" onclick="navStep(-10)">&lt;&lt;</button>
+              <button type="button" class="nav-play-btn" id="navBtnPrev" title="Previous Move" onclick="navStep(-1)">&lt;</button>
+              <button type="button" class="nav-play-btn" id="navBtnNext" title="Next Move" onclick="navStep(1)">&gt;</button>
+              <button type="button" class="nav-play-btn" id="navBtnFwd10" title="Forward 10 Moves" onclick="navStep(10)">&gt;&gt;</button>
+              <button type="button" class="nav-play-btn" id="navBtnLast" title="Last Move" onclick="navStep(9999)">&gt;|</button>
+              <button type="button" class="nav-play-btn mode-last" id="numToggleBtn" title="Toggle Move Markers" onclick="toggleMoveNums()">🎯 Last</button>
+            </div>
+
+            <!-- Move Slider -->
+            <div class="slider-row">
+              <input type="range" id="moveSlider" min="0" max="0" value="0" aria-label="Move Slider" oninput="onSliderInput(this.value)">
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+              <button type="button" class="btn-action" onclick="undoMove()" data-i18n="btn_undo">↩️ Undo</button>
+              <button type="button" class="btn-action" id="passActionBtn" onclick="passTurn(false)" data-i18n="btn_pass">⏭️ Pass</button>
+              <button type="button" class="btn-action" id="estBtn" onclick="toggleEstimate()" data-i18n="btn_est">📊 Score Est.</button>
+              <button type="button" class="btn-action" onclick="startNewGame()" data-i18n="btn_reset">🔄 New Game</button>
+            </div>
+
+            <!-- KataGo Score Estimation Panel -->
+            <div class="est-panel" id="estPanel" hidden>
+              <div class="est-lead-text" id="estLeadText">⏳ Analyzing score & winrate...</div>
+              <div class="est-winbar">
+                <div class="est-winbar-fill" id="estWinBarFill"></div>
+              </div>
+              <div class="est-wintxt">
+                <span id="estBlackWin">⚫ Black 50%</span>
+                <span id="estSourceNote">Komi 7.5 · KataGo b15</span>
+                <span id="estWhiteWin">⚪ White 50%</span>
+              </div>
+              <div class="est-newgame-wrap">
+                <button type="button" class="btn-new-game" onclick="startNewGame()" data-i18n="btn_new_game_bottom">
+                  ✨ New Game / Play Again
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Game Info, SGF I/O & Send to Coach -->
+          <div class="kifu-panel" id="kifuRightPanel">
+            <h3 style="font-size: 1.25rem; margin-bottom: 14px;" data-i18n="kifu_right_title">📝 Game Details & SGF Record</h3>
+            
+            <div class="meta-grid-2">
+              <div>
+                <label for="metaPB" style="font-size: 0.82rem; font-weight: 700; display: block; margin-bottom: 4px;" data-i18n="lbl_pb">⚫ Black Player Name</label>
+                <input type="text" id="metaPB" class="form-control" style="padding: 8px 12px; font-size: 0.88rem;" placeholder="e.g., Student Name" oninput="syncMetaNames()">
+              </div>
+              <div>
+                <label for="metaPW" style="font-size: 0.82rem; font-weight: 700; display: block; margin-bottom: 4px;" data-i18n="lbl_pw">⚪ White Player Name</label>
+                <input type="text" id="metaPW" class="form-control" style="padding: 8px 12px; font-size: 0.88rem;" placeholder="e.g., Opponent / AI" oninput="syncMetaNames()">
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 14px;">
+              <label for="metaNotes" style="font-size: 0.82rem; font-weight: 700; display: block; margin-bottom: 4px;" data-i18n="lbl_kifu_notes">💭 Notes or Questions for Your Coach (e.g., Move #)</label>
+              <textarea id="metaNotes" class="form-control" style="height: 68px; padding: 8px 12px; font-size: 0.88rem; resize: vertical;" placeholder="e.g., I wasn't sure where to play at Move 15..."></textarea>
+            </div>
+
+            <label for="sgfInput" style="font-size: 0.82rem; font-weight: 700; display: block; margin-bottom: 6px;" data-i18n="lbl_sgf_box">📂 SGF Code (Upload .sgf file, auto-generate, or paste code)</label>
+            <textarea id="sgfInput" class="sgf-textarea" placeholder="(;GM[1]FF[4]SZ[9]...)"></textarea>
+
+            <!-- Hidden Local SGF File Input -->
+            <input type="file" id="sgfFileInput" accept=".sgf,.txt" style="display: none;" onchange="handleSgfFileUpload(event)">
+
+            <!-- SGF Action Buttons -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+              <button type="button" class="btn-action" style="grid-column: 1 / -1; background: #FEF3C7; border-color: var(--accent-amber); color: #B45309;" onclick="document.getElementById('sgfFileInput').click()" data-i18n="btn_sgf_upload">📂 Upload .sgf File from Device</button>
+              <button type="button" class="btn-action" onclick="loadSgfFromBox()" data-i18n="btn_sgf_load">📥 Load SGF Text</button>
+              <button type="button" class="btn-action" id="btnAutoPlay" onclick="playSGF()" data-i18n="btn_sgf_play">▶️ Auto Replay</button>
+              <button type="button" class="btn-action" onclick="copySgfText()" data-i18n="btn_sgf_copy">📋 Copy SGF</button>
+              <button type="button" class="btn-action" onclick="downloadSgfFile()" data-i18n="btn_sgf_dl">💾 Download .sgf</button>
+            </div>
+
+            <!-- Select Coach for Game Review -->
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label for="kifuCoachSelect" style="font-size: 0.82rem; font-weight: 700; display: block; margin-bottom: 5px;" data-i18n="lbl_pick_coach">👨‍🏫 Select Coach for Game Review:</label>
+              <select id="kifuCoachSelect" class="form-control" style="padding: 9px 12px; font-size: 0.9rem; font-weight: 600;">
+                <option value="mengchun" data-i18n="opt_coach_mc">Coach Lim Meng Chun (016-954 1603)</option>
+                <option value="khaiyong" data-i18n="opt_coach_ky">Coach Cheng Khai Yong (012-200 9396)</option>
+                <option value="qingxiang" data-i18n="opt_coach_qx">Coach Cheng Qing Xiang (016-232 2768)</option>
+              </select>
+            </div>
+
+            <button type="button" class="btn" style="width: 100%; padding: 13px; font-size: 0.96rem;" onclick="sendKifuToTeacher()" data-i18n="btn_send_kifu">
+              💬 Send Game & Questions to Coach (WhatsApp)
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Section 8: Footer -->
+  <footer class="cta-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h2 data-i18n="ft_title">Ready for Your First Game of Go?</h2>
+          <p data-i18n="ft_desc">Click below to message Coach Meng Chun directly on WhatsApp for trial slots and class schedules.</p>
+          <a id="wa-footer" href="https://wa.me/60169541603?text=Hi%20Coach%20Meng%20Chun%2C%20I%20would%20like%20to%20enquire%20about%20booking%20a%20Go%20trial%20class%20at%20World%20Star%20Go." target="_blank" rel="noopener noreferrer" class="btn" style="padding: 15px 32px; font-size: 1.02rem;" data-i18n="ft_btn">
+            💬 WhatsApp Coach Meng Chun Now
+          </a>
+        </div>
+
+        <div class="contact-card">
+          <div class="contact-item" data-i18n="ft_loc">
+            <strong>📍 Academy Locations</strong>
+            World Star Go Academy 世星围棋<br>
+            Puchong · Setapak · Rawang
+          </div>
+          <div class="contact-item" data-i18n="ft_mode">
+            <strong>🕒 Class Modes</strong>
+            Small-Group Physical Classes ／ Live Online Classes ／ School Holiday Camps
+          </div>
+          <div class="contact-item" style="margin-bottom: 0;" data-i18n="ft_coach">
+            <strong>👨‍🏫 Head Instructor</strong>
+            Coach Lim Meng Chun · +60 16-954 1603
+          </div>
+        </div>
+      </div>
+
+      <div class="copyright" data-i18n="ft_copy">
+        © 2011–2026 World Star Go (Puchong · Setapak · Rawang) · Inspiring Independent Thinking & Resilience Through Go
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification Element -->
+  <div id="toastEl" class="toast-msg" role="status" aria-live="polite"></div>
+
+  <!-- =====================================================
+       Script Part 1: View Switching + Bilingual Dictionary (EN Default) + Trial Form
+       ===================================================== -->
+  <script>
+    const WHATSAPP_NUMBER = "60169541603";
+    const GOOGLE_FORM_URL = "";
+    let currentLang = "en";
+    let currentView = "home";
+    let toastTimer = null;
+
+    function showToast(msg) {
+      const el = document.getElementById('toastEl');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        el.classList.remove('show');
+      }, 2800);
+    }
+
+    function switchMainView(viewName) {
+      currentView = viewName;
+      const homeEl = document.getElementById('view-home');
+      const kifuEl = document.getElementById('view-kifu');
+      const tabHome = document.getElementById('tab-home');
+      const tabKifu = document.getElementById('tab-kifu');
+      const subNav = document.getElementById('home-sub-nav');
+
+      if (typeof stopAutoPlay === 'function') stopAutoPlay();
+
+      if (viewName === 'kifu') {
+        homeEl.classList.remove('active-view');
+        kifuEl.classList.add('active-view');
+        tabHome.classList.remove('active');
+        tabKifu.classList.add('active');
+        if (subNav) subNav.style.display = 'none';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (typeof resizeBoardCanvas === 'function') {
+          setTimeout(resizeBoardCanvas, 40);
+        }
+      } else {
+        kifuEl.classList.remove('active-view');
+        homeEl.classList.add('active-view');
+        tabKifu.classList.remove('active');
+        tabHome.classList.add('active');
+        if (subNav) subNav.style.display = '';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    const i18nData = {
+      en: {
+        nav_sub: "Puchong · Setapak · Rawang",
+        tab_home: "🏫 Programs & Trial",
+        tab_kifu: "⚫⚪ Go Board & AI",
+        back_home_btn: "← Back to Programs & Trial Booking",
+        lbl_size: "Board",
+        lbl_mode: "Mode",
+        lbl_level: "Level",
+        sz_opt_5: "5x5 (Kids Intro)",
+        sz_opt_7: "7x7 (Capture Practice)",
+        sz_opt_9: "9x9 (Beginner)",
+        sz_opt_13: "13x13 (Intermediate)",
+        sz_opt_19: "19x19 (Standard)",
+        md_opt_human: "👥 2-Player / Free Record",
+        md_opt_ai: "🤖 vs Computer AI (White)",
+        md_opt_puzzle: "🧩 100 Beginner Puzzles",
+        lv_opt_1: "🌱 Lv.1 Gentle (For Novices)",
+        lv_opt_2: "🐣 Lv.2 Easy (~18k)",
+        lv_opt_3: "⚔️ Lv.3 Medium (~10k)",
+        lv_opt_4: "🔥 Lv.4 Strong (~5k)",
+        lv_opt_5: "👑 Lv.5 Master KataGo (Dan)",
+        lbl_caps: "Captures",
+        btn_undo: "↩️ Undo",
+        btn_pass: "⏭️ Pass",
+        btn_est: "📊 Score Est.",
+        btn_reset: "🔄 New Game",
+        btn_new_game_bottom: "✨ New Game / Play Again",
+        kifu_right_title: "📝 Game Details & SGF Record",
+        lbl_pb: "⚫ Black Player Name",
+        lbl_pw: "⚪ White Player Name",
+        lbl_kifu_notes: "💭 Notes or Questions for Your Coach (e.g., Move #)",
+        lbl_sgf_box: "📂 SGF Code (Upload .sgf file, auto-generate, or paste code)",
+        btn_sgf_upload: "📂 Upload .sgf File from Device",
+        btn_sgf_load: "📥 Load SGF Text",
+        btn_sgf_play: "▶️ Auto Replay",
+        btn_sgf_copy: "📋 Copy SGF",
+        btn_sgf_dl: "💾 Download .sgf",
+        lbl_pick_coach: "👨‍🏫 Select Coach for Game Review:",
+        opt_coach_mc: "Coach Lim Meng Chun (016-954 1603)",
+        opt_coach_ky: "Coach Cheng Khai Yong (012-200 9396)",
+        opt_coach_qx: "Coach Cheng Qing Xiang (016-232 2768)",
+        btn_send_kifu: "💬 Send Game & Questions to Coach (WhatsApp)",
+        nav_phil: "Philosophy",
+        nav_course: "Programs",
+        nav_coach: "Our Coaches",
+        nav_moments: "Moments & Events",
+        nav_faq: "FAQ",
+        nav_cta: "Book a Trial",
+        hero_badge: "📍 Puchong · Setapak · Rawang · Mind Sports & Character Building",
+        hero_title: "Beyond Black & White:<br>Inspiring <span>Logical Thinking & Resilience</span>",
+        hero_desc: "We teach far more than just winning on the board. Established in 2011, our warm, interactive classes help <strong>complete beginners to Dan-level players</strong> (kids & adults) build deep focus, strategic reasoning, and emotional resilience.",
+        hero_btn_form: "📝 30-Sec Trial Registration",
+        hero_btn_sgf: "⚫⚪ Play AI / Record Game",
+        hero_btn_wa: "💬 Chat via WhatsApp",
+        stat1_num: "Since 2011",
+        stat1_lbl: "Dedicated to Go Education",
+        stat2_num: "Beginner~Dan",
+        stat2_lbl: "Structured Step-by-Step Curriculum",
+        stat3_num: "Small Groups",
+        stat3_lbl: "Cognitive & Emotional Guidance",
+        hero_quote: "\"Every game of Go is a journey of independent problem-solving. Learning how to handle mistakes is far more valuable than winning a single match.\"",
+        hero_quote_sub: "— Core Philosophy of World Star Go",
+        phil_title: "Why Learn Go (Weiqi)? We Focus on Lifelong Growth",
+        phil_sub: "No rigid rote memorization. With patient and encouraging guidance, every lesson is a training ground for critical thinking and character.",
+        phil1_t: "Spark Logical Thinking, Not Rote Memory",
+        phil1_d: "We don't train robotic memorizers. Through guided questions and scenario breakdowns, we teach students to observe the whole board, weigh trade-offs, and reason independently.",
+        phil2_t: "Build Adversity Quotient (AQ) & Resilience",
+        phil2_d: "Many children fear losing and get frustrated easily when behind. Through supportive post-game reviews, we guide students to embrace mistakes calmly and turn setbacks into the courage to try again.",
+        phil3_t: "Warm & Engaging Small-Group Classes",
+        phil3_d: "Teaching since 2011, we understand every child's attention span. Interactive challenges keep active kids engaged and help them fall in love with deep focus.",
+        crs_title: "Tailored Programs for Kids & Adults",
+        crs_sub: "Whether you are a complete novice or an advancing player aiming for Dan ranks, we have the right class for you.",
+        c1_tag: "For: Kids Aged 5+ (Complete Beginners)",
+        c1_title: "🌟 Kids Beginner Class (Foundation)",
+        c1_b1: "Master Go rules, board etiquette, and capturing techniques through fun stories & games",
+        c1_b2: "Gradually extend attention span and calm focus in a supportive environment",
+        c1_b3: "Develop spatial awareness and enjoy playing real games from the very first lesson",
+        c1_btn: "Book Beginner Trial",
+        c2_tag: "For: Kids from Basic to Dan Level",
+        c2_title: "🚀 Kids Intermediate & Dan-Level Class",
+        c2_b1: "Master opening strategy, middle-game tactics, life-and-death calculation & endgame",
+        c2_b2: "In-depth game reviews to sharpen multi-step reading and logical deduction",
+        c2_b3: "Preparation for youth tournaments and Kyu/Dan grading tests while building mental toughness",
+        c2_btn: "Book Level Assessment",
+        c3_tag: "For: Adult Beginners & Enthusiasts",
+        c3_title: "🍵 Adult Beginner & Interest Class",
+        c3_b1: "Learn Go through clear, structured logic—free from confusing jargon",
+        c3_b2: "Unwind after work in a friendly, mindful atmosphere over the Go board",
+        c3_b3: "Ideal for adults seeking a rewarding mental hobby or parents learning alongside their kids",
+        c3_btn: "Enquire Adult Class",
+        c4_tag: "For: School Holidays & Remote Students",
+        c4_title: "🏕️ Holiday Camps & Interactive Online Classes",
+        c4_b1: "School Holiday Camps: Intensive themed training, team relays, and tactical puzzles",
+        c4_b2: "Live Online Classes (Small Group / 1-on-1): Learn and review effectively from home",
+        c4_b3: "Regular in-house matches and mind-sports events to celebrate progress",
+        c4_btn: "Enquire Holiday Camp / Online",
+        coach_card_name: "Coach Lim Meng Chun",
+        coach_title: "Meet Our Coaching Team",
+        coach_sub: "Dedicated to Go education since 2011, our experienced coaches guide students step-by-step from complete beginners to Dan ranks.",
+        c_ky_name: "Coach Cheng Khai Yong",
+        c_ky_rank: "✦ Amateur 5-Dan",
+        c_ky_role: "✦ Advanced Strategy & Dan Promotion",
+        c_ky_desc: "Backed by strong tournament experience, Coach Khai Yong specializes in middle-game tactics, deep life-and-death calculation, and whole-board judgment for advancing students.",
+        c_qx_name: "Coach Cheng Qing Xiang",
+        c_qx_rank: "✦ Amateur 1-Dan",
+        c_qx_role: "✦ Beginner Foundation & Kyu Training",
+        c_qx_desc: "Patient, warm, and engaging, Coach Qing Xiang uses interactive challenges and stories to spark beginners' interest while building rock-solid fundamentals.",
+        c_mc_name: "Coach Lim Meng Chun",
+        c_mc_rank: "✦ Amateur 1-Dan",
+        c_mc_role: "✦ Secretary, Malaysia Weiqi Association",
+        c_mc_desc: "Teaching full-time since 2011, Coach Meng Chun focuses on inspiring logical thinking and cultivating Adversity Quotient (AQ) through supportive post-game reviews.",
+        coach_quote: "\"We look forward to welcoming you and your child to the Go board!\"",
+        mom_title: "Classroom Moments & Tournament Highlights",
+        mom_sub: "From quiet contemplation in class to courageous matches at national tournaments, we celebrate every step of our students' growth.",
+        ev_head: "📅 Upcoming Events & Tournaments",
+        ev_sub: "Contact Coach Meng Chun for the latest schedule & slots",
+        ev1_tag: "🔥 Open for Registration · School Holidays",
+        ev1_t: "School Holiday Go Intensive Camp",
+        ev1_d: "Immersive holiday training combining tactical puzzle challenges, team matches, and guided game reviews—helping kids sharpen calculation and make great friends.",
+        ev1_m: "<strong>🎯 For:</strong> Complete Beginners to Dan-Level Groups<br><strong>📍 Locations:</strong> Puchong ／ Setapak ／ Rawang",
+        ev2_tag: "🏆 Official Tournaments · Real Experience",
+        ev2_t: "MWA Tournaments & Youth Mind Sports Events",
+        ev2_d: "We regularly lead students to participate in national championships, inter-school cups, and mall mind-sports tournaments (U9 / U12 / U18) to build sportsmanship and poise under pressure.",
+        ev2_m: "<strong>🎯 Support:</strong> Pre-tournament mock matches & mindset coaching<br><strong>🤝 Organizer/Partner:</strong> Malaysia Weiqi Association (MWA)",
+        ev3_tag: "✨ Open Year-Round · Progressive Learning",
+        ev3_t: "Weekly Regular Classes & In-House Grading",
+        ev3_d: "Weekly small-group sessions complemented by regular internal practice matches and rank assessments, giving every student clear milestones and steady confidence.",
+        ev3_m: "<strong>🎯 Schedule:</strong> Weekend & Weekday slots available<br><strong>💬 Booking:</strong> Register via the 30-sec form or WhatsApp",
+        gal_head: "📸 Classroom & Tournament Gallery",
+        gal_sub: "Capturing moments of focus, reflection, and growth",
+        g1_tag: "Interactive Classes",
+        g1_t: "Deep Focus in Action",
+        g1_d: "In our warm small-group setting, active kids gradually learn to calm down, observe carefully, and think several moves ahead.",
+        g2_tag: "Game Review & AQ",
+        g2_t: "Grace in Winning & Learning from Defeat",
+        g2_d: "Post-game review matters more than the score. We listen to each child's thought process and turn mistakes into curiosity.",
+        g3_tag: "Holiday Camp",
+        g3_t: "Joyful Holiday Training Camps",
+        g3_d: "Away from digital screens, students enjoy team challenges, capturing games, and collaborative learning with peers.",
+        g4_tag: "Tournament Spirit",
+        g4_t: "Courage on the Tournament Floor",
+        g4_d: "Representing the academy in regional and national youth tournaments with proper etiquette and resilience.",
+        sgf_title: "⚫⚪ Online Game Recorder & Graded AI",
+        sgf_sub: "Switch between 5x5 to 19x19 boards, 5 AI difficulty levels, or 100 Beginner Puzzles. Record SGF or send to your coach for review.",
+        bk_title: "Book a Trial Class in 30 Seconds",
+        bk_sub: "Fill in the quick form below and Coach Meng Chun will arrange the most suitable trial slot for you.",
+        bk_left_t: "🎯 What Happens in a Trial Session?",
+        bk_left_p: "Every trial class is designed to be fun and meaningful for the student while giving parents clear insights:",
+        st1_t: "Fun Ice-Breaker & Interactive Rules (15 mins)",
+        st1_d: "Engaging introduction to the board, stones, and liberties that sparks instant curiosity.",
+        st2_t: "Hands-On Mini-Board Match (20 mins)",
+        st2_d: "Real gameplay to observe the student's focus, spatial observation, and emotional response.",
+        st3_t: "1-on-1 Post-Class Consultation (10 mins)",
+        st3_d: "Coach Meng Chun shares personalized feedback with parents and recommends the ideal learning pathway.",
+        f_name_lbl: "Parent / Student Name *",
+        f_age_lbl: "Student's Age *",
+        f_crs_lbl: "Interested Program *",
+        opt_c1: "🌟 Kids Beginner Class (Zero Foundation)",
+        opt_c2: "🚀 Kids Intermediate / Dan Class",
+        opt_c3: "🍵 Adult Beginner / Interest Class",
+        opt_c4: "🏕️ Holiday Camp / Online Interactive Class",
+        f_time_lbl: "Preferred Location & Mode *",
+        opt_t1: "Puchong Physical Class",
+        opt_t2: "Setapak / Rawang Physical Class",
+        opt_t3: "Live Online Class",
+        opt_t4: "Flexible — Please Recommend",
+        f_trait_lbl: "Student Traits / Goals (Click to select multiple):",
+        tr_1: "Complete Beginner",
+        tr_2: "Active / Improve Focus",
+        tr_3: "Afraid of Losing / Build Resilience",
+        tr_4: "Loves Puzzles & Strategy",
+        tr_5: "Advancing Toward Dan Level",
+        f_note_lbl: "Additional Notes or Questions (Optional)",
+        f_submit_btn: "🚀 Generate Trial Pass & Send via WhatsApp",
+        f_foot_note: "🔒 Clicking submit formats your details and opens WhatsApp (+60 16-954 1603) for instant confirmation",
+        faq_title: "Frequently Asked Questions",
+        faq_sub: "Answers to common questions from parents and new students:",
+        q1_q: "Q1: My child is a complete beginner and very active. Will they be able to sit still?",
+        q1_a: "Absolutely! For beginners, we avoid dry lectures and instead use interactive challenges, storytelling, and fast-paced capturing games to naturally stretch their attention span.",
+        q2_q: "Q2: My child hates losing and gets upset easily when defeated. Can Go help?",
+        q2_a: "That is precisely why Go is so valuable. Cultivating Adversity Quotient (AQ) is at the heart of our teaching. We gently guide children to shift focus from \"I lost\" to \"What move could work better next time?\" in a safe, encouraging environment.",
+        q3_q: "Q3: What is the best age to start? Can adults with zero experience learn too?",
+        q3_a: "Children can start from <strong>age 5 and above</strong>. And for adults, any age is a great age to start! Our adult sessions break down concepts using clear, practical logic so you can enjoy real games right from Lesson 1.",
+        q4_q: "Q4: Can we book a trial class before committing to a full term?",
+        q4_a: "Yes! We warmly welcome parents and children to experience our classroom atmosphere first. Simply fill out the 30-second booking form above to schedule your slot.",
+        ft_title: "Ready for Your First Game of Go?",
+        ft_desc: "Click below to message Coach Meng Chun directly on WhatsApp for trial slots and class schedules.",
+        ft_btn: "💬 WhatsApp Coach Meng Chun Now",
+        ft_loc: "<strong>📍 Academy Locations</strong>World Star Go Academy 世星围棋<br>Puchong · Setapak · Rawang",
+        ft_mode: "<strong>🕒 Class Modes</strong>Small-Group Physical Classes ／ Live Online Classes ／ School Holiday Camps",
+        ft_coach: "<strong>👨‍🏫 Head Instructor</strong>Coach Lim Meng Chun · +60 16-954 1603",
+        ft_copy: "© 2011–2026 World Star Go (Puchong · Setapak · Rawang) · Inspiring Independent Thinking & Resilience Through Go"
+      },
+      zh: {
+        nav_sub: "蒲种 · 文良港 · 万挠",
+        tab_home: "🏫 课程与试课",
+        tab_kifu: "⚫⚪ 棋盘与 AI 对弈",
+        back_home_btn: "← 返回课程介绍与试课预约",
+        lbl_size: "棋盘",
+        lbl_mode: "模式",
+        lbl_level: "难度",
+        sz_opt_5: "5 路盘 (幼童破冰)",
+        sz_opt_7: "7 路盘 (吃子练习)",
+        sz_opt_9: "9 路盘 (启蒙入门)",
+        sz_opt_13: "13 路盘 (进阶过渡)",
+        sz_opt_19: "19 路盘 (标准棋盘)",
+        md_opt_human: "👥 双人记谱 / 自由打谱",
+        md_opt_ai: "🤖 vs 电脑 AI (AI执白)",
+        md_opt_puzzle: "🧩 Speed Go Intro Puzzles (上·中·下 144)",
+        lv_opt_1: "🌱 Lv.1 启蒙陪练 (新手推荐)",
+        lv_opt_2: "🐣 Lv.2 初级入门 (约18级)",
+        lv_opt_3: "⚔️ Lv.3 进阶挑战 (约10级)",
+        lv_opt_4: "🔥 Lv.4 中级突破 (约5级)",
+        lv_opt_5: "👑 Lv.5 宗师 KataGo (段位)",
+        lbl_caps: "提子",
+        btn_undo: "↩️ 悔棋",
+        btn_pass: "⏭️ 虚手 (Pass)",
+        btn_est: "📊 形势判断",
+        btn_reset: "🔄 新对局 / 重置",
+        btn_new_game_bottom: "✨ 新对局 / 再来一局",
+        kifu_right_title: "📝 对局记录与 SGF 棋谱",
+        lbl_pb: "⚫ 黑方姓名",
+        lbl_pw: "⚪ 白方姓名",
+        lbl_kifu_notes: "💭 本局心得或想请教老师的问题（比如第几手）",
+        lbl_sgf_box: "📂 SGF 棋谱代码（可上传 .sgf 文件、随落子生成或粘贴代码）",
+        btn_sgf_upload: "📂 从手机 / 电脑上传 .sgf 棋谱文件",
+        btn_sgf_load: "📥 载入上方代码",
+        btn_sgf_play: "▶️ 自动播放演示",
+        btn_sgf_copy: "📋 复制 SGF 代码",
+        btn_sgf_dl: "💾 下载 .sgf 文件",
+        lbl_pick_coach: "👨‍🏫 选择发送复盘的导师：",
+        opt_coach_mc: "林明俊老师 (Coach Meng Chun · 016-954 1603)",
+        opt_coach_ky: "钟凯荣老师 (Coach Khai Yong · 012-200 9396)",
+        opt_coach_qx: "曾庆祥老师 (Coach Qing Xiang · 016-232 2768)",
+        btn_send_kifu: "💬 一键将棋谱与问题发送给导师 (WhatsApp)",
+        nav_phil: "教学理念",
+        nav_course: "课程体系",
+        nav_coach: "关于导师",
+        nav_moments: "课堂与赛事",
+        nav_faq: "常见问题",
+        nav_cta: "预约体验课",
+        hero_badge: "📍 蒲种 · 文良港 · 万挠 · 启发式围棋教育",
+        hero_title: "在黑白世界里，<br>启发孩子的<span>独立思考与抗挫力</span>",
+        hero_desc: "我们教的不只是棋盘上的胜负。自2011年成立至今，专为<strong>零基础至段位</strong>小朋友与成人打造有温度的互动课堂——让孩子学会静心专注、独立推理，在顺境与逆境中养成强大的心理韧性。",
+        hero_btn_form: "📝 30秒填表预约试课",
+        hero_btn_sgf: "⚫⚪ 进入线上棋盘 & AI 对弈",
+        hero_btn_wa: "💬 WhatsApp 直接咨询",
+        stat1_num: "2011年",
+        stat1_lbl: "成立至今深耕围棋教育",
+        stat2_num: "0基础~段位",
+        stat2_lbl: "清晰扎实的成长阶梯",
+        stat3_num: "小班互动",
+        stat3_lbl: "兼顾思维启发与心理引导",
+        hero_quote: "“一盘棋就是一次独立面对问题的过程。学会怎样面对失误，比赢下一盘棋更珍贵。”",
+        hero_quote_sub: "—— World Star Go 教学核心理念",
+        phil_title: "为什么让孩子学围棋？我们关注长远成长",
+        phil_sub: "告别枯燥说教与死记硬背，在温和坚定的引导下，让每一堂课都成为思维与品格的锻炼场。",
+        phil1_t: "启发逻辑思维，拒绝死记硬背",
+        phil1_d: "我们不培养只会机械背诵定式的“做题机器”。在课堂上，老师通过提问与情景拆解，引导孩子自己观察全局、比较得失、推导下一步，建立真正的独立思考习惯。",
+        phil2_t: "锻炼抗挫折力 (AQ)，赢不骄败不馁",
+        phil2_d: "很多孩子天生怕输、一遇到落后就容易情绪崩溃。我们极为重视对局后的复盘与心理疏导，陪伴孩子接纳失误、从败局中找方法，把“怕输”转化为“再试一次”的勇气。",
+        phil3_t: "亲切互动课堂，懂围棋更懂孩子",
+        phil3_d: "自2011年深耕围棋教学至今，我们深知不同性格孩子的专注力规律。用生动有趣的闯关和鼓励式沟通，让原本坐不住的孩子循序渐进地爱上静心思考。",
+        crs_title: "量身定制的课程体系（少儿 & 成人）",
+        crs_sub: "无论完全没接触过围棋的零基础新手，还是希望冲击段位的进阶学员，都能找到适合自己的班级。",
+        c1_tag: "适合：5岁以上零基础少儿",
+        c1_title: "🌟 少儿启蒙班（零基础入门）",
+        c1_b1: "通过趣味故事与吃子互动，轻松掌握围棋基本规则与礼仪",
+        c1_b2: "循序渐进拉长孩子的静心专注时间，告别三分钟热度",
+        c1_b3: "建立初步棋感与空间观察力，第一堂课就能体验动脑对弈的乐趣",
+        c1_btn: "预约启蒙班体验",
+        c2_tag: "适合：已掌握规则至段位水平少儿",
+        c2_title: "🚀 少儿进阶 / 段位班（实战与思维升级）",
+        c2_b1: "系统学习布局大局观、中盘攻防逻辑、死活计算与官子技巧",
+        c2_b2: "结合深度实战复盘，培养孩子多步推演与严密的逻辑链条",
+        c2_b3: "备战各类少儿围棋赛事与级位/段位考核，磨炼赛场抗压心态",
+        c2_btn: "预约进阶班评估",
+        c3_tag: "适合：零基础或进阶成人爱好者",
+        c3_title: "🍵 成人零基础 / 兴趣提升班",
+        c3_b1: "用成年人易懂的逻辑框架拆解围棋，告别云里雾里的复杂术语",
+        c3_b2: "轻松友好的对弈氛围，在忙碌工作之余享受静心手谈的乐趣",
+        c3_b3: "非常适合希望培养深度爱好，或想学会围棋陪伴孩子共同成长的家长",
+        c3_btn: "预约成人班体验",
+        c4_tag: "适合：学校假期密集提升 / 跨区域学员",
+        c4_title: "🏕️ 假期集训营 (Holiday Camp) & 线上互动课",
+        c4_b1: "学校假期专属主题营：高密度趣味专题训练、队际赛与思维拓展",
+        c4_b2: "线上互动小班 / 一对一指导：省去接送奔波，在家也能高效学棋与复盘",
+        c4_b3: "定期举办棋院内部交流赛与益智运动活动，检验学习成果",
+        c4_btn: "了解假期营与线上课",
+        coach_card_name: "林明俊老师",
+        coach_title: "专业师资团队",
+        coach_sub: "自2011年深耕围棋教育，由经验丰富的专职导师团队亲授，陪伴学员从零基础稳步迈向段位。",
+        c_ky_name: "钟凯荣 老师",
+        c_ky_rank: "✦ 围棋业余 5 段 (5-Dan)",
+        c_ky_role: "✦ 高阶实战与段位冲刺指导",
+        c_ky_desc: "拥有深厚的棋力功底与大赛实战经验，擅长中盘攻防逻辑拆解、死活深度计算与大局观培养，带领进阶学员突破计算瓶颈、冲刺高段位水平。",
+        c_qx_name: "曾庆祥 老师",
+        c_qx_rank: "✦ 围棋业余 1 段 (1-Dan)",
+        c_qx_role: "✦ 趣味启蒙与级位基础扎实训练",
+        c_qx_desc: "授课风格亲切生动、富有耐心，善于运用互动闯关与情景故事点燃零基础孩子的学棋热情，帮助学员打下扎实的吃子、死活与攻防基本功。",
+        c_mc_name: "林明俊 老师",
+        c_mc_rank: "✦ 围棋业余 1 段 (1-Dan)",
+        c_mc_role: "✦ 马来西亚围棋协会秘书",
+        c_mc_desc: "2011年投身围棋教育至今，极度重视复盘引导与心理建设，坚持「通过围棋启发独立思维，在胜负中锻炼抗挫折能力 (AQ)」，陪伴孩子建立强大的心理韧性。",
+        coach_quote: "“期待在棋盘前与你和孩子相见，一起感受独立思考与成长的乐趣！”",
+        mom_title: "课堂剪影与赛事活动动态",
+        mom_sub: "从日常教室里的专注推演，到全马赛场上的勇敢历练，我们陪伴并记录孩子的每一次成长。",
+        ev_head: "📅 近期重点活动与赛事安排",
+        ev_sub: "欢迎向老师咨询最新名额与详情",
+        ev1_tag: "🔥 热门招募 · 假期特训",
+        ev1_t: "学校假期围棋集训营 (Holiday Camp)",
+        ev1_d: "利用学校假期进行沉浸式围棋特训！结合趣味死活闯关、队际接力赛与实战复盘，帮孩子在短期内突破计算瓶颈，结交志同道合的小棋友。",
+        ev1_m: "<strong>🎯 适合对象：</strong>零基础启蒙组 ／ 进阶至段位提升组<br><strong>📍 教学点：</strong>蒲种 ／ 文良港 ／ 万挠",
+        ev2_tag: "🏆 协会赛事 · 实战历练",
+        ev2_t: "马来西亚围棋协会赛事 & 青少年交流赛",
+        ev2_d: "定期组织并带领棋院学员参与全马公开赛、校园杯及商场益智运动赛（U9 / U12 / U18 组别）。在真实赛场中锻炼大心脏，学会面对胜负与压力。",
+        ev2_m: "<strong>🎯 赛前支持：</strong>赛前模拟对局、赛场礼仪与心理建设<br><strong>🤝 主办/协办：</strong>马来西亚围棋协会 (MWA) 等",
+        ev3_tag: "✨ 常年开放 · 内部交流",
+        ev3_t: "周末常年班 & 棋院内部升级赛",
+        ev3_d: "每周固定时段小班授课，并定期举办棋院内部交流对局与级位/段位认证考核。让每一阶段的学习都有清晰反馈，稳步积累孩子的自信心。",
+        ev3_m: "<strong>🎯 课程安排：</strong>周末及平日多时段可选<br><strong>💬 预约方式：</strong>随时在线填表或 WhatsApp 预约插班体验",
+        gal_head: "📸 课堂与赛场精彩瞬间",
+        gal_sub: "点滴记录：静心、思考、复盘与蜕变",
+        g1_tag: "日常互动课堂",
+        g1_t: "静心专注的思考瞬间",
+        g1_d: "在小班温暖的氛围中，孩子们从最初的“坐不住”，慢慢学会托腮沉思、独立推演每一步棋。",
+        g2_tag: "复盘与抗挫引导",
+        g2_t: "赢不骄、败不馁的复盘时刻",
+        g2_d: "下完棋后的复盘比胜负更重要。老师耐心倾听孩子的想法，一起找出改进空间，化解怕输情绪。",
+        g3_tag: "Holiday Camp 假期营",
+        g3_t: "充满欢笑的假期集训营",
+        g3_d: "脱离电子屏幕，在团队闯关、趣味吃子赛与分组对抗中，体验高密度思考与伙伴协作的快乐。",
+        g4_tag: "赛场实战风采",
+        g4_t: "勇敢走上赛场的历练",
+        g4_d: "代表棋院参加全马及区域青少年围棋赛，在庄重的赛场礼仪中握手对局，见证每一次成长蜕变。",
+        sgf_title: "⚫⚪ 线上记谱与分级 AI 对弈",
+        sgf_sub: "支持 5路至19路棋盘切换、5 档 AI 难度调节与 100 道启蒙闯关题，可随时记谱或一键发送给导师复盘。",
+        bk_title: "30秒在线预约体验课",
+        bk_sub: "填写下方简短资料，明俊老师将为您匹配最适合的体验课时段。",
+        bk_left_t: "🎯 一堂体验课包含什么？",
+        bk_left_p: "我们希望每一堂体验课都能让孩子有所收获，同时让家长清楚了解孩子的潜能所在：",
+        st1_t: "趣味破冰与规则互动 (15分钟)",
+        st1_d: "用轻松易懂的互动方式带孩子认识棋盘与气，瞬间点燃好奇心。",
+        st2_t: "沉浸式小棋盘实战对弈 (20分钟)",
+        st2_d: "在真实落子与吃子攻防中，观察孩子的专注度、观察力与面对得失的反应。",
+        st3_t: "课后一对一学习反馈 (10分钟)",
+        st3_d: "明俊老师直接与家长交流孩子的课堂表现，给出最诚恳的班级与学习规划建议。",
+        f_name_lbl: "家长 / 学员称呼 *",
+        f_age_lbl: "学员年龄 *",
+        f_crs_lbl: "想了解的课程类型 *",
+        opt_c1: "🌟 少儿启蒙班（零基础）",
+        opt_c2: "🚀 少儿进阶 / 段位班（已有基础）",
+        opt_c3: "🍵 成人零基础 / 兴趣提升班",
+        opt_c4: "🏕️ 学校假期集训营 / 线上互动课",
+        f_time_lbl: "倾向的上课地点与形式 *",
+        opt_t1: "蒲种实体课",
+        opt_t2: "文良港 / 万挠实体课",
+        opt_t3: "线上实时互动课 (Online)",
+        opt_t4: "时间/地点灵活，请老师推荐",
+        f_trait_lbl: "学员特点或期望（可点选多项，帮助老师提前准备）：",
+        tr_1: "完全零基础",
+        tr_2: "活泼好动 / 想提升专注力",
+        tr_3: "比较怕输 / 想锻炼抗挫力",
+        tr_4: "喜欢动脑与策略游戏",
+        tr_5: "已有基础想冲刺段位",
+        f_note_lbl: "其他备注或想询问的问题（选填）",
+        f_submit_btn: "🚀 生成预约卡并发送给明俊老师 (WhatsApp)",
+        f_foot_note: "🔒 点击后将自动整理您的资料并跳转至 WhatsApp（+60 16-954 1603）完成预约确认",
+        faq_title: "家长与学员常见问题",
+        faq_sub: "我们在试课前为您整理了大家最关心的几个问题：",
+        q1_q: "Q1：孩子完全零基础，平时比较活泼好动，坐得住吗？",
+        q1_a: "完全不用担心！启蒙阶段我们不会照本宣科讲枯燥的理论，而是通过闯关互动、趣味问答和短局吃子游戏来吸引孩子的注意力，循序渐进地帮孩子建立专注习惯。",
+        q2_q: "Q2：孩子自尊心很强、特别怕输，一输棋就容易哭闹或想放弃怎么办？",
+        q2_a: "这正是让孩子学围棋最宝贵的契机。我们的课堂核心之一就是培养「抗挫折能力 (AQ)」。老师会温和地引导孩子把注意力从“我输了很丢脸”转移到“刚才哪一步棋怎么走会更好”，帮孩子在安全、受鼓励的环境里学会接纳失误。",
+        q3_q: "Q3：几岁开始学围棋最合适？大人完全没基础也能学吗？",
+        q3_a: "小朋友一般建议 <strong>5岁或以上</strong>（能够理解简单规则与基础数字概念）即可开始启蒙；而对于成年人来说，任何年龄都是学围棋的好时机！我们的成人班采用通俗易懂的逻辑拆解，让你第一堂课就能顺利上手对弈。",
+        q4_q: "Q4：正式报名前，可以先预约试课看看孩子喜不喜欢吗？",
+        q4_a: "当然可以！我们非常鼓励家长先带孩子来体验课堂氛围。在体验课中，明俊老师也会观察孩子的专注度与性格特点，课后与您沟通最适合孩子的学习建议。您可以在上方表单直接提交预约。",
+        ft_title: "准备好开启第一堂围棋课了吗？",
+        ft_desc: "欢迎点击下方按钮直接联系明俊老师，预约您的专属体验课时段，或咨询最适合孩子年龄的班级安排。",
+        ft_btn: "💬 立即通过 WhatsApp 联系明俊老师",
+        ft_loc: "<strong>📍 授课地点</strong>World Star Go Academy 世星围棋<br>蒲种 · 文良港 · 万挠",
+        ft_mode: "<strong>🕒 授课形式</strong>实体小班课 ／ 线上实时互动课 ／ 学校假期集训营",
+        ft_coach: "<strong>👨‍🏫 负责导师</strong>林明俊老师 (Coach Lim Meng Chun) · +60 16-954 1603",
+        ft_copy: "© 2011–2026 World Star Go 世星围棋 (蒲种 · 文良港 · 万挠) · 启发独立思维与抗挫折能力的专业围棋课堂"
+      }
+    };
+
+    const placeholders = {
+      en: {
+        parentName: "e.g., Mr. Tan / Mrs. Lim",
+        studentAge: "e.g., 7 years old / Adult",
+        extraNotes: "e.g., Any slots available in Puchong / Setapak / Rawang?",
+        metaPB: "e.g., Student Name",
+        metaPW: "e.g., Opponent / AI",
+        metaNotes: "e.g., I wasn't sure where to play at Move 15..."
+      },
+      zh: {
+        parentName: "例如：Mr. Tan / 陈妈妈",
+        studentAge: "例如：7岁 / 成人",
+        extraNotes: "例如：请问蒲种 / 文良港 / 万挠周六上午有空位吗？",
+        metaPB: "例如：学员名字",
+        metaPW: "例如：对手 / AI",
+        metaNotes: "例如：第 15 手我不确定该走哪边，请老师帮忙看看..."
+      }
+    };
+
+    const defaultWaMessages = {
+      en: "Hi Coach Meng Chun, I would like to enquire about booking a Go trial class at World Star Go.",
+      zh: "你好明俊老师，我想了解并预约 World Star Go 围棋体验课。"
+    };
+
+    function setLanguage(lang) {
+      currentLang = lang === 'zh' ? 'zh' : 'en';
+      document.documentElement.lang = currentLang === 'zh' ? 'zh-MY' : 'en';
+
+      ['en', 'zh'].forEach(function(l) {
+        const btn = document.getElementById('btn-' + l);
+        if (btn) btn.classList.toggle('active', l === currentLang);
+      });
+
+      const dict = i18nData[currentLang];
+      document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.innerHTML = dict[key];
+      });
+
+      const ph = placeholders[currentLang];
+      Object.keys(ph).forEach(function(id) {
+        const input = document.getElementById(id);
+        if (input) input.placeholder = ph[id];
+      });
+
+      const encodedMsg = encodeURIComponent(defaultWaMessages[currentLang]);
+      const waUrl = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodedMsg;
+      const heroWa = document.getElementById('wa-hero');
+      const footerWa = document.getElementById('wa-footer');
+      if (heroWa) heroWa.href = waUrl;
+      if (footerWa) footerWa.href = waUrl;
+
+      if (typeof refreshKifuLanguageUI === 'function') {
+        refreshKifuLanguageUI();
+      }
+    }
+
+    function scrollToSection(id) {
+      if (currentView !== 'home') {
+        switchMainView('home');
+      }
+      setTimeout(function() {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 45);
+    }
+
+    function prefillCourse(courseVal) {
+      const select = document.getElementById('courseSelect');
+      if (select) select.value = courseVal;
+      scrollToSection('booking');
+    }
+
+    function toggleTrait(chip) {
+      chip.classList.toggle('selected');
+    }
+
+    function submitTrialForm(e) {
+      e.preventDefault();
+      const name = document.getElementById('parentName').value.trim();
+      const age = document.getElementById('studentAge').value.trim();
+      const courseSelect = document.getElementById('courseSelect');
+      const courseText = courseSelect.options[courseSelect.selectedIndex].text;
+      const timeSelect = document.getElementById('timeSelect');
+      const timeText = timeSelect.options[timeSelect.selectedIndex].text;
+      const notes = document.getElementById('extraNotes').value.trim();
+
+      const selectedTraits = [];
+      document.querySelectorAll('.trait-chip.selected').forEach(function(chip) {
+        selectedTraits.push(chip.textContent.trim());
+      });
+
+      let msg = "";
+      if (currentLang === 'zh') {
+        msg = "你好明俊老师！我想预约【World Star Go 围棋体验课】👇\n\n"
+            + "👤 家长/学员称呼：" + name + "\n"
+            + "🎂 学员年龄：" + age + "\n"
+            + "📚 意向课程：" + courseText + "\n"
+            + "📍 倾向地点/形式：" + timeText + "\n"
+            + (selectedTraits.length ? "✨ 学员特点：" + selectedTraits.join("、") + "\n" : "")
+            + (notes ? "💬 备注询问：" + notes + "\n" : "")
+            + "\n请问近期有哪些体验课时段可以安排？谢谢！";
+      } else {
+        msg = "Hi Coach Meng Chun! I'd like to book a 【World Star Go Trial Class】👇\n\n"
+            + "👤 Name: " + name + "\n"
+            + "🎂 Student Age: " + age + "\n"
+            + "📚 Program: " + courseText + "\n"
+            + "📍 Preferred Location/Mode: " + timeText + "\n"
+            + (selectedTraits.length ? "✨ Student Traits: " + selectedTraits.join(", ") + "\n" : "")
+            + (notes ? "💬 Notes: " + notes + "\n" : "")
+            + "\nCould you let me know the available trial slots? Thank you!";
+      }
+
+      const waLink = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(msg);
+      window.open(waLink, '_blank');
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+      setLanguage('en');
+    });
+  </script>
+
+  <!-- =====================================================
+       Script Part 2: 5x5–19x19 Interactive Go Board + 《速成围棋：入门篇(上·中·下)》144题库 + Graded AI
+       ===================================================== -->
+  <script>
+    const canvas = document.getElementById('goBoard');
+    const ctx = canvas.getContext('2d');
+    const COLS_LABEL = "ABCDEFGHJKLMNOPQRST";
+
+    let BOARD_SIZE = 9;
+    let GRID_SIZE = 0;
+    let MARGIN = 0;
+
+    let moves = [];
+    let curMove = 0;
+    let board = [];
+    let moveNumsGrid = [];
+    let capB = 0, capW = 0;
+    let lastMoveCoord = null;
+    let koPoint = null;
+    let hoverCoord = null;
+
+    // Move Marker Mode: 'last' (Red circle on last move) | 'lastNum' (Number on last move) | 'all' (All numbers)
+    let markMode = 'last';
+    let isBoardZoomed = false;
+
+    let isAnimating = false;
+    let playInterval = null;
+    let vsAI = false;
+    let aiLevel = 1;
+    let aiColor = 2;
+    let isAIThinking = false;
+    let passNoticeState = null;
+
+    let estActive = false;
+    let estOwnership = null;
+
+    // 《速成围棋：入门篇（上·中·下）》144道章节题库状态变量
+    let isPuzzleMode = false;
+    let curPuzzleIdx = 0;
+    let curPuzzleStep = 0; // 0 = 等待第1手, 1 = 连环题等待第2手
+    let curBookFilter = 'all';
+    let puzzleSolved = false;
+    let PUZZLE_BANK = [];
+
+    // Kifu & AI Bilingual Dictionary (EN Primary)
+    const KIFU_I18N = {
+      en: {
+        sndOn: "🔊 Sound",
+        sndOff: "🔇 Mute",
+        zoomInBtn: "🔍 Enlarge Board",
+        zoomOutBtn: "🗗 Split View",
+        zoomInToast: "🔍 Large Board Mode enabled (Press ESC or click again to exit)",
+        zoomOutToast: "🗗 Split View restored",
+        blackDefault: "Black",
+        whiteDefault: "White",
+        blackTurn: "⚫ Black to play",
+        whiteTurn: "⚪ White to play",
+        aiPassStatus: "⏸️ AI Passed · Black's turn",
+        humanPassStatus: "⏸️ Previous move: Pass",
+        gameOverStatus: "🏁 Both Passed · Game Over",
+        aiThinking: "🤖 AI thinking...",
+        aiLoading: "⏳ Loading AI (~20MB first time)...",
+        aiReady: "✅ AI Ready! Black plays first",
+        aiLoadErr: "AI model fallback to lightweight mode.",
+        estAnalyzing: "⏳ Analyzing score & winrate...",
+        estEven: "⚖️ Even Game (Half-point margin)",
+        estBlackLead: "⚫ Black leads by ~{n} pts",
+        estWhiteLead: "⚪ White leads by ~{n} pts",
+        estBlackWin: "⚫ Black {p}%",
+        estWhiteWin: "⚪ White {p}%",
+        estBlackSmall: "⚫ Black {s} pts ({p}%)",
+        estWhiteSmall: "⚪ White {s} pts ({p}%)",
+        estNoteKata: "Komi 7.5 · KataGo b15",
+        estNoteSmall: "Mini-board area estimate",
+        sgfLoadErr: "No valid moves found in SGF text. Please check the format.",
+        sgfLoadOk: "✅ SGF loaded ({n} moves)",
+        sgfPlayEmpty: "Please play some moves or paste a valid SGF first.",
+        sgfCopied: "✅ SGF code copied to clipboard!",
+        btnPlayStart: "▶️ Auto Replay",
+        btnPlayStop: "⏸️ Pause Replay",
+        markBtnLast: "🎯 Last",
+        markBtnLastNum: "🔢 Last#",
+        markBtnAll: "123 All",
+        markToastLast: "🎯 Marker: Highlight Last Move Only",
+        markToastLastNum: "🔢 Marker: Show Last Move Number Only",
+        markToastAll: "123 Marker: Show All Move Numbers",
+        navFirstTitle: "First Move",
+        navBack10Title: "Back 10 Moves",
+        navPrevTitle: "Previous Move",
+        navNextTitle: "Next Move",
+        navFwd10Title: "Forward 10 Moves",
+        navLastTitle: "Last Move",
+        navMarkTitle: "Toggle Move Markers",
+        aiPassTitle: "🤖 Computer AI Passed!",
+        aiPassDesc: "The AI thinks the game is finished. If you agree there are no more useful moves, click below to Pass and see the final score; otherwise, just keep playing on the board!",
+        aiPassConfirmBtn: "⏭️ Pass Too (End Game & Count Score)",
+        aiPassContBtn: "👀 Keep Playing (Close Notice)",
+        gameOverTitle: "🏁 Both Players Passed — Game Over!",
+        gameOverDesc: "In Go, when both Black and White pass consecutively, the game ends. Check the score estimation panel below for the final result!",
+        gameOverNewBtn: "✨ New Game / Play Again",
+        gameOverOkBtn: "📊 View Final Score Below",
+        newGameReadyToast: "✨ New game started! Black plays first.",
+        humanPassToast: "⏭️ {who} chose to Pass",
+        pzPrevBtn: "⬅️ Prev",
+        pzHintBtn: "💡 Hint",
+        pzNextBtn: "Next ➡️",
+        aiNames: {
+          1: "AI (Lv.1 Gentle)",
+          2: "AI (Lv.2 Easy)",
+          3: "AI (Lv.3 Medium)",
+          4: "AI (Lv.4 Strong)",
+          5: "KataGo (Lv.5 Master)"
+        }
+      },
+      zh: {
+        sndOn: "🔊 音效",
+        sndOff: "🔇 静音",
+        zoomInBtn: "🔍 放大棋盘",
+        zoomOutBtn: "🗗 恢复分栏",
+        zoomInToast: "🔍 已开启大棋盘模式（可按 ESC 或再次点击按钮恢复分栏）",
+        zoomOutToast: "🗗 已恢复双栏视图（右侧可查看 SGF 棋谱）",
+        blackDefault: "黑棋",
+        whiteDefault: "白棋",
+        blackTurn: "⚫ 黑方落子",
+        whiteTurn: "⚪ 白方落子",
+        aiPassStatus: "⏸️ 电脑已虚手 (Pass) · 轮到黑棋",
+        humanPassStatus: "⏸️ 上一手虚手 (Pass)",
+        gameOverStatus: "🏁 双方虚手 · 对局结束",
+        aiThinking: "🤖 AI 思考中...",
+        aiLoading: "⏳ 首次加载神经网络约20MB...",
+        aiReady: "✅ AI 已就绪，请执黑先行",
+        aiLoadErr: "AI 模型加载失败，已自动切换为轻量陪练模式。",
+        estAnalyzing: "⏳ 正在分析目数与胜率...",
+        estEven: "⚖️ 局势均势（半目胜负）",
+        estBlackLead: "⚫ 黑棋领先约 {n} 目",
+        estWhiteLead: "⚪ 白棋领先约 {n} 目",
+        estBlackWin: "⚫ 黑胜率 {p}%",
+        estWhiteWin: "⚪ 白胜率 {p}%",
+        estBlackSmall: "⚫ 黑方 {s} 子 ({p}%)",
+        estWhiteSmall: "⚪ 白方 {s} 子 ({p}%)",
+        estNoteKata: "贴 7.5 目 · KataGo b15",
+        estNoteSmall: "小棋盘子地皆目预估",
+        sgfLoadErr: "未能识别出有效的 SGF 落子记录，请检查格式。",
+        sgfLoadOk: "✅ 已成功载入棋谱（共 {n} 手）",
+        sgfPlayEmpty: "请先在棋盘落子或粘贴有效的 SGF 棋谱。",
+        sgfCopied: "✅ SGF 棋谱代码已复制到剪贴板！",
+        btnPlayStart: "▶️ 自动播放演示",
+        btnPlayStop: "⏸️ 暂停自动播放",
+        markBtnLast: "🎯 最新",
+        markBtnLastNum: "🔢 单步",
+        markBtnAll: "123 全部",
+        markToastLast: "🎯 棋子标记：仅红圈标记最新一手",
+        markToastLastNum: "🔢 棋子标记：仅最新一手显示手数",
+        markToastAll: "123 棋子标记：显示全部手数",
+        navFirstTitle: "第一手",
+        navBack10Title: "快退10手",
+        navPrevTitle: "上一手",
+        navNextTitle: "下一手",
+        navFwd10Title: "快进10手",
+        navLastTitle: "最后一手",
+        navMarkTitle: "点击切换棋子标记方式",
+        aiPassTitle: "🤖 电脑 AI 选择了「虚手 (Pass)」！",
+        aiPassDesc: "电脑认为棋盘上已经没有可以争抢的地方啦！如果你也觉得下完了，请点击下方按钮一起「虚手」结束对局并数子；如果还有地方可以下，请直接点击棋盘继续落子。",
+        aiPassConfirmBtn: "⏭️ 我也虚手 (结束对局并看结果)",
+        aiPassContBtn: "👀 我还要继续下 (关闭提示)",
+        gameOverTitle: "🏁 双方连续虚手，对局结束！",
+        gameOverDesc: "在围棋规则中，当黑白双方都选择「虚手 (Pass)」时，代表大家都同意棋局结束，系统已在下方为您自动计算胜负结果！",
+        gameOverNewBtn: "✨ 新对局 / 再来一局",
+        gameOverOkBtn: "📊 查看下方胜负结果",
+        newGameReadyToast: "✨ 已开启新对局，请执黑先行！",
+        humanPassToast: "⏭️ {who}选择了「虚手 (Pass)」",
+        pzPrevBtn: "⬅️ 上一题",
+        pzHintBtn: "💡 提示",
+        pzNextBtn: "下一题 ➡️",
+        aiNames: {
+          1: "AI (Lv.1 启蒙)",
+          2: "AI (Lv.2 初级)",
+          3: "AI (Lv.3 进阶)",
+          4: "AI (Lv.4 中级)",
+          5: "KataGo (Lv.5 宗师)"
+        }
+      }
+    };
+
+    function kt(key) {
+      const pack = KIFU_I18N[currentLang] || KIFU_I18N.en;
+      return pack[key] || KIFU_I18N.en[key] || key;
+    }
+
+    function getAIName(level) {
+      const pack = KIFU_I18N[currentLang] || KIFU_I18N.en;
+      return (pack.aiNames && pack.aiNames[level]) ? pack.aiNames[level] : "AI";
+    }
+
+    function updateZoomBtnUI() {
+      const btn = document.getElementById('zoomBoardBtn');
+      if (!btn) return;
+      btn.innerText = isBoardZoomed ? kt("zoomOutBtn") : kt("zoomInBtn");
+      btn.classList.toggle('zoom-active', isBoardZoomed);
+    }
+
+    function toggleBoardZoom() {
+      isBoardZoomed = !isBoardZoomed;
+      const gridEl = document.getElementById('kifuAppGrid');
+      if (gridEl) {
+        gridEl.classList.toggle('board-zoomed', isBoardZoomed);
+      }
+      updateZoomBtnUI();
+      setTimeout(() => {
+        resizeBoardCanvas();
+        if (isBoardZoomed) {
+          canvas.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 50);
+      showToast(isBoardZoomed ? kt("zoomInToast") : kt("zoomOutToast"));
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isBoardZoomed && currentView === 'kifu') {
+        toggleBoardZoom();
+      }
+    });
+
+    function updateMarkBtnUI() {
+      const btn = document.getElementById('numToggleBtn');
+      if (!btn) return;
+      btn.classList.remove('active', 'mode-last');
+      if (markMode === 'last') {
+        btn.innerText = kt("markBtnLast");
+        btn.classList.add('mode-last');
+      } else if (markMode === 'lastNum') {
+        btn.innerText = kt("markBtnLastNum");
+        btn.classList.add('mode-last');
+      } else {
+        btn.innerText = kt("markBtnAll");
+        btn.classList.add('active');
+      }
+    }
+
+    function updateNavTooltips() {
+      const map = {
+        navBtnFirst: "navFirstTitle",
+        navBtnBack10: "navBack10Title",
+        navBtnPrev: "navPrevTitle",
+        navBtnNext: "navNextTitle",
+        navBtnFwd10: "navFwd10Title",
+        navBtnLast: "navLastTitle",
+        numToggleBtn: "navMarkTitle"
+      };
+      Object.keys(map).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.title = kt(map[id]);
+      });
+    }
+
+    function showPassNotice(type) {
+      passNoticeState = type;
+      const box = document.getElementById('boardPassNotice');
+      const iconEl = document.getElementById('passNoticeIcon');
+      const titleEl = document.getElementById('passNoticeTitle');
+      const descEl = document.getElementById('passNoticeDesc');
+      const confirmBtn = document.getElementById('passConfirmEndBtn');
+      const newGameBtn = document.getElementById('passNewGameBtn');
+      const contBtn = document.getElementById('passContinueBtn');
+      const passActionBtn = document.getElementById('passActionBtn');
+
+      if (!box) return;
+
+      if (type === 'ai-pass') {
+        iconEl.textContent = "🤖⏸️";
+        titleEl.textContent = kt("aiPassTitle");
+        descEl.textContent = kt("aiPassDesc");
+        confirmBtn.style.display = "inline-block";
+        confirmBtn.textContent = kt("aiPassConfirmBtn");
+        if (newGameBtn) newGameBtn.style.display = "none";
+        contBtn.textContent = kt("aiPassContBtn");
+        if (passActionBtn) passActionBtn.classList.add('pass-highlight');
+        box.hidden = false;
+      } else if (type === 'game-over') {
+        iconEl.textContent = "🏁🏆";
+        titleEl.textContent = kt("gameOverTitle");
+        descEl.textContent = kt("gameOverDesc");
+        confirmBtn.style.display = "none";
+        if (newGameBtn) {
+          newGameBtn.style.display = "inline-block";
+          newGameBtn.textContent = kt("gameOverNewBtn");
+        }
+        contBtn.textContent = kt("gameOverOkBtn");
+        if (passActionBtn) passActionBtn.classList.remove('pass-highlight');
+        box.hidden = false;
+      }
+    }
+
+    function hidePassNotice() {
+      passNoticeState = null;
+      const box = document.getElementById('boardPassNotice');
+      if (box) box.hidden = true;
+    }
+
+    function updateAutoPlayBtnUI() {
+      const btn = document.getElementById('btnAutoPlay');
+      if (!btn) return;
+      btn.innerText = isAnimating ? kt("btnPlayStop") : kt("btnPlayStart");
+      btn.classList.toggle('playing-active', isAnimating);
+    }
+
+    function stopAutoPlay() {
+      if (playInterval) {
+        clearInterval(playInterval);
+        playInterval = null;
+      }
+      if (isAnimating) {
+        isAnimating = false;
+        updateAutoPlayBtnUI();
+        updateUI();
+      }
+    }
+
+    function refreshKifuLanguageUI() {
+      const sndBtn = document.getElementById('sndBtn');
+      if (sndBtn) sndBtn.innerText = soundOn ? kt("sndOn") : kt("sndOff");
+      const pzPrev = document.getElementById('pzPrevBtn');
+      const pzHint = document.getElementById('pzHintBtn');
+      const pzNext = document.getElementById('pzNextBtn');
+      if (pzPrev) pzPrev.innerText = kt("pzPrevBtn");
+      if (pzHint) pzHint.innerText = kt("pzHintBtn");
+      if (pzNext) pzNext.innerText = kt("pzNextBtn");
+
+      updateZoomBtnUI();
+      updateAutoPlayBtnUI();
+      updateMarkBtnUI();
+      updateNavTooltips();
+      syncMetaNames();
+      updateBookFilterLabels();
+
+      if (isPuzzleMode) {
+        populatePuzzleSelector();
+        refreshCurrentPuzzleText();
+      } else {
+        updateUI();
+      }
+
+      if (passNoticeState) {
+        showPassNotice(passNoticeState);
+      }
+      if (estActive) {
+        runEstimateAnalysis();
+      } else {
+        document.getElementById('estLeadText').innerText = kt("estAnalyzing");
+        document.getElementById('estBlackWin').innerText = kt("estBlackWin").replace("{p}", 50);
+        document.getElementById('estWhiteWin').innerText = kt("estWhiteWin").replace("{p}", 50);
+        document.getElementById('estSourceNote').innerText = BOARD_SIZE < 9 ? kt("estNoteSmall") : kt("estNoteKata");
+      }
+    }
+
+    // WebAudio Synthesized Stone & Pass Sounds
+    let soundOn = true;
+    let audioCtx = null;
+    function getAudioCtx() {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        return audioCtx;
+      } catch(e) { return null; }
+    }
+    function playSynthHit(nf, nq, nd, na, tf, td, ta, t0) {
+      if (!soundOn) return;
+      const c = getAudioCtx(); if (!c) return;
+      const t = t0 || c.currentTime, V = 0.65;
+      const n = Math.floor(c.sampleRate * nd), bf = c.createBuffer(1, n, c.sampleRate), d = bf.getChannelData(0);
+      for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+      const src = c.createBufferSource(); src.buffer = bf;
+      const f = c.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = nf; f.Q.value = nq;
+      const g = c.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(na * V, t + 0.002);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + nd);
+      src.connect(f); f.connect(g); g.connect(c.destination);
+      src.start(t); src.stop(t + nd + 0.02);
+      if (tf) {
+        const o = c.createOscillator();
+        o.frequency.setValueAtTime(tf, t);
+        o.frequency.exponentialRampToValueAtTime(tf * 0.6, t + td);
+        const g2 = c.createGain();
+        g2.gain.setValueAtTime(0.0001, t);
+        g2.gain.exponentialRampToValueAtTime(ta * V, t + 0.002);
+        g2.gain.exponentialRampToValueAtTime(0.0001, t + td);
+        o.connect(g2); g2.connect(c.destination);
+        o.start(t); o.stop(t + td + 0.02);
+      }
+    }
+    function soundPut() { playSynthHit(3800, 2.5, 0.035, 0.8, 900, 0.03, 0.25); }
+    function soundCapture() {
+      if (!soundOn) return;
+      const c = getAudioCtx(); if (!c) return;
+      const t = c.currentTime;
+      for (let i = 0; i < 5; i++) playSynthHit(2800 + Math.random() * 1400, 2, 0.03, 0.4, 0, 0, 0, t + 0.08 + Math.random() * 0.14);
+    }
+    function soundPass() {
+      if (!soundOn) return;
+      const c = getAudioCtx(); if (!c) return;
+      const t = c.currentTime;
+      [520, 660].forEach((freq, idx) => {
+        const o = c.createOscillator();
+        const g = c.createGain();
+        o.type = "sine";
+        o.frequency.setValueAtTime(freq, t + idx * 0.11);
+        g.gain.setValueAtTime(0.001, t + idx * 0.11);
+        g.gain.exponentialRampToValueAtTime(0.18, t + idx * 0.11 + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + idx * 0.11 + 0.22);
+        o.connect(g); g.connect(c.destination);
+        o.start(t + idx * 0.11);
+        o.stop(t + idx * 0.11 + 0.24);
+      });
+    }
+    function toggleSound() {
+      soundOn = !soundOn;
+      document.getElementById('sndBtn').innerText = soundOn ? kt("sndOn") : kt("sndOff");
+      if (soundOn) soundPut();
+    }
+
+    function initGameEngine(size) {
+      stopAutoPlay();
+      hidePassNotice();
+
+      const passActionBtn = document.getElementById('passActionBtn');
+      if (passActionBtn) passActionBtn.classList.remove('pass-highlight');
+
+      estActive = false;
+      estOwnership = null;
+      const estBtn = document.getElementById('estBtn');
+      if (estBtn) estBtn.classList.remove('active-est');
+      const estPanel = document.getElementById('estPanel');
+      if (estPanel) estPanel.hidden = true;
+
+      BOARD_SIZE = parseInt(size, 10) || 9;
+      GRID_SIZE = (canvas.width || 660) / (BOARD_SIZE + 1);
+      MARGIN = GRID_SIZE;
+      moves = [];
+      curMove = 0;
+      isAIThinking = false;
+      hoverCoord = null;
+
+      rebuildBoardToMove(0);
+      exportSgfToBox();
+    }
+
+    function startNewGame() {
+      if (isPuzzleMode) {
+        loadPuzzleByIndex(curPuzzleIdx);
+        soundPut();
+        return;
+      }
+      const notesEl = document.getElementById('metaNotes');
+      if (notesEl) notesEl.value = "";
+      initGameEngine(BOARD_SIZE);
+      soundPut();
+      showToast(kt("newGameReadyToast"));
+    }
+
+    function rebuildBoardToMove(targetMove) {
+      curMove = Math.max(0, Math.min(targetMove, moves.length));
+      board = Array.from({length: BOARD_SIZE}, () => Array(BOARD_SIZE).fill(0));
+      moveNumsGrid = Array.from({length: BOARD_SIZE}, () => Array(BOARD_SIZE).fill(0));
+      capB = 0; capW = 0;
+      lastMoveCoord = null;
+      koPoint = null;
+
+      // If in Puzzle Mode, place initial puzzle setup stones first
+      if (isPuzzleMode && PUZZLE_BANK[curPuzzleIdx]) {
+        const pz = PUZZLE_BANK[curPuzzleIdx];
+        pz.b.forEach(([x, y]) => { board[y][x] = 1; });
+        pz.w.forEach(([x, y]) => { board[y][x] = 2; });
+      }
+
+      for (let i = 0; i < curMove; i++) {
+        const m = moves[i];
+        if (m.x < 0 || m.y < 0 || m.x >= BOARD_SIZE || m.y >= BOARD_SIZE) {
+          lastMoveCoord = null;
+          koPoint = null;
+          continue;
+        }
+        applyMoveOnGrid(board, moveNumsGrid, m.x, m.y, m.c, i + 1);
+      }
+      updateUI();
+      drawBoard();
+      if (estActive) runEstimateAnalysis();
+    }
+
+    function applyMoveOnGrid(brd, numGrid, x, y, color, moveNo) {
+      if (brd[y][x] !== 0) return { ok: false, captured: 0 };
+      brd[y][x] = color;
+      if (numGrid) numGrid[y][x] = moveNo;
+
+      const opponent = color === 1 ? 2 : 1;
+      const dirs = [[0,1], [1,0], [0,-1], [-1,0]];
+      let totalCaptured = 0;
+      let singleCapturedStone = null;
+
+      for (let [dx, dy] of dirs) {
+        let nx = x + dx, ny = y + dy;
+        if (nx >= 0 && nx < BOARD_SIZE && ny >= 0 && ny < BOARD_SIZE && brd[ny][nx] === opponent) {
+          let grp = getGroupAndLiberties(brd, nx, ny, opponent);
+          if (grp.liberties === 0) {
+            grp.stones.forEach(p => {
+              brd[p.y][p.x] = 0;
+              if (numGrid) numGrid[p.y][p.x] = 0;
+              totalCaptured++;
+              singleCapturedStone = p;
+            });
+          }
+        }
+      }
+
+      let myGrp = getGroupAndLiberties(brd, x, y, color);
+      if (myGrp.liberties === 0 && totalCaptured === 0) {
+        brd[y][x] = 0;
+        if (numGrid) numGrid[y][x] = 0;
+        return { ok: false, captured: 0 };
+      }
+
+      if (color === 1) capB += totalCaptured; else capW += totalCaptured;
+      lastMoveCoord = { x, y };
+      koPoint = (totalCaptured === 1 && myGrp.stones.length === 1 && myGrp.liberties === 1) ? singleCapturedStone : null;
+      return { ok: true, captured: totalCaptured };
+    }
+
+    function getGroupAndLiberties(brd, x, y, color) {
+      let stones = [], liberties = 0;
+      let visited = Array.from({length: BOARD_SIZE}, () => Array(BOARD_SIZE).fill(false));
+      let libVisited = Array.from({length: BOARD_SIZE}, () => Array(BOARD_SIZE).fill(false));
+      let queue = [{x, y}];
+      visited[y][x] = true;
+
+      while (queue.length > 0) {
+        let curr = queue.shift();
+        stones.push(curr);
+        const dirs = [[0,1], [1,0], [0,-1], [-1,0]];
+        for (let [dx, dy] of dirs) {
+          let nx = curr.x + dx, ny = curr.y + dy;
+          if (nx >= 0 && nx < BOARD_SIZE && ny >= 0 && ny < BOARD_SIZE) {
+            if (brd[ny][nx] === 0 && !libVisited[ny][nx]) {
+              liberties++; libVisited[ny][nx] = true;
+            } else if (brd[ny][nx] === color && !visited[ny][nx]) {
+              visited[ny][nx] = true; queue.push({x: nx, y: ny});
+            }
+          }
+        }
+      }
+      return { stones, liberties };
+    }
+
+    function nextTurnColor() {
+      if (curMove === 0) return 1;
+      return moves[curMove - 1].c === 1 ? 2 : 1;
+    }
+
+    function simulateMove(x, y, color) {
+      if (x < 0 || x >= BOARD_SIZE || y < 0 || y >= BOARD_SIZE) return { legal: false };
+      if (board[y][x] !== 0) return { legal: false };
+      if (koPoint && koPoint.x === x && koPoint.y === y) return { legal: false };
+
+      let tempBoard = board.map(row => [...row]);
+      tempBoard[y][x] = color;
+      const opponent = color === 1 ? 2 : 1;
+      let capturedCount = 0;
+      let atariBonus = 0;
+      const dirs = [[0,1], [1,0], [0,-1], [-1,0]];
+
+      for (let [dx, dy] of dirs) {
+        let nx = x + dx, ny = y + dy;
+        if (nx >= 0 && nx < BOARD_SIZE && ny >= 0 && ny < BOARD_SIZE && tempBoard[ny][nx] === opponent) {
+          let oppGrp = getGroupAndLiberties(tempBoard, nx, ny, opponent);
+          if (oppGrp.liberties === 0) {
+            capturedCount += oppGrp.stones.length;
+            oppGrp.stones.forEach(p => tempBoard[p.y][p.x] = 0);
+          } else if (oppGrp.liberties === 1) {
+            atariBonus += oppGrp.stones.length;
+          }
+        }
+      }
+
+      let myGrp = getGroupAndLiberties(tempBoard, x, y, color);
+      if (myGrp.liberties === 0 && capturedCount === 0) return { legal: false };
+
+      return {
+        legal: true,
+        capturedCount,
+        atariBonus,
+        myLiberties: myGrp.liberties
+      };
+    }
+
+    function isLegalMove(x, y, color) {
+      return simulateMove(x, y, color).legal;
+    }
+
+    function commitMove(x, y, color) {
+      if (x >= 0 && !isLegalMove(x, y, color)) return false;
+
+      if (curMove < moves.length) {
+        moves = moves.slice(0, curMove);
+      }
+
+      let prevCaps = capB + capW;
+      moves.push({ x, y, c: color });
+      hoverCoord = null;
+
+      if (x >= 0) {
+        hidePassNotice();
+        const passActionBtn = document.getElementById('passActionBtn');
+        if (passActionBtn) passActionBtn.classList.remove('pass-highlight');
+      }
+
+      rebuildBoardToMove(moves.length);
+      if (x >= 0) {
+        soundPut();
+        if (capB + capW > prevCaps) soundCapture();
+      } else {
+        soundPass();
+      }
+      exportSgfToBox();
+      return true;
+    }
+
+    function drawBoard() {
+      if (!canvas.width || !GRID_SIZE) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      let bgGrad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      bgGrad.addColorStop(0, "#F0D4A4");
+      bgGrad.addColorStop(0.5, "#E4BC79");
+      bgGrad.addColorStop(1, "#D3A45C");
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Symmetrical Coordinates on 4 Sides
+      ctx.fillStyle = "#5A3F20";
+      ctx.font = `700 ${Math.max(10, Math.round(GRID_SIZE * 0.31))}px sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      const edgeFar = canvas.width - MARGIN * 0.42;
+      for (let i = 0; i < BOARD_SIZE; i++) {
+        const pos = MARGIN + i * GRID_SIZE;
+        const colTxt = COLS_LABEL[i];
+        const rowTxt = String(BOARD_SIZE - i);
+        ctx.fillText(colTxt, pos, MARGIN * 0.42);
+        ctx.fillText(colTxt, pos, edgeFar);
+        ctx.fillText(rowTxt, MARGIN * 0.42, pos);
+        ctx.fillText(rowTxt, edgeFar, pos);
+      }
+
+      ctx.beginPath();
+      ctx.strokeStyle = "#4A3520";
+      ctx.lineWidth = Math.max(1, canvas.width / 460);
+      for (let i = 0; i < BOARD_SIZE; i++) {
+        ctx.moveTo(MARGIN, MARGIN + i * GRID_SIZE);
+        ctx.lineTo(MARGIN + (BOARD_SIZE - 1) * GRID_SIZE, MARGIN + i * GRID_SIZE);
+        ctx.moveTo(MARGIN + i * GRID_SIZE, MARGIN);
+        ctx.lineTo(MARGIN + i * GRID_SIZE, MARGIN + (BOARD_SIZE - 1) * GRID_SIZE);
+      }
+      ctx.stroke();
+
+      ctx.lineWidth = Math.max(2, canvas.width / 260);
+      ctx.strokeRect(MARGIN, MARGIN, (BOARD_SIZE - 1) * GRID_SIZE, (BOARD_SIZE - 1) * GRID_SIZE);
+
+      drawStarPoints();
+
+      for (let y = 0; y < BOARD_SIZE; y++) {
+        for (let x = 0; x < BOARD_SIZE; x++) {
+          if (board[y][x] !== 0) {
+            drawStone(x, y, board[y][x], moveNumsGrid[y][x]);
+          }
+        }
+      }
+
+      // Hover Ghost Stone
+      if (hoverCoord && !isAnimating && !isAIThinking && !(vsAI && nextTurnColor() === aiColor)) {
+        const hx = hoverCoord.x, hy = hoverCoord.y;
+        const turnCol = isPuzzleMode ? 1 : nextTurnColor();
+        if (board[hy][hx] === 0 && isLegalMove(hx, hy, turnCol)) {
+          const cx = MARGIN + hx * GRID_SIZE;
+          const cy = MARGIN + hy * GRID_SIZE;
+          const r = GRID_SIZE * 0.44;
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+          ctx.fillStyle = turnCol === 1 ? "rgba(25, 20, 18, 0.38)" : "rgba(255, 255, 255, 0.55)";
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      if (estActive && estOwnership && estOwnership.length === BOARD_SIZE * BOARD_SIZE) {
+        for (let i = 0; i < BOARD_SIZE * BOARD_SIZE; i++) {
+          const x = i % BOARD_SIZE, y = Math.floor(i / BOARD_SIZE);
+          const own = estOwnership[i];
+          if (Math.abs(own) < 0.22) continue;
+          const cx = MARGIN + x * GRID_SIZE, cy = MARGIN + y * GRID_SIZE;
+          const sz = GRID_SIZE * (Math.abs(own) > 0.6 ? 0.34 : 0.24);
+          ctx.fillStyle = own > 0 ? "rgba(20, 20, 20, 0.85)" : "rgba(255, 255, 255, 0.92)";
+          ctx.fillRect(cx - sz / 2, cy - sz / 2, sz, sz);
+          if (own < 0) {
+            ctx.strokeStyle = "rgba(0,0,0,0.45)";
+            ctx.lineWidth = 1;
+            ctx.strokeRect(cx - sz / 2, cy - sz / 2, sz, sz);
+          }
+        }
+      }
+    }
+
+    function drawStarPoints() {
+      ctx.fillStyle = "#4A3520";
+      const drawDot = (x, y) => {
+        ctx.beginPath();
+        ctx.arc(MARGIN + x * GRID_SIZE, MARGIN + y * GRID_SIZE, Math.max(3, GRID_SIZE * 0.085), 0, 2 * Math.PI);
+        ctx.fill();
+      };
+      if (BOARD_SIZE === 5) {
+        drawDot(2, 2);
+      } else if (BOARD_SIZE === 7) {
+        drawDot(3, 3); drawDot(2, 2); drawDot(4, 2); drawDot(2, 4); drawDot(4, 4);
+      } else if (BOARD_SIZE === 9) {
+        drawDot(4, 4); drawDot(2, 2); drawDot(6, 2); drawDot(2, 6); drawDot(6, 6);
+      } else if (BOARD_SIZE === 13) {
+        drawDot(3, 3); drawDot(9, 3); drawDot(3, 9); drawDot(9, 9); drawDot(6, 6);
+      } else if (BOARD_SIZE === 19) {
+        [3, 9, 15].forEach(x => [3, 9, 15].forEach(y => drawDot(x, y)));
+      }
+    }
+
+    function drawStone(x, y, color, moveNo) {
+      const cx = MARGIN + x * GRID_SIZE;
+      const cy = MARGIN + y * GRID_SIZE;
+      const r = GRID_SIZE * 0.465;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx + r * 0.1, cy + r * 0.12, r, 0, 2 * Math.PI);
+      ctx.fillStyle = "rgba(44, 34, 30, 0.26)";
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+      if (color === 1) {
+        let grad = ctx.createRadialGradient(cx - r * 0.35, cy - r * 0.35, r * 0.1, cx, cy, r);
+        grad.addColorStop(0, "#5c5650");
+        grad.addColorStop(0.45, "#221e19");
+        grad.addColorStop(1, "#0b0a08");
+        ctx.fillStyle = grad;
+      } else {
+        let grad = ctx.createRadialGradient(cx - r * 0.35, cy - r * 0.35, r * 0.1, cx, cy, r);
+        grad.addColorStop(0, "#ffffff");
+        grad.addColorStop(0.6, "#f4efe4");
+        grad.addColorStop(1, "#d9d2c4");
+        ctx.fillStyle = grad;
+      }
+      ctx.fill();
+      ctx.restore();
+
+      const isLast = lastMoveCoord && lastMoveCoord.x === x && lastMoveCoord.y === y;
+
+      if (markMode === 'last') {
+        if (isLast) {
+          ctx.beginPath();
+          ctx.arc(cx, cy, r * 0.38, 0, 2 * Math.PI);
+          ctx.strokeStyle = color === 1 ? "#FF6B8B" : "#E0365C";
+          ctx.lineWidth = Math.max(2.5, GRID_SIZE * 0.09);
+          ctx.stroke();
+        }
+      } else if (markMode === 'lastNum') {
+        if (isLast && moveNo > 0) {
+          ctx.fillStyle = color === 1 ? "#FF8FA8" : "#E0365C";
+          const fs = GRID_SIZE * (moveNo > 99 ? 0.36 : moveNo > 9 ? 0.42 : 0.48);
+          ctx.font = `800 ${fs}px sans-serif`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(String(moveNo), cx, cy + fs * 0.04);
+        }
+      } else if (markMode === 'all') {
+        if (moveNo > 0) {
+          ctx.fillStyle = isLast ? (color === 1 ? "#FF8FA8" : "#E0365C") : (color === 1 ? "#FFFFFF" : "#1A1A1A");
+          const fs = GRID_SIZE * (moveNo > 99 ? 0.36 : moveNo > 9 ? 0.42 : 0.48);
+          ctx.font = `800 ${fs}px sans-serif`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(String(moveNo), cx, cy + fs * 0.04);
+        }
+      }
+    }
+
+    function getBoardCoordFromEvent(e) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const x = Math.round(((e.clientX - rect.left) * scaleX - MARGIN) / GRID_SIZE);
+      const y = Math.round(((e.clientY - rect.top) * scaleY - MARGIN) / GRID_SIZE);
+      if (x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE) {
+        return { x, y };
+      }
+      return null;
+    }
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (isAnimating || isAIThinking) return;
+      const pt = getBoardCoordFromEvent(e);
+      if (!pt) {
+        if (hoverCoord) { hoverCoord = null; drawBoard(); }
+        return;
+      }
+      if (!hoverCoord || hoverCoord.x !== pt.x || hoverCoord.y !== pt.y) {
+        hoverCoord = pt;
+        drawBoard();
+      }
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+      if (hoverCoord) {
+        hoverCoord = null;
+        drawBoard();
+      }
+    });
+
+    canvas.addEventListener('click', (e) => {
+      if (isAnimating) stopAutoPlay();
+      if (isAIThinking) return;
+
+      const pt = getBoardCoordFromEvent(e);
+      if (!pt) return;
+
+      // 闯关题库模式专属判题拦截
+      if (isPuzzleMode) {
+        handlePuzzleClick(pt.x, pt.y);
+        return;
+      }
+
+      if (vsAI && nextTurnColor() === aiColor) return;
+      if (commitMove(pt.x, pt.y, nextTurnColor())) {
+        if (vsAI && nextTurnColor() === aiColor) {
+          triggerAI();
+        }
+      }
+    });
+
+    function updateUI() {
+      document.getElementById('curMoveNum').innerText = curMove;
+      document.getElementById('totMoveNum').innerText = moves.length;
+      document.getElementById('capB').innerText = capB;
+      document.getElementById('capW').innerText = capW;
+
+      const slider = document.getElementById('moveSlider');
+      slider.max = moves.length;
+      slider.value = curMove;
+
+      if (isPuzzleMode && PUZZLE_BANK[curPuzzleIdx]) {
+        const pz = PUZZLE_BANK[curPuzzleIdx];
+        document.getElementById('moveInfo').innerText = currentLang === 'zh'
+          ? `🧩 第 ${pz.num} / ${PUZZLE_BANK.length} 题 · 黑先`
+          : `🧩 Puzzle #${pz.num} / ${PUZZLE_BANK.length} · Black`;
+        document.getElementById('player-black').classList.remove('inactive');
+        document.getElementById('player-white').classList.add('inactive');
+        return;
+      }
+
+      const turn = nextTurnColor();
+      const lastMv = curMove > 0 ? moves[curMove - 1] : null;
+      const prevMv = curMove > 1 ? moves[curMove - 2] : null;
+      const isDoublePass = lastMv && prevMv && lastMv.x < 0 && prevMv.x < 0;
+
+      if (isAIThinking) {
+        document.getElementById('moveInfo').innerText = kt("aiThinking");
+      } else if (isDoublePass) {
+        document.getElementById('moveInfo').innerText = kt("gameOverStatus");
+      } else if (lastMv && lastMv.x < 0) {
+        document.getElementById('moveInfo').innerText = (vsAI && lastMv.c === aiColor) ? kt("aiPassStatus") : kt("humanPassStatus");
+      } else {
+        document.getElementById('moveInfo').innerText = turn === 1 ? kt("blackTurn") : kt("whiteTurn");
+      }
+
+      document.getElementById('player-black').classList.toggle('inactive', turn !== 1);
+      document.getElementById('player-white').classList.toggle('inactive', turn !== 2);
+    }
+
+    function syncMetaNames() {
+      const pb = document.getElementById('metaPB').value.trim();
+      const pw = document.getElementById('metaPW').value.trim();
+      document.getElementById('dispPB').innerText = pb || kt("blackDefault");
+      document.getElementById('dispPW').innerText = pw || (vsAI ? getAIName(aiLevel) : kt("whiteDefault"));
+      exportSgfToBox();
+    }
+
+    function navStep(delta) {
+      if (isAIThinking) return;
+      if (isAnimating) stopAutoPlay();
+      hidePassNotice();
+      rebuildBoardToMove(curMove + delta);
+    }
+
+    function onSliderInput(val) {
+      if (isAIThinking) return;
+      if (isAnimating) stopAutoPlay();
+      hidePassNotice();
+      rebuildBoardToMove(parseInt(val, 10));
+    }
+
+    function toggleMoveNums() {
+      if (markMode === 'last') {
+        markMode = 'lastNum';
+        showToast(kt("markToastLastNum"));
+      } else if (markMode === 'lastNum') {
+        markMode = 'all';
+        showToast(kt("markToastAll"));
+      } else {
+        markMode = 'last';
+        showToast(kt("markToastLast"));
+      }
+      updateMarkBtnUI();
+      drawBoard();
+    }
+
+    function undoMove() {
+      if (curMove === 0 || isAIThinking) return;
+      if (isAnimating) stopAutoPlay();
+      hidePassNotice();
+      const passActionBtn = document.getElementById('passActionBtn');
+      if (passActionBtn) passActionBtn.classList.remove('pass-highlight');
+
+      if (isPuzzleMode) {
+        loadPuzzleByIndex(curPuzzleIdx);
+        return;
+      }
+
+      const steps = (vsAI && curMove >= 2 && nextTurnColor() === 1) ? 2 : 1;
+      moves = moves.slice(0, Math.max(0, curMove - steps));
+      rebuildBoardToMove(moves.length);
+      exportSgfToBox();
+    }
+
+    function passTurn(isAI = false) {
+      if (isAIThinking || isPuzzleMode) return;
+      if (isAnimating) stopAutoPlay();
+
+      const moverColor = nextTurnColor();
+      commitMove(-1, -1, moverColor);
+
+      const len = moves.length;
+      const isDoublePass = len >= 2 && moves[len - 1].x < 0 && moves[len - 2].x < 0;
+
+      if (isDoublePass) {
+        showPassNotice('game-over');
+        if (!estActive) {
+          estActive = true;
+          document.getElementById('estBtn').classList.add('active-est');
+          document.getElementById('estPanel').hidden = false;
+        }
+        runEstimateAnalysis();
+        return;
+      }
+
+      if (isAI) {
+        showPassNotice('ai-pass');
+        return;
+      }
+
+      hidePassNotice();
+      const whoName = moverColor === 1 ? kt("blackDefault") : kt("whiteDefault");
+      showToast(kt("humanPassToast").replace("{who}", whoName));
+
+      if (vsAI && nextTurnColor() === aiColor) {
+        triggerAI();
+      }
+    }
+
+    function changeBoardSize() {
+      if (isPuzzleMode) {
+        document.getElementById('boardSizeSelect').value = "9";
+        return;
+      }
+      const size = document.getElementById('boardSizeSelect').value;
+      initGameEngine(size);
+    }
+
+    function resetBoard() {
+      startNewGame();
+    }
+
+    // ================= 黄焰、金成来著《速成围棋：入门篇（上·中·下）》36章·144题全套题库引擎 =================
+    function tfPt(x, y, t) {
+      let nx = x, ny = y, S = 8;
+      if (t & 1) nx = S - x;
+      if (t & 2) ny = S - y;
+      if (t & 4) { let tmp = nx; nx = ny; ny = tmp; }
+      return [nx, ny];
+    }
+
+    // 棋理自检器：验证初始摆子无0气死子且第1手正解合法
+    function isValidPuzzleSetup(bList, wList, ansList) {
+      const testBrd = Array.from({length: 9}, () => Array(9).fill(0));
+      for (const [x, y] of bList) {
+        if (x < 0 || x >= 9 || y < 0 || y >= 9 || testBrd[y][x] !== 0) return false;
+        testBrd[y][x] = 1;
+      }
+      for (const [x, y] of wList) {
+        if (x < 0 || x >= 9 || y < 0 || y >= 9 || testBrd[y][x] !== 0) return false;
+        testBrd[y][x] = 2;
+      }
+      for (let y = 0; y < 9; y++) {
+        for (let x = 0; x < 9; x++) {
+          if (testBrd[y][x] !== 0) {
+            if (getGroupAndLiberties(testBrd, x, y, testBrd[y][x]).liberties === 0) return false;
+          }
+        }
+      }
+      if (!ansList || !ansList.length) return false;
+      const [ax, ay] = ansList[0];
+      if (testBrd[ay][ax] !== 0) return false;
+      return true;
+    }
+
+    function build100Puzzles() {
+      if (PUZZLE_BANK.length > 0) return;
+
+      // 严格按照黄焰、金成来著《速成围棋：入门篇（上、中、下）》36个核心章节编排（36章 × 4方位 = 144道标准题）
+      const seeds = [
+        // ==================== 📘 第一册：《速成围棋：入门篇（上）》（第1～48题，共12个核心章节） ====================
+        // 1. 上册 第2章：吃子（中腹、边线、角部提子）
+        { book: 1, chZh: "第2章:吃子(一子)", chEn: "B1 Ch2: Capture",
+          b: [[4,3],[3,4],[5,4]], w: [[4,4]], ans: [[4,5]],
+          zh: "【入门上·第2章 吃子】把对方棋子的气全部围住称为吃子。请吃掉只剩一口气的白△！",
+          en: "[Book 1 · Ch.2 Capture] Surround the last liberty of the White stone to capture it!" },
+
+        // 2. 上册 第2章：吃子（连块多子提子，教材第16页第4题原型）
+        { book: 1, chZh: "第2章:吃子(块棋)", chEn: "B1 Ch2: Group Capture",
+          b: [[3,3],[4,3],[2,4],[5,4],[3,5]], w: [[3,4],[4,4]], ans: [[4,5]],
+          zh: "【入门上·第2章 吃子】两颗连在一起的白棋只剩最后一口气，请把它们一起提掉！",
+          en: "[Book 1 · Ch.2 Capture] The two connected White stones have only 1 liberty left. Capture both!" },
+
+        // 3. 上册 第3章：逃（逃跑，教材第22页原型）
+        { book: 1, chZh: "第3章:逃(长气逃跑)", chEn: "B1 Ch3: Escape",
+          b: [[4,4]], w: [[4,3],[3,4],[5,4]], ans: [[4,5]],
+          zh: "【入门上·第3章 逃跑】黑子被白棋叫吃只剩一口气了！快通过长气救出被叫吃的黑棋。",
+          en: "[Book 1 · Ch.3 Escape] Your Black stone is in Atari! Extend into open space to gain 3 liberties." },
+
+        // 4. 上册 第4章：互相叫吃（教材第27页1图原型）
+        { book: 1, chZh: "第4章:互相叫吃", chEn: "B1 Ch4: Mutual Atari",
+          b: [[3,3],[4,3],[3,5],[4,5],[5,4],[5,5]], w: [[3,2],[4,2],[5,2],[3,4],[4,4],[5,3]], ans: [[2,4]],
+          zh: "【入门上·第4章 互相叫吃】黑白双方互相都被叫吃！这时先提掉对方棋子的一方获胜。",
+          en: "[Book 1 · Ch.4 Mutual Atari] Both sides are in Atari! Capture the White stones first to rescue yours." },
+
+        // 5. 上册 第5章：连接（教材第36页第1题原型）
+        { book: 1, chZh: "第5章:连接", chEn: "B1 Ch5: Connect",
+          b: [[3,4],[5,4]], w: [[4,3],[4,5]], ans: [[4,4]],
+          zh: "【入门上·第5章 连接】白棋上下夹击想分断黑棋，请把左右两颗黑棋连成一体！",
+          en: "[Book 1 · Ch.5 Connect] White threatens to split your stones. Connect your Black stones solidly!" },
+
+        // 6. 上册 第6章：断（分断，教材第42页第3题原型）
+        { book: 1, chZh: "第6章:断(分断)", chEn: "B1 Ch6: Cut",
+          b: [[2,5],[3,5],[4,5],[4,3]], w: [[4,4],[5,5]], ans: [[5,4]],
+          zh: "【入门上·第6章 断】断是使对方棋子变弱的着法。请果断分断白棋的连接！",
+          en: "[Book 1 · Ch.6 Cut] Cut the two White stones apart so they cannot connect!" },
+
+        // 7. 上册 第7-1章：把对方的棋子向一线方向叫吃（教材第48页2图原型）
+        { book: 1, chZh: "第7-1章:向一线叫吃", chEn: "B1 Ch7-1: 1st-Line Atari",
+          b: [[3,7],[4,6]], w: [[4,7]], ans: [[5,7]],
+          zh: "【入门上·第7-1章 向一线叫吃】将二线白子往一线（棋盘最外围死亡线）方向叫吃，白棋长气也逃不掉！",
+          en: "[Book 1 · Ch.7-1 Atari to Edge] Atari the White stone toward the 1st line so it cannot escape!" },
+
+        // 8. 上册 第7-2章：向己方方向叫吃（抱吃，教材第54页1图原型）
+        { book: 1, chZh: "第7-2章:向己方叫吃", chEn: "B1 Ch7-2: Hugging Atari",
+          b: [[3,5],[3,6],[4,4]], w: [[4,5]], ans: [[5,5]],
+          zh: "【入门上·第7-2章 向己方方向叫吃】把白棋往黑棋自己的墙壁方向赶（抱吃），白棋无处可逃！",
+          en: "[Book 1 · Ch.7-2 Hugging Atari] Drive the White stone into your own wall of Black stones!" },
+
+        // 9. 上册 第7-3/7-4章：断吃与双叫吃（教材第65页1图原型）
+        { book: 1, chZh: "第7-4章:双叫吃", chEn: "B1 Ch7-4: Double Atari",
+          b: [[2,3],[3,3],[4,4],[4,5],[5,5]], w: [[3,2],[4,3],[5,4]], ans: [[5,3]],
+          zh: "【入门上·第7-4章 双叫吃】一手棋同时做出两个叫吃！请找出双叫吃白棋的要点。",
+          en: "[Book 1 · Ch.7-4 Double Atari] Play one stone that puts two White stones into Atari simultaneously!" },
+
+        // 10. 上册 第11章：接不归（教材第93页1图原型）
+        { book: 1, chZh: "第11章:接不归", chEn: "B1 Ch11: Connect & Die",
+          b: [[2,0],[3,1],[2,2],[1,2],[0,2]], w: [[1,1],[2,1],[3,0],[4,1]], ans: [[1,0]],
+          zh: "【入门上·第11章 接不归】利用接不归在一线叫吃白棋！就算白棋连上也依然只有一口气。",
+          en: "[Book 1 · Ch.11 Connect-and-Die] Atari on the 1st line! Even if White connects, the whole group dies." },
+
+        // 11. 上册 第12章：倒扑（教材第99页1图原型，支持两步连环：黑扑 ➔ 白提 ➔ 黑反提）
+        { book: 1, chZh: "第12章:倒扑(两步连环)", chEn: "B1 Ch12: Snapback",
+          b: [[2,8],[4,5],[4,6],[5,7],[5,8],[3,5]], w: [[2,7],[3,6],[4,7],[4,8],[1,7]],
+          ans: [[3,7]],
+          nextW: [3,8],
+          ans2: [[3,7]],
+          zh: "【入门上·第12章 倒扑】第1步：请先往白棋虎口里“送吃（扑）”一子！等白棋提掉后再反提三子。",
+          en: "[Book 1 · Ch.12 Snapback] Step 1: Sacrifice a stone into White's tiger's mouth, then recapture!" },
+
+        // 12. 上册 第13-14章：罩（枷）与征子（教材第106页&112页原型）
+        { book: 1, chZh: "第13-14章:罩(枷)与征子", chEn: "B1 Ch13-14: Net & Ladder",
+          b: [[2,4],[2,5],[3,6],[4,6]], w: [[3,5],[5,3]], ans: [[4,4]],
+          zh: "【入门上·第13章 罩(枷)】用“罩（枷吃）”将白子网罗在黑棋中间，让它往哪边冲都跑不掉！",
+          en: "[Book 1 · Ch.13 The Net] Cage the White stone loosely on the diagonal so both escape routes are blocked!" },
+
+        // ==================== 📗 第二册：《速成围棋：入门篇（中）》（第49～96题，共12个核心章节） ====================
+        // 13. 中册 第1章：虎口连接与双连接（教材第7页1图&3图原型）
+        { book: 2, chZh: "第1章:虎口与双连接", chEn: "B2 Ch1: Tiger's Mouth & Bamboo",
+          b: [[3,4],[4,4],[3,6],[4,6]], w: [[2,5],[5,5],[1,3]], ans: [[4,5],[3,5]],
+          zh: "【入门中·第1章 双连接】白棋在两边窥断，请用坚实的“双”把上下黑棋彻底连起来！",
+          en: "[Book 2 · Ch.1 Bamboo Joint] Connect your two pairs of Black stones solidly against White's peep!" },
+
+        // 14. 中册 第2章：断吃弱棋（教材第16页原型）
+        { book: 2, chZh: "第2章:断的要领", chEn: "B2 Ch2: Cutting Technique",
+          b: [[2,4],[3,4],[4,5]], w: [[3,5],[4,4],[2,6],[5,4]], ans: [[3,3]],
+          zh: "【入门中·第2章 断的要领】白棋刚在下方冲断，请从上方打吃征掉切断的黑棋之敌！",
+          en: "[Book 2 · Ch.2 Cutting] White just cut your stones. Atari the cutting White stone from above!" },
+
+        // 15. 中册 第3章：征与周围棋子的关系（教材第19页1图原型）
+        { book: 2, chZh: "第3章:征子方向选择", chEn: "B2 Ch3: Ladder Direction",
+          b: [[3,4],[4,4],[2,5],[5,5]], w: [[2,4],[3,5],[4,5]], ans: [[3,6]],
+          zh: "【入门中·第3章 征子与引征】注意左边有一颗白子！请在 A(D3) 与 B(E3) 中选择正确的方向征吃两颗白子。",
+          en: "[Book 2 · Ch.3 Ladder Direction] Watch out for the White breaker stone on the left! Choose the right Atari side." },
+
+        // 16. 中册 第4章：征不利时改用罩（教材第27页1图原型）
+        { book: 2, chZh: "第4章:征不利改用罩", chEn: "B2 Ch4: Net over Ladder",
+          b: [[1,4],[2,4],[2,5],[3,5],[4,6],[4,7]], w: [[4,5],[1,5],[2,6],[3,6],[3,8],[7,4],[7,6]], ans: [[5,5]],
+          zh: "【入门中·第4章 罩(枷)】右边有白子接应，征子不利！请改用“罩（枷）”吃住白子。",
+          en: "[Book 2 · Ch.4 Net] The ladder fails because of White's support on the right. Use a Net (Geta) instead!" },
+
+        // 17. 中册 第5-1/5-2章：基本对杀与先收外气（教材第37页1图原型）
+        { book: 2, chZh: "第5-2章:对杀先收外气", chEn: "B2 Ch5-2: Outside Liberties",
+          b: [[2,6],[2,7],[2,8],[3,6],[4,5],[5,5],[5,6],[6,7]], w: [[1,5],[1,6],[1,7],[1,8],[2,5],[3,5],[3,7],[4,6],[4,7],[4,8]], ans: [[5,7]],
+          zh: "【入门中·第5-2章 先收外气】在对杀中如果从内侧叫吃会自撞一气！请先从外面收紧白棋的外气。",
+          en: "[Book 2 · Ch.5-2 Outside Liberties] Do not play inside! Tighten White's outside liberty first to win the race." },
+
+        // 18. 中册 第5-3章：先收连着棋子的气（吃棋筋，教材第40页1图原型）
+        { book: 2, chZh: "第5-3章:收连着棋子的气", chEn: "B2 Ch5-3: Attack Key Stones",
+          b: [[1,6],[1,7],[1,8],[2,4],[3,4],[4,4],[5,5],[5,6],[5,7],[4,8]], w: [[2,8],[2,7],[2,6],[3,7],[4,7],[3,5],[1,4],[1,3],[2,2],[2,5]], ans: [[4,6]],
+          zh: "【入门中·第5-3章 先收连着棋子的气】不要去抓孤立的废子，先紧住包住黑棋的3颗重要白棋的气！",
+          en: "[Book 2 · Ch.5-3 Key Stones] Tighten the liberties of the connected White group surrounding your stones!" },
+
+        // 19. 中册 第7章：制造假眼（教材第57页1图原型）
+        { book: 2, chZh: "第7章:制造假眼", chEn: "B2 Ch7: Make False Eye",
+          b: [[1,8],[2,7],[2,6],[2,4],[3,8]], w: [[4,6],[4,7],[3,7]], ans: [[4,8]],
+          zh: "【入门中·第7章 假眼】眼角被对方占住就会变成假眼！请下在要点破掉或守住角上的眼位。",
+          en: "[Book 2 · Ch.7 False Eye] Play the vital corner point to falsify the eye or secure your own eye!" },
+
+        // 20. 中册 第8-1章：四目死活（丁四急所，教材第63页3图原型）
+        { book: 2, chZh: "第8-1章:四目死活(丁四)", chEn: "B2 Ch8-1: Pyramid Four",
+          b: [[0,6],[1,5],[2,5],[3,5],[4,5],[5,5],[6,6],[6,7],[6,8]], w: [[1,8],[1,7],[2,7],[2,6],[3,6],[3,7],[4,6],[5,7],[5,8]], ans: [[3,8]],
+          zh: "【入门中·第8-1章 四目死活】“丁四”之形，正中间交叉点是做活与点杀的唯一急所！",
+          en: "[Book 2 · Ch.8-1 Pyramid Four] In a Pyramid-Four shape, the center vital point kills White (or makes 2 eyes)!" },
+
+        // 21. 中册 第10-1章：送吃（扑）后的接不归（教材第81页1图原型，支持两步连环：黑扑 ➔ 白提 ➔ 黑再叫吃）
+        { book: 2, chZh: "第10-1章:扑后接不归(连环)", chEn: "B2 Ch10-1: Throw-In & Connect-Die",
+          b: [[1,4],[3,4],[3,5],[0,6],[1,6],[2,6],[2,7]], w: [[1,7],[2,8],[3,8],[3,7],[3,6],[4,5],[5,6]],
+          ans: [[1,8]],
+          nextW: [0,8],
+          ans2: [[1,8]],
+          zh: "【入门中·第10-1章 送吃后的接不归】直接叫吃白会连回！第1步：请先在一线“扑（送吃）”一子，制造接不归！",
+          en: "[Book 2 · Ch.10-1 Throw-In] Step 1: Throw in a sacrifice stone on the 1st line, then Atari for Connect-and-Die!" },
+
+        // 22. 中册 第11章：吃重要的棋子（先吃能逃的子/互断的子，教材第93页&96页原型）
+        { book: 2, chZh: "第11章:吃重要的棋子", chEn: "B2 Ch11: Capture Key Stone",
+          b: [[1,4],[2,5],[3,4],[5,4],[2,6],[3,6],[4,6]], w: [[2,4],[4,4],[4,5],[5,5],[5,6],[2,2],[4,2]], ans: [[4,3]],
+          zh: "【入门中·第11章 吃重要的棋子】左边白一子已经跑不掉了，请先征吃右边分断黑棋的两颗重要白子（棋筋）！",
+          en: "[Book 2 · Ch.11 Key Stone] Ignore the trapped stone on the left! Capture the cutting White key stones first." },
+
+        // 23. 中册 第12-2章：死活的见合（教材第104页1图原型）
+        { book: 2, chZh: "第12-2章:死活的见合", chEn: "B2 Ch12-2: Miai for Life",
+          b: [[1,6],[2,6],[2,7],[0,7],[1,8]], w: [[0,5],[1,5],[2,5],[3,5],[3,6],[3,7],[3,8],[0,6]], ans: [[2,8]],
+          zh: "【入门中·第12-2章 死活的见合】白棋从左边缩小眼位，请黑棋在下方做眼，与左上虎口形成“见合”活棋！",
+          en: "[Book 2 · Ch.12-2 Miai] White reduced your eye space from the left. Secure the bottom eye to live!" },
+
+        // 24. 中册 第14章：好形和坏形（一间跳好形，教材第117页1图原型）
+        { book: 2, chZh: "第14章:一间跳好形", chEn: "B2 Ch14: Good Shape Jump",
+          b: [[2,4],[2,5],[3,6],[4,6]], w: [[1,5],[2,6],[1,7],[3,7]], ans: [[4,4]],
+          zh: "【入门中·第14章 好形与坏形】不要下成凝形或愚形三角！请用轻灵的“一间跳”做出好形出头。",
+          en: "[Book 2 · Ch.14 Good Shape] Avoid heavy clumps! Play a One-Point Jump to make good shape into the center." },
+
+        // ==================== 📙 第三册：《速成围棋：入门篇（下）》（第97～144题，共12个核心章节） ====================
+        // 25. 下册 第1章：互相叫吃实战应用（教材第7页1图原型）
+        { book: 3, chZh: "第1章:互相叫吃实战", chEn: "B3 Ch1: Mutual Atari in Combat",
+          b: [[3,2],[4,3],[4,4],[1,4],[2,4],[3,5],[3,6],[4,6],[4,7],[5,7],[6,6]],
+          w: [[3,3],[3,4],[2,5],[2,6],[2,7],[3,8],[4,5],[5,5],[6,5],[5,6]], ans: [[2,3]],
+          zh: "【入门下·第1章 互相叫吃】白棋叫吃下方黑三子，如果黑棋单纯粘上会被征死！请找出反提上面白二子的手段。",
+          en: "[Book 3 · Ch.1 Mutual Atari] Connecting at the bottom fails! Capture the two upper White stones instead." },
+
+        // 26. 下册 第3-3章：征和罩选择哪个（教材第29页1图原型）
+        { book: 3, chZh: "第3-3章:征和罩选择", chEn: "B3 Ch3-3: Ladder vs Net",
+          b: [[2,4],[2,5],[3,6],[4,6]], w: [[3,5],[1,6],[2,6],[3,7],[7,2]], ans: [[4,4]],
+          zh: "【入门下·第3-3章 征和罩选择哪个】右上角有白棋引征子，征吃不成立！请改选“罩（枷）”吃住白子。",
+          en: "[Book 3 · Ch.3-3 Ladder vs Net] White has a ladder-breaker in the upper right. Choose the Net (Geta)!" },
+
+        // 27. 下册 第4章：连和断（断中求胜，教材第35页1图原型）
+        { book: 3, chZh: "第4章:连和断反击", chEn: "B3 Ch4: Cut & Counter",
+          b: [[1,4],[2,4],[3,5],[4,5],[5,5],[6,5]], w: [[1,5],[2,5],[3,4],[3,6],[4,6],[5,6]], ans: [[3,3]],
+          zh: "【入门下·第4章 连和断】白1冲断黑棋看似严厉，黑棋只需从上方打吃，就能把切断的白子罩死！",
+          en: "[Book 3 · Ch.4 Connect & Cut] White cut your group, but you can Atari from above to trap the cutting stone!" },
+
+        // 28. 下册 第5章：叫吃的要领综合（教材第45页原型）
+        { book: 3, chZh: "第5章:叫吃的要领", chEn: "B3 Ch5: Atari Mastery",
+          b: [[2,6],[3,5],[5,5]], w: [[4,5],[4,6]], ans: [[4,4]],
+          zh: "【入门下·第5章 叫吃的要领】迎头向己方厚势方向叫吃白棋，不给白棋逃向中腹的机会！",
+          en: "[Book 3 · Ch.5 Atari Mastery] Atari from above to drive White into your lower stones!" },
+
+        // 29. 下册 第6章：地（守空，教材第55页1图原型）
+        { book: 3, chZh: "第6章:守空围地", chEn: "B3 Ch6: Defend Territory",
+          b: [[2,5],[4,6],[4,7]], w: [[3,5],[3,4]], ans: [[3,6]],
+          zh: "【入门下·第6章 地(守空)】白棋侵入黑棋角空，请黑棋果断挡住，守护完整的角地！",
+          en: "[Book 3 · Ch.6 Territory] White is invading your corner. Block firmly to protect your territory!" },
+
+        // 30. 下册 第7章：死活（直线三目与曲线三目急所，教材第62页1图&2图原型）
+        { book: 3, chZh: "第7章:三目死活急所", chEn: "B3 Ch7: 3-Space Vital Point",
+          b: [[1,7],[2,6],[3,6],[4,7],[5,7],[5,8]], w: [[0,7],[0,6],[1,5],[2,5],[3,5],[4,5],[5,6],[6,6],[6,7],[6,8]], ans: [[3,7]],
+          zh: "【入门下·第7章 死活】“曲线三目（曲三）”与“直三”一样，中间交叉点是做活与点杀的急所！",
+          en: "[Book 3 · Ch.7 Life & Death] In a Bent-Three eye shape, the center point is the vital point to make two eyes!" },
+
+        // 31. 下册 第8章：撞气（避免自撞气与抓对手撞气，教材第75页1图原型）
+        { book: 3, chZh: "第8章:避免撞气", chEn: "B3 Ch8: Self-Shortage of Liberties",
+          b: [[2,4],[2,5],[1,6],[2,6],[3,6],[4,6]], w: [[3,5],[4,5],[5,5],[5,6],[5,7],[2,7]], ans: [[1,7]],
+          zh: "【入门下·第8章 撞气】如果黑棋在里面叫吃会“自撞一气”被白反杀！请从外侧一线立下吃掉白子。",
+          en: "[Book 3 · Ch.8 Liberty Shortage] Playing inside reduces your own liberties! Play on the 1st line outside." },
+
+        // 32. 下册 第9-2章：对杀和死活（做眼杀无眼，教材第86页1图原型）
+        { book: 3, chZh: "第9-2章:对杀与做活", chEn: "B3 Ch9-2: Semeai & Eye",
+          b: [[0,4],[1,4],[2,4],[1,5],[1,6],[1,7],[3,3],[4,3],[5,4],[5,5],[4,6],[4,7],[4,8]],
+          w: [[0,3],[1,3],[2,3],[2,2],[3,2],[2,5],[3,5],[2,6],[2,7],[2,8]], ans: [[0,6]],
+          zh: "【入门下·第9-2章 对杀与死活】单纯收气黑棋气不够！请在一线做活（或形成有眼杀无眼）战胜白棋。",
+          en: "[Book 3 · Ch.9-2 Semeai & Life] A direct liberty race fails! Make life on the 1st line to defeat White." },
+
+        // 33. 下册 第9-3章：对杀与长气（一线立下长气，教材第90页1图原型）
+        { book: 3, chZh: "第9-3章:对杀与长气", chEn: "B3 Ch9-3: Extend Liberties",
+          b: [[1,3],[2,3],[1,4],[2,5],[3,5],[3,6],[2,7],[3,7],[5,6]],
+          w: [[2,4],[3,4],[4,4],[4,5],[1,5],[1,6],[2,6],[1,7],[4,6],[4,7],[6,6]], ans: [[4,6],[5,7]],
+          zh: "【入门下·第9-3章 对杀与长气】黑棋只有2气，白棋有3气。请黑棋向右方好点延气，把气长到4气获胜！",
+          en: "[Book 3 · Ch.9-3 Extend Liberties] Extend at the key point to increase Black's liberties and win the race!" },
+
+        // 34. 下册 第10-2章：收气和扳（扳二子头，教材第100页1图原型）
+        { book: 3, chZh: "第10-2章:扳阻出头", chEn: "B3 Ch10-2: Hane at Head",
+          b: [[3,4],[3,5]], w: [[4,4],[4,5]], ans: [[4,3]],
+          zh: "【入门下·第10-2章 扳】围棋格言：“逢靠必扳”、“扳二子头”！请迎头扳住白棋，既防白出头又收紧白气。",
+          en: "[Book 3 · Ch.10-2 Hane] 'Hane at the head of two stones!' Block White from extending into the center." },
+
+        // 35. 下册 第11-12章：长和长气、扳与长（教材第105页1图原型）
+        { book: 3, chZh: "第11章:长和长气", chEn: "B3 Ch11: Extend for Strength",
+          b: [[2,4],[3,4],[6,4]], w: [[2,3],[1,4],[2,5],[3,5]], ans: [[4,4]],
+          zh: "【入门下·第11章 长和长气】白棋在下方扳住叫吃，黑棋若乱扳会被断死！请向右边同伴方向“长”出长气。",
+          en: "[Book 3 · Ch.11 Extend] Do not Hane recklessly when short of liberties! Extend toward your friendly stone." },
+
+        // 36. 下册 第13/17章：扳吃与收官（一线扳吃收官，教材第117页&145页原型）
+        { book: 3, chZh: "第13/17章:扳吃与收官", chEn: "B3 Ch13/17: Hane & Endgame",
+          b: [[1,4],[2,4],[3,4],[3,5],[4,4],[5,4],[6,4],[6,5]], w: [[1,5],[2,5],[3,6],[5,5],[6,3]], ans: [[4,5]],
+          zh: "【入门下·第13章 扳吃技术】白棋想跨断联络，请黑棋大胆扳断反击，将分断的白子吃住！",
+          en: "[Book 3 · Ch.13 Hane Capture] Play a bold Hane to cut off the White stone and capture it!" }
+      ];
+
+      let idCounter = 1;
+      for (let sIdx = 0; sIdx < seeds.length; sIdx++) {
+        const seed = seeds[sIdx];
+        // 每个章节母题生成 4 个对称方位 (36 章 × 4 题 = 144 道题)
+        for (let v = 0; v < 4; v++) {
+          const t = (sIdx + v * 2) % 8;
+          const bTrans = seed.b.map(p => tfPt(p[0], p[1], t));
+          const wTrans = seed.w.map(p => tfPt(p[0], p[1], t));
+          const ansTrans = seed.ans.map(p => tfPt(p[0], p[1], t));
+          const nextWTrans = seed.nextW ? tfPt(seed.nextW[0], seed.nextW[1], t) : null;
+          const ans2Trans = seed.ans2 ? seed.ans2.map(p => tfPt(p[0], p[1], t)) : null;
+
+          PUZZLE_BANK.push({
+            id: idCounter++,
+            book: seed.book,
+            chZh: seed.chZh,
+            chEn: seed.chEn,
+            b: bTrans,
+            w: wTrans,
+            ans: ansTrans,
+            nextW: nextWTrans,
+            ans2: ans2Trans,
+            zh: seed.zh,
+            en: seed.en
+          });
+        }
+      }
+      PUZZLE_BANK.forEach((p, idx) => { p.num = idx + 1; });
+    }
+
+    function updateBookFilterLabels() {
+      const bookSel = document.getElementById('puzzleBookSelect');
+      if (!bookSel) return;
+      const opts = bookSel.options;
+      if (opts.length >= 4) {
+        if (currentLang === 'zh') {
+          opts[0].text = "📚 全部三册 (1-144题)";
+          opts[1].text = "📘 入门篇(上) (1-48题)";
+          opts[2].text = "📗 入门篇(中) (49-96题)";
+          opts[3].text = "📙 入门篇(下) (97-144题)";
+        } else {
+          opts[0].text = "📚 All 3 Books (1-144)";
+          opts[1].text = "📘 Book 1: Upper (1-48)";
+          opts[2].text = "📗 Book 2: Middle (49-96)";
+          opts[3].text = "📙 Book 3: Lower (97-144)";
+        }
+      }
+    }
+
+    function filterPuzzleByBook(bookVal) {
+      curBookFilter = bookVal;
+      populatePuzzleSelector();
+      const firstMatchIdx = PUZZLE_BANK.findIndex(p => curBookFilter === 'all' || String(p.book) === String(curBookFilter));
+      if (firstMatchIdx >= 0) {
+        loadPuzzleByIndex(firstMatchIdx);
+      }
+    }
+
+    function populatePuzzleSelector() {
+      build100Puzzles();
+      updateBookFilterLabels();
+      const sel = document.getElementById('puzzleSelect');
+      if (!sel) return;
+      sel.innerHTML = "";
+      const bookTagZh = ["", "上册", "中册", "下册"];
+      const bookTagEn = ["", "B1", "B2", "B3"];
+
+      PUZZLE_BANK.forEach((p, idx) => {
+        if (curBookFilter !== 'all' && String(p.book) !== String(curBookFilter)) return;
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = currentLang === 'zh'
+          ? `第 ${p.num} 题 [${bookTagZh[p.book]}] ${p.chZh}`
+          : `#${p.num} [${bookTagEn[p.book]}] ${p.chEn}`;
+        sel.appendChild(opt);
+      });
+      sel.value = curPuzzleIdx;
+    }
+
+    function refreshCurrentPuzzleText() {
+      if (!isPuzzleMode || !PUZZLE_BANK[curPuzzleIdx]) return;
+      const pz = PUZZLE_BANK[curPuzzleIdx];
+      const badge = document.getElementById('pzStageBadge');
+      if (badge) {
+        const bNamesZh = ["", "📘 入门篇(上)", "📗 入门篇(中)", "📙 入门篇(下)"];
+        const bNamesEn = ["", "📘 Book 1 (Upper)", "📗 Book 2 (Middle)", "📙 Book 3 (Lower)"];
+        badge.textContent = currentLang === 'zh' ? bNamesZh[pz.book] : bNamesEn[pz.book];
+      }
+      const promptEl = document.getElementById('puzzlePromptText');
+      if (promptEl && !puzzleSolved) {
+        promptEl.style.color = "var(--text-main)";
+        if (curPuzzleStep === 1) {
+          promptEl.textContent = currentLang === 'zh'
+            ? "🔥 好棋！白棋提掉了你的扑子，现在请下出第 2 步反提/叫吃白棋！"
+            : "🔥 Great sacrifice! White captured your stone—now play Step 2 to finish it!";
+        } else {
+          promptEl.textContent = "🎯 " + (currentLang === 'zh' ? pz.zh : pz.en);
+        }
+      }
+      updateUI();
+    }
+
+    function loadPuzzleByIndex(idx) {
+      build100Puzzles();
+      curPuzzleIdx = Math.max(0, Math.min(parseInt(idx, 10) || 0, PUZZLE_BANK.length - 1));
+      curPuzzleStep = 0;
+      puzzleSolved = false;
+
+      document.getElementById('boardSizeSelect').value = "9";
+      initGameEngine(9);
+
+      const sel = document.getElementById('puzzleSelect');
+      if (sel) sel.value = curPuzzleIdx;
+
+      refreshCurrentPuzzleText();
+      drawBoard();
+      exportSgfToBox();
+    }
+
+    function stepPuzzle(delta) {
+      build100Puzzles();
+      const filteredIndices = PUZZLE_BANK
+        .map((p, i) => ({ book: p.book, idx: i }))
+        .filter(item => curBookFilter === 'all' || String(item.book) === String(curBookFilter))
+        .map(item => item.idx);
+
+      if (!filteredIndices.length) return;
+      const pos = filteredIndices.indexOf(curPuzzleIdx);
+      const nextPos = pos >= 0
+        ? Math.max(0, Math.min(pos + delta, filteredIndices.length - 1))
+        : 0;
+      loadPuzzleByIndex(filteredIndices[nextPos]);
+    }
+
+    function showPuzzleHint() {
+      if (!isPuzzleMode) return;
+      const pz = PUZZLE_BANK[curPuzzleIdx];
+      if (!pz) return;
+      const targetList = (curPuzzleStep === 1 && pz.ans2) ? pz.ans2 : pz.ans;
+      if (!targetList || !targetList.length) return;
+      const [hx, hy] = targetList[0];
+      const coordStr = COLS_LABEL[hx] + String(BOARD_SIZE - hy);
+      hoverCoord = { x: hx, y: hy };
+      drawBoard();
+      showToast(currentLang === 'zh' ? `💡 老师提示：试试看下在 ${coordStr} 位置！` : `💡 Hint: Try playing at ${coordStr}!`);
+    }
+
+    function handlePuzzleClick(x, y) {
+      if (puzzleSolved) {
+        stepPuzzle(1);
+        return;
+      }
+      const pz = PUZZLE_BANK[curPuzzleIdx];
+      if (!pz || board[y][x] !== 0) return;
+
+      const targetAns = (curPuzzleStep === 1 && pz.ans2) ? pz.ans2 : pz.ans;
+      const isCorrect = targetAns.some(([ax, ay]) => ax === x && ay === y);
+      const promptEl = document.getElementById('puzzlePromptText');
+
+      if (isCorrect) {
+        commitMove(x, y, 1);
+
+        // 若该题是两步连环题（如倒扑、扑后接不归），且当前刚完成第1步
+        if (curPuzzleStep === 0 && pz.nextW && pz.ans2) {
+          curPuzzleStep = 1;
+          refreshCurrentPuzzleText();
+          setTimeout(() => {
+            if (isPuzzleMode && curPuzzleStep === 1) {
+              commitMove(pz.nextW[0], pz.nextW[1], 2);
+              refreshCurrentPuzzleText();
+            }
+          }, 360);
+          return;
+        }
+
+        puzzleSolved = true;
+        soundPass();
+        if (promptEl) {
+          promptEl.style.color = "#15803D";
+          promptEl.textContent = currentLang === 'zh'
+            ? `🎉 太棒啦，答对了！（即将自动进入下一题，或点击棋盘继续）`
+            : `🎉 Correct! Great job! (Loading next puzzle...)`;
+        }
+        showToast(currentLang === 'zh' ? `🎉 闯关成功！第 ${pz.num} 题完成！` : `🎉 Puzzle #${pz.num} Solved!`);
+        setTimeout(() => {
+          if (isPuzzleMode && puzzleSolved && curPuzzleIdx < PUZZLE_BANK.length - 1) {
+            stepPuzzle(1);
+          }
+        }, 1250);
+      } else {
+        soundPut();
+        if (promptEl) {
+          promptEl.style.color = "#B91C1C";
+          promptEl.textContent = currentLang === 'zh'
+            ? `🤔 哎呀，这步不对哦！仔细看看棋形与气数，或点击右上角「💡 提示」！`
+            : `🤔 Not quite right! Check the liberties & shape, or click "💡 Hint"!`;
+        }
+      }
+    }
+
+    // 5-Level Graded AI Engine: Heuristic (Lv1–2) + KataGo Neural Net (Lv3–5)
+    const KG_MODEL_URL = "https://cdn.jsdelivr.net/gh/gostar-tw/kifu-ai@5cf05d9/kata-b15-fp16.onnx";
+    let kgSess = null;
+    let kgEncs = {};
+
+    async function getCachedModelBuffer() {
+      try {
+        if (window.caches) {
+          const cache = await caches.open("worldstargo-katago-v1");
+          const matched = await cache.match(KG_MODEL_URL);
+          if (matched) return new Uint8Array(await matched.arrayBuffer());
+          const resp = await fetch(KG_MODEL_URL);
+          if (resp.ok) {
+            cache.put(KG_MODEL_URL, resp.clone()).catch(() => {});
+            return new Uint8Array(await resp.arrayBuffer());
+          }
+        }
+      } catch(e) {}
+      const res = await fetch(KG_MODEL_URL);
+      return new Uint8Array(await res.arrayBuffer());
+    }
+
+    async function ensureKataGoLoaded() {
+      if (kgSess) return kgSess;
+      document.getElementById('moveInfo').innerText = kt("aiLoading");
+      ort.env.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/";
+      ort.env.wasm.numThreads = 1;
+      const modelBuf = await getCachedModelBuffer();
+      kgSess = await ort.InferenceSession.create(modelBuf, {
+        executionProviders: ['wasm'],
+        enableCpuMemArena: false,
+        enableMemPattern: false
+      });
+      return kgSess;
+    }
+
+    async function changeOpponent() {
+      const modeVal = document.getElementById('opponentSelect').value;
+      vsAI = (modeVal === 'ai');
+      isPuzzleMode = (modeVal === 'puzzle');
+
+      document.getElementById('aiLevelGroup').style.display = vsAI ? 'inline-flex' : 'none';
+      const pzBar = document.getElementById('puzzleCtrlBar');
+      if (pzBar) pzBar.style.display = isPuzzleMode ? 'block' : 'none';
+
+      if (isPuzzleMode) {
+        populatePuzzleSelector();
+        loadPuzzleByIndex(curPuzzleIdx);
+        return;
+      }
+
+      syncMetaNames();
+      initGameEngine(BOARD_SIZE);
+      if (vsAI && aiLevel >= 3 && BOARD_SIZE >= 9) {
+        try {
+          await ensureKataGoLoaded();
+          document.getElementById('moveInfo').innerText = kt("aiReady");
+        } catch(err) {
+          showToast(kt("aiLoadErr"));
+        }
+      } else if (vsAI) {
+        document.getElementById('moveInfo').innerText = kt("aiReady");
+      }
+    }
+
+    async function changeAILevel() {
+      aiLevel = parseInt(document.getElementById('aiLevelSelect').value, 10);
+      syncMetaNames();
+      if (vsAI && aiLevel >= 3 && BOARD_SIZE >= 9 && !kgSess) {
+        try {
+          await ensureKataGoLoaded();
+          document.getElementById('moveInfo').innerText = kt("aiReady");
+        } catch(e) {
+          showToast(kt("aiLoadErr"));
+        }
+      }
+    }
+
+    function isSingleEyePoint(x, y, color) {
+      const dirs = [[0,1], [1,0], [0,-1], [-1,0]];
+      for (let [dx, dy] of dirs) {
+        let nx = x + dx, ny = y + dy;
+        if (nx >= 0 && nx < BOARD_SIZE && ny >= 0 && ny < BOARD_SIZE) {
+          if (board[ny][nx] !== color) return false;
+          if (getGroupAndLiberties(board, nx, ny, color).liberties <= 1) return false;
+        }
+      }
+      return true;
+    }
+
+    function pickHeuristicMove(level) {
+      const candidates = [];
+      const center = (BOARD_SIZE - 1) / 2;
+      const dirs = [[0,1], [1,0], [0,-1], [-1,0]];
+      const humanPassedLast = curMove > 0 && moves[curMove - 1].x < 0;
+
+      for (let y = 0; y < BOARD_SIZE; y++) {
+        for (let x = 0; x < BOARD_SIZE; x++) {
+          const sim = simulateMove(x, y, aiColor);
+          if (!sim.legal) continue;
+
+          if (sim.capturedCount === 0 && isSingleEyePoint(x, y, aiColor)) continue;
+
+          let score = 0;
+          if (sim.myLiberties === 1 && sim.capturedCount === 0) {
+            score -= (level === 1 ? 15 : 30);
+          }
+          if (sim.capturedCount > 0) {
+            score += sim.capturedCount * (level === 1 ? 12 : 28);
+          }
+          if (sim.atariBonus > 0) {
+            score += sim.atariBonus * (level === 1 ? 5 : 12);
+          }
+
+          for (let [dx, dy] of dirs) {
+            let nx = x + dx, ny = y + dy;
+            if (nx >= 0 && nx < BOARD_SIZE && ny >= 0 && ny < BOARD_SIZE && board[ny][nx] === aiColor) {
+              let myOldGrp = getGroupAndLiberties(board, nx, ny, aiColor);
+              if (myOldGrp.liberties === 1 && sim.myLiberties >= 2) {
+                score += (level === 1 ? 8 : 20);
+              }
+            }
+          }
+
+          const distEdge = Math.min(x, y, BOARD_SIZE - 1 - x, BOARD_SIZE - 1 - y);
+          if (distEdge === 0 && moves.length < BOARD_SIZE * 2) score -= 3;
+          const distCenter = Math.abs(x - center) + Math.abs(y - center);
+          score += (BOARD_SIZE - distCenter) * 0.4;
+
+          const noise = level === 1 ? (Math.random() * 8) : (Math.random() * 4);
+          candidates.push({ x, y, rawScore: score, score: score + noise });
+        }
+      }
+
+      if (candidates.length === 0) return null;
+      candidates.sort((a, b) => b.score - a.score);
+
+      if (candidates[0].rawScore < -8) return null;
+      if (humanPassedLast && moves.length > BOARD_SIZE * BOARD_SIZE * 0.45 && candidates[0].rawScore < 4) {
+        return null;
+      }
+
+      return candidates[0];
+    }
+
+    function KGEnc(N) {
+      var NN = N * N, NB = [];
+      for (var i = 0; i < NN; i++) {
+        var x = i % N, y = (i - x) / N, a = [];
+        if (x < N - 1) a.push(i + 1);
+        if (x > 0) a.push(i - 1);
+        if (y < N - 1) a.push(i + N);
+        if (y > 0) a.push(i - N);
+        NB.push(a);
+      }
+      function group(g, s) {
+        var c = g[s], st = [s], seen = {}, libs = {}, nl = 0, stones = [];
+        seen[s] = 1;
+        while (st.length) {
+          var p = st.pop(); stones.push(p); var a = NB[p];
+          for (var k = 0; k < a.length; k++) {
+            var q = a[k], v = g[q];
+            if (v === 0) { if (!libs[q]) { libs[q] = 1; nl++; } }
+            else if (v === c && !seen[q]) { seen[q] = 1; st.push(q); }
+          }
+        }
+        return { stones: stones, libs: libs, nl: nl };
+      }
+      function tryPlay(g, p, c) {
+        if (g[p] !== 0) return null;
+        var h = g.slice(); h[p] = c; var opp = 3 - c, cap = [], a = NB[p];
+        for (var k = 0; k < a.length; k++) {
+          var q = a[k];
+          if (h[q] === opp) {
+            var G = group(h, q);
+            if (G.nl === 0) { G.stones.forEach(function(s) { h[s] = 0; }); cap = cap.concat(G.stones); }
+          }
+        }
+        var M = group(h, p);
+        if (M.nl === 0) return null;
+        return { g: h, ko: (cap.length === 1 && M.stones.length === 1 && M.nl === 1) ? cap[0] : -1 };
+      }
+      function playForce(g, p, c) {
+        var r = tryPlay(g, p, c);
+        if (!r) { g[p] = c; return -1; }
+        for (var i = 0; i < NN; i++) g[i] = r.g[i];
+        return r.ko;
+      }
+      function encode(setup, moveList, komi, plaIn) {
+        var g = new Int8Array(NN), ko = -1, hist = [], i, k;
+        for (i = 0; i < moveList.length; i++) {
+          var m = moveList[i];
+          if (m.p < 0) { ko = -1; hist.push(m); continue; }
+          ko = playForce(g, m.p, m.c);
+          hist.push(m);
+        }
+        var pla = plaIn || ((!hist.length || hist[hist.length - 1].c === 2) ? 1 : 2), opp = 3 - pla;
+        var B = new Float32Array(22 * NN), Gl = new Float32Array(19);
+        function set(f, p) { B[f * NN + p] = 1; }
+        for (i = 0; i < NN; i++) {
+          set(0, i);
+          var v = g[i];
+          if (v === pla) set(1, i); else if (v === opp) set(2, i);
+          if (v) { var nl = group(g, i).nl; if (nl >= 1 && nl <= 3) set(2 + nl, i); }
+        }
+        if (ko >= 0) set(6, ko);
+        var want = opp;
+        for (k = 0; k < 5; k++) {
+          if (hist.length < k + 1) break;
+          var h = hist[hist.length - 1 - k];
+          if (h.c !== want) break;
+          if (h.p < 0) Gl[k] = 1; else set(9 + k, h.p);
+          want = 3 - want;
+        }
+        Gl[5] = (pla === 2 ? komi : -komi) / 20;
+        Gl[9] = 1; Gl[10] = 1;
+        return { bin: B, glob: Gl, pla: pla };
+      }
+      return { encode: encode };
+    }
+
+    function getEncodedHistory() {
+      return moves.slice(0, curMove).map(m => ({
+        c: m.c,
+        p: m.x < 0 ? -1 : m.y * BOARD_SIZE + m.x
+      }));
+    }
+
+    async function triggerAI() {
+      if (isAIThinking) return;
+      isAIThinking = true;
+      updateUI();
+
+      if (aiLevel <= 2 || BOARD_SIZE < 9) {
+        setTimeout(() => {
+          const mv = pickHeuristicMove(aiLevel);
+          isAIThinking = false;
+          if (mv) {
+            commitMove(mv.x, mv.y, aiColor);
+          } else {
+            passTurn(true);
+          }
+        }, 420);
+        return;
+      }
+
+      try {
+        const sess = await ensureKataGoLoaded();
+        await new Promise(r => setTimeout(r, 80));
+
+        const enc = kgEncs[BOARD_SIZE] || (kgEncs[BOARD_SIZE] = KGEnc(BOARD_SIZE));
+        const r = enc.encode({}, getEncodedHistory(), 7.5, aiColor);
+
+        const tensorBin = new ort.Tensor("float32", r.bin, [1, 22, BOARD_SIZE, BOARD_SIZE]);
+        const tensorGlob = new ort.Tensor("float32", r.glob, [1, 19]);
+
+        const out = await sess.run({ input_binary: tensorBin, input_global: tensorGlob });
+        const pol = out.output_policy.data;
+        const passLogit = pol[BOARD_SIZE * BOARD_SIZE];
+        const humanPassedLast = curMove > 0 && moves[curMove - 1].x < 0;
+
+        const legalCandidates = [];
+        for (let i = 0; i < BOARD_SIZE * BOARD_SIZE; i++) {
+          const x = i % BOARD_SIZE, y = Math.floor(i / BOARD_SIZE);
+          if (isLegalMove(x, y, aiColor)) {
+            legalCandidates.push({ idx: i, x, y, logit: pol[i] });
+          }
+        }
+
+        isAIThinking = false;
+        if (legalCandidates.length === 0) {
+          passTurn(true);
+          return;
+        }
+
+        legalCandidates.sort((a, b) => b.logit - a.logit);
+
+        if (passLogit !== undefined) {
+          if (passLogit > legalCandidates[0].logit || (humanPassedLast && passLogit > legalCandidates[0].logit - 1.2)) {
+            passTurn(true);
+            return;
+          }
+        }
+
+        let chosen = legalCandidates[0];
+        if (aiLevel === 3) {
+          const pool = legalCandidates.slice(0, Math.min(10, legalCandidates.length));
+          const temp = 2.4;
+          const maxL = pool[0].logit;
+          const weights = pool.map(c => Math.exp((c.logit - maxL) / temp));
+          const sumW = weights.reduce((a, b) => a + b, 0);
+          let rand = Math.random() * sumW;
+          for (let k = 0; k < pool.length; k++) {
+            rand -= weights[k];
+            if (rand <= 0) { chosen = pool[k]; break; }
+          }
+        } else if (aiLevel === 4) {
+          const pool = legalCandidates.slice(0, Math.min(4, legalCandidates.length));
+          const temp = 1.25;
+          const maxL = pool[0].logit;
+          const weights = pool.map(c => Math.exp((c.logit - maxL) / temp));
+          const sumW = weights.reduce((a, b) => a + b, 0);
+          let rand = Math.random() * sumW;
+          for (let k = 0; k < pool.length; k++) {
+            rand -= weights[k];
+            if (rand <= 0) { chosen = pool[k]; break; }
+          }
+        }
+
+        commitMove(chosen.x, chosen.y, aiColor);
+      } catch(err) {
+        isAIThinking = false;
+        const fallback = pickHeuristicMove(2);
+        if (fallback) commitMove(fallback.x, fallback.y, aiColor);
+        else passTurn(true);
+      }
+    }
+
+    async function toggleEstimate() {
+      estActive = !estActive;
+      document.getElementById('estBtn').classList.toggle('active-est', estActive);
+      document.getElementById('estPanel').hidden = !estActive;
+      if (estActive) {
+        await runEstimateAnalysis();
+      } else {
+        estOwnership = null;
+        drawBoard();
+      }
+    }
+
+    function runSimpleInfluenceEstimate() {
+      const N = BOARD_SIZE, N2 = N * N;
+      estOwnership = new Float32Array(N2);
+      let scoreB = capB, scoreW = capW;
+
+      for (let y = 0; y < N; y++) {
+        for (let x = 0; x < N; x++) {
+          const i = y * N + x;
+          if (board[y][x] === 1) { estOwnership[i] = 0.9; scoreB++; continue; }
+          if (board[y][x] === 2) { estOwnership[i] = -0.9; scoreW++; continue; }
+
+          let infB = 0, infW = 0;
+          for (let sy = 0; sy < N; sy++) {
+            for (let sx = 0; sx < N; sx++) {
+              if (board[sy][sx] === 0) continue;
+              const d = Math.abs(x - sx) + Math.abs(y - sy);
+              const w = Math.pow(0.55, d);
+              if (board[sy][sx] === 1) infB += w; else infW += w;
+            }
+          }
+          if (infB > infW * 1.35 && infB > 0.25) { estOwnership[i] = 0.65; scoreB++; }
+          else if (infW > infB * 1.35 && infW > 0.25) { estOwnership[i] = -0.65; scoreW++; }
+        }
+      }
+
+      const diff = scoreB - scoreW;
+      const winB = Math.max(5, Math.min(95, Math.round(50 + diff * 6)));
+      document.getElementById('estWinBarFill').style.width = winB + "%";
+      document.getElementById('estBlackWin').innerText = kt("estBlackSmall").replace("{s}", scoreB).replace("{p}", winB);
+      document.getElementById('estWhiteWin').innerText = kt("estWhiteSmall").replace("{s}", scoreW).replace("{p}", 100 - winB);
+      document.getElementById('estSourceNote').innerText = kt("estNoteSmall");
+      document.getElementById('estLeadText').innerText =
+        diff === 0 ? kt("estEven") : (diff > 0 ? kt("estBlackLead").replace("{n}", diff) : kt("estWhiteLead").replace("{n}", Math.abs(diff)));
+      drawBoard();
+    }
+
+    async function runEstimateAnalysis() {
+      if (!estActive) return;
+      if (BOARD_SIZE < 9 || isPuzzleMode) {
+        runSimpleInfluenceEstimate();
+        return;
+      }
+
+      document.getElementById('estLeadText').innerText = kt("estAnalyzing");
+      document.getElementById('estSourceNote').innerText = kt("estNoteKata");
+      try {
+        const sess = await ensureKataGoLoaded();
+        const pla = nextTurnColor();
+        const enc = kgEncs[BOARD_SIZE] || (kgEncs[BOARD_SIZE] = KGEnc(BOARD_SIZE));
+        const r = enc.encode({}, getEncodedHistory(), 7.5, pla);
+
+        const tensorBin = new ort.Tensor("float32", r.bin, [1, 22, BOARD_SIZE, BOARD_SIZE]);
+        const tensorGlob = new ort.Tensor("float32", r.glob, [1, 19]);
+        const out = await sess.run({ input_binary: tensorBin, input_global: tensorGlob });
+
+        const rawOwn = out.output_ownership.data;
+        const N2 = BOARD_SIZE * BOARD_SIZE;
+        estOwnership = new Float32Array(N2);
+        for (let i = 0; i < N2; i++) {
+          const v = Math.tanh(rawOwn[i]);
+          estOwnership[i] = r.pla === 1 ? v : -v;
+        }
+
+        const vv = out.output_value.data;
+        const e0 = Math.exp(vv[0]), e1 = Math.exp(vv[1]), e2 = Math.exp(vv[2]);
+        const pw = e0 / (e0 + e1 + e2), pl = e1 / (e0 + e1 + e2);
+        const winB = r.pla === 1 ? pw / (pw + pl) : pl / (pw + pl);
+        const leadB = (r.pla === 1 ? 1 : -1) * out.output_miscvalue.data[0] * 20;
+
+        const pctB = Math.round(winB * 100);
+        document.getElementById('estWinBarFill').style.width = pctB + "%";
+        document.getElementById('estBlackWin').innerText = kt("estBlackWin").replace("{p}", pctB);
+        document.getElementById('estWhiteWin').innerText = kt("estWhiteWin").replace("{p}", 100 - pctB);
+
+        const absLead = (Math.round(Math.abs(leadB) * 10) / 10).toFixed(1);
+        document.getElementById('estLeadText').innerText =
+          Math.abs(leadB) < 0.3 ? kt("estEven") : (leadB > 0 ? kt("estBlackLead").replace("{n}", absLead) : kt("estWhiteLead").replace("{n}", absLead));
+
+        drawBoard();
+      } catch(e) {
+        runSimpleInfluenceEstimate();
+      }
+    }
+
+    function sanitizeSgfField(str) {
+      return String(str || "").replace(/[\[\]\\]/g, " ").trim();
+    }
+
+    function exportSgfToBox() {
+      const pb = sanitizeSgfField(document.getElementById('metaPB').value) || "Black";
+      const pw = sanitizeSgfField(document.getElementById('metaPW').value) || (vsAI ? getAIName(aiLevel) : "White");
+      let sgf = `(;GM[1]FF[4]SZ[${BOARD_SIZE}]KM[7.5]PB[${pb}]PW[${pw}]`;
+
+      // Include initial puzzle setup stones (AB / AW) when in Puzzle Mode
+      if (isPuzzleMode && PUZZLE_BANK[curPuzzleIdx]) {
+        const pz = PUZZLE_BANK[curPuzzleIdx];
+        if (pz.b && pz.b.length) {
+          sgf += "AB" + pz.b.map(([x, y]) => `[${String.fromCharCode(97 + x)}${String.fromCharCode(97 + y)}]`).join("");
+        }
+        if (pz.w && pz.w.length) {
+          sgf += "AW" + pz.w.map(([x, y]) => `[${String.fromCharCode(97 + x)}${String.fromCharCode(97 + y)}]`).join("");
+        }
+      }
+
+      for (let i = 0; i < moves.length; i++) {
+        const m = moves[i];
+        const tag = m.c === 1 ? "B" : "W";
+        if (m.x < 0 || m.y < 0) {
+          sgf += `;${tag}[]`;
+        } else {
+          const cx = String.fromCharCode(97 + m.x);
+          const cy = String.fromCharCode(97 + m.y);
+          sgf += `;${tag}[${cx}${cy}]`;
+        }
+      }
+      sgf += ")";
+      document.getElementById('sgfInput').value = sgf;
+      return sgf;
+    }
+
+    function parseSgfText(sgf) {
+      const sizeMatch = sgf.match(/SZ\[(\d+)\]/i);
+      let sz = BOARD_SIZE;
+      if (sizeMatch && [5, 7, 9, 13, 19].includes(parseInt(sizeMatch[1], 10))) {
+        sz = parseInt(sizeMatch[1], 10);
+      }
+      const list = [];
+      const regex = /;([BW])\[([a-z]{0,2})\]/ig;
+      let match;
+      while ((match = regex.exec(sgf)) !== null) {
+        const color = match[1].toUpperCase() === 'B' ? 1 : 2;
+        const coord = match[2].toLowerCase();
+        if (coord.length === 2 && coord !== 'tt') {
+          const x = coord.charCodeAt(0) - 97;
+          const y = coord.charCodeAt(1) - 97;
+          if (x >= 0 && x < sz && y >= 0 && y < sz) {
+            list.push({ x, y, c: color });
+          } else {
+            list.push({ x: -1, y: -1, c: color });
+          }
+        } else {
+          list.push({ x: -1, y: -1, c: color });
+        }
+      }
+      return { size: sz, moves: list };
+    }
+
+    function handleSgfFileUpload(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const content = String(evt.target.result || "").trim();
+        document.getElementById('sgfInput').value = content;
+        loadSgfFromBox();
+      };
+      reader.readAsText(file, "UTF-8");
+      e.target.value = "";
+    }
+
+    function loadSgfFromBox() {
+      if (isAIThinking) return;
+      stopAutoPlay();
+      const sgf = document.getElementById('sgfInput').value.trim();
+      const parsed = parseSgfText(sgf);
+      if (parsed.moves.length === 0) {
+        showToast(kt("sgfLoadErr"));
+        return;
+      }
+
+      const pbMatch = sgf.match(/PB\[([^\]]*)\]/i);
+      const pwMatch = sgf.match(/PW\[([^\]]*)\]/i);
+      if (pbMatch && pbMatch[1]) document.getElementById('metaPB').value = pbMatch[1].trim();
+      if (pwMatch && pwMatch[1]) document.getElementById('metaPW').value = pwMatch[1].trim();
+
+      vsAI = false;
+      isPuzzleMode = false;
+      document.getElementById('opponentSelect').value = "human";
+      document.getElementById('aiLevelGroup').style.display = 'none';
+      const pzBar = document.getElementById('puzzleCtrlBar');
+      if (pzBar) pzBar.style.display = 'none';
+      document.getElementById('boardSizeSelect').value = parsed.size;
+
+      initGameEngine(parsed.size);
+      moves = parsed.moves;
+      rebuildBoardToMove(moves.length);
+      syncMetaNames();
+      exportSgfToBox();
+      showToast(kt("sgfLoadOk").replace("{n}", moves.length));
+    }
+
+    function playSGF() {
+      if (isAIThinking) return;
+      if (isAnimating) {
+        stopAutoPlay();
+        return;
+      }
+
+      const sgf = document.getElementById('sgfInput').value.trim();
+      const parsed = parseSgfText(sgf);
+      if (parsed.moves.length === 0) {
+        showToast(kt("sgfPlayEmpty"));
+        return;
+      }
+
+      vsAI = false;
+      isPuzzleMode = false;
+      document.getElementById('opponentSelect').value = "human";
+      document.getElementById('aiLevelGroup').style.display = 'none';
+      const pzBar = document.getElementById('puzzleCtrlBar');
+      if (pzBar) pzBar.style.display = 'none';
+      document.getElementById('boardSizeSelect').value = parsed.size;
+
+      initGameEngine(parsed.size);
+      moves = parsed.moves;
+      rebuildBoardToMove(0);
+
+      isAnimating = true;
+      updateAutoPlayBtnUI();
+
+      playInterval = setInterval(() => {
+        if (curMove >= moves.length) {
+          stopAutoPlay();
+          return;
+        }
+        rebuildBoardToMove(curMove + 1);
+        const curM = moves[curMove - 1];
+        if (curM && curM.x < 0) soundPass();
+        else soundPut();
+      }, 550);
+    }
+
+    function copySgfText() {
+      const sgf = exportSgfToBox();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(sgf).then(() => {
+          showToast(kt("sgfCopied"));
+        }).catch(() => {
+          fallbackCopySgf();
+        });
+      } else {
+        fallbackCopySgf();
+      }
+    }
+
+    function fallbackCopySgf() {
+      const box = document.getElementById('sgfInput');
+      box.select();
+      document.execCommand('copy');
+      showToast(kt("sgfCopied"));
+    }
+
+    function downloadSgfFile() {
+      const sgf = exportSgfToBox();
+      const blob = new Blob([sgf], { type: "application/x-go-sgf" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `WorldStarGo-${BOARD_SIZE}x${BOARD_SIZE}-${new Date().toISOString().slice(0,10)}.sgf`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+    }
+
+    const KIFU_COACHES = {
+      mengchun:  { phone: "60169541603", zh: "明俊老师", en: "Coach Meng Chun" },
+      khaiyong:  { phone: "60122009396", zh: "凯荣老师", en: "Coach Khai Yong" },
+      qingxiang: { phone: "60162322768", zh: "庆祥老师", en: "Coach Qing Xiang" }
+    };
+
+    function sendKifuToTeacher() {
+      const sgf = exportSgfToBox();
+      const pb = document.getElementById('metaPB').value.trim() || kt("blackDefault");
+      const pw = document.getElementById('metaPW').value.trim() || (vsAI ? getAIName(aiLevel) : kt("whiteDefault"));
+      const notes = document.getElementById('metaNotes').value.trim();
+
+      const selectEl = document.getElementById('kifuCoachSelect');
+      const coachKey = selectEl ? selectEl.value : 'mengchun';
+      const coach = KIFU_COACHES[coachKey] || KIFU_COACHES.mengchun;
+
+      let msg = "";
+      if (currentLang === 'zh') {
+        msg = `你好${coach.zh}！我在官网完成了线上记谱，想请老师帮忙复盘指点👇\n\n`
+            + `⚫ 黑方：${pb}\n`
+            + `⚪ 白方：${pw}\n`
+            + `📏 棋盘：${BOARD_SIZE}路盘（共 ${moves.length} 手）\n`
+            + (notes ? `💭 我的问题/心得：${notes}\n` : "")
+            + `\n📂 SGF 棋谱代码：\n${sgf}`;
+      } else {
+        msg = `Hi ${coach.en}! I recorded a game on the website and would love your review 👇\n\n`
+            + `⚫ Black: ${pb}\n`
+            + `⚪ White: ${pw}\n`
+            + `📏 Board: ${BOARD_SIZE}x${BOARD_SIZE} (${moves.length} moves)\n`
+            + (notes ? `💭 Questions/Notes: ${notes}\n` : "")
+            + `\n📂 SGF Code:\n${sgf}`;
+      }
+
+      window.open("https://wa.me/" + coach.phone + "?text=" + encodeURIComponent(msg), '_blank');
+    }
+
+    function resizeBoardCanvas() {
+      const wrapper = canvas.parentElement;
+      if (!wrapper) return;
+      const rect = wrapper.getBoundingClientRect();
+      if (rect.width <= 0) return;
+
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const targetPx = Math.round(rect.width * dpr);
+
+      if (canvas.width !== targetPx) {
+        canvas.width = targetPx;
+        canvas.height = targetPx;
+      }
+      GRID_SIZE = canvas.width / (BOARD_SIZE + 1);
+      MARGIN = GRID_SIZE;
+      drawBoard();
+    }
+
+    window.addEventListener('resize', resizeBoardCanvas);
+
+    window.addEventListener('DOMContentLoaded', () => {
+      build100Puzzles();
+      initGameEngine(9);
+      updateMarkBtnUI();
+      updateZoomBtnUI();
+      updateNavTooltips();
+      resizeBoardCanvas();
+
+      if (window.ResizeObserver) {
+        new ResizeObserver(() => resizeBoardCanvas()).observe(canvas.parentElement);
+      }
+
+      if (GOOGLE_FORM_URL && GOOGLE_FORM_URL.trim() !== "") {
+        const quickForm = document.getElementById('quickTrialForm');
+        const gIframe = document.getElementById('googleFormIframe');
+        if (quickForm && gIframe) {
+          quickForm.style.display = 'none';
+          gIframe.style.display = 'block';
+          gIframe.src = GOOGLE_FORM_URL.trim();
+        }
+      }
+    });
+  </script>
+</body>
+</html>
