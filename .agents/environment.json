@@ -1,0 +1,3 @@
+{
+  "install": "node -v && python3 --version && python3 -c 'import pathlib, re, subprocess; scripts = re.findall(r\"<script(?![^>]*\\bsrc=)[^>]*>(.*?)</script>\", pathlib.Path(\"index.html\").read_text(encoding=\"utf-8\"), flags=re.S | re.I); assert scripts, \"No inline scripts found\"; [subprocess.run([\"node\", \"--check\"], input=s, text=True, check=True) for s in scripts]; print(f\"Verified {len(scripts)} inline script blocks\")'"
+}
