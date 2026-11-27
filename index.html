@@ -2228,7 +2228,7 @@
           <div>
             <span class="tag-badge" style="margin-bottom: 6px;">INTERACTIVE BOARD & GRADED AI</span>
             <h2 style="font-size: 1.65rem;" data-i18n="sgf_title">⚫⚪ Online Game Recorder & Graded AI</h2>
-            <p style="font-size: 0.92rem; color: var(--text-muted);" data-i18n="sgf_sub">Switch between 5x5 to 19x19 boards, 5 AI difficulty levels, or 100 Beginner Puzzles. Record SGF or send to your coach for review.</p>
+            <p style="font-size: 0.92rem; color: var(--text-muted);" data-i18n="sgf_sub">Switch between 5x5 to 19x19 boards, 5 AI difficulty levels, or 144 Speed Go Intro Puzzles. Record SGF or send to your coach for review.</p>
           </div>
           <button type="button" class="btn btn-outline" onclick="switchMainView('home')" data-i18n="back_home_btn">
             ← Back to Programs & Trial Booking
@@ -2252,13 +2252,13 @@
                   </select>
                 </div>
 
-                <!-- Mode Selector (Includes Beginner Puzzles) -->
+                <!-- Mode Selector (Includes Speed Go Intro Puzzles) -->
                 <div class="pill-group">
                   <span class="pill-label" data-i18n="lbl_mode">Mode</span>
                   <select id="opponentSelect" class="pill-select" onchange="changeOpponent()">
                     <option value="human" data-i18n="md_opt_human">👥 2-Player / Free Record</option>
                     <option value="ai" data-i18n="md_opt_ai">🤖 vs Computer AI (White)</option>
-                    <option value="puzzle" data-i18n="md_opt_puzzle">🧩 100 Beginner Puzzles</option>
+                    <option value="puzzle" data-i18n="md_opt_puzzle">🧩 Speed Go Intro Puzzles (144)</option>
                   </select>
                 </div>
 
@@ -2560,7 +2560,7 @@
         sz_opt_19: "19x19 (Standard)",
         md_opt_human: "👥 2-Player / Free Record",
         md_opt_ai: "🤖 vs Computer AI (White)",
-        md_opt_puzzle: "🧩 100 Beginner Puzzles",
+        md_opt_puzzle: "🧩 Speed Go Intro Puzzles (144)",
         lv_opt_1: "🌱 Lv.1 Gentle (For Novices)",
         lv_opt_2: "🐣 Lv.2 Easy (~18k)",
         lv_opt_3: "⚔️ Lv.3 Medium (~10k)",
@@ -2688,7 +2688,7 @@
         g4_t: "Courage on the Tournament Floor",
         g4_d: "Representing the academy in regional and national youth tournaments with proper etiquette and resilience.",
         sgf_title: "⚫⚪ Online Game Recorder & Graded AI",
-        sgf_sub: "Switch between 5x5 to 19x19 boards, 5 AI difficulty levels, or 100 Beginner Puzzles. Record SGF or send to your coach for review.",
+        sgf_sub: "Switch between 5x5 to 19x19 boards, 5 AI difficulty levels, or 144 Speed Go Intro Puzzles. Record SGF or send to your coach for review.",
         bk_title: "Book a Trial Class in 30 Seconds",
         bk_sub: "Fill in the quick form below and Coach Meng Chun will arrange the most suitable trial slot for you.",
         bk_left_t: "🎯 What Happens in a Trial Session?",
@@ -2881,7 +2881,7 @@
         g4_t: "勇敢走上赛场的历练",
         g4_d: "代表棋院参加全马及区域青少年围棋赛，在庄重的赛场礼仪中握手对局，见证每一次成长蜕变。",
         sgf_title: "⚫⚪ 线上记谱与分级 AI 对弈",
-        sgf_sub: "支持 5路至19路棋盘切换、5 档 AI 难度调节与 100 道启蒙闯关题，可随时记谱或一键发送给导师复盘。",
+        sgf_sub: "支持 5路至19路棋盘切换、5 档 AI 难度调节与 144 道速成围棋启蒙题，可随时记谱或一键发送给导师复盘。",
         bk_title: "30秒在线预约体验课",
         bk_sub: "填写下方简短资料，明俊老师将为您匹配最适合的体验课时段。",
         bk_left_t: "🎯 一堂体验课包含什么？",
@@ -3102,6 +3102,9 @@
     let aiLevel = 1;
     let aiColor = 2;
     let isAIThinking = false;
+    let gameSessionId = 0;
+    let sgfSetupB = [];
+    let sgfSetupW = [];
     let passNoticeState = null;
 
     let estActive = false;
@@ -3306,7 +3309,22 @@
     let curPuzzleStep = 0; // 0 = 等待第1手, 1 = 连环题等待第2手
     let curBookFilter = 'all';
     let puzzleSolved = false;
+    let isPuzzleWaitingW = false;
+    let puzzleWaitTimer = null;
+    let puzzleNextTimer = null;
     let PUZZLE_BANK = [];
+
+    function clearPuzzleTimers() {
+      if (puzzleWaitTimer !== null) {
+        clearTimeout(puzzleWaitTimer);
+        puzzleWaitTimer = null;
+      }
+      if (puzzleNextTimer !== null) {
+        clearTimeout(puzzleNextTimer);
+        puzzleNextTimer = null;
+      }
+      isPuzzleWaitingW = false;
+    }
 
     // Kifu & AI Bilingual Dictionary (EN Primary)
     const KIFU_I18N = {
@@ -3332,6 +3350,7 @@
         aiLoading: "⏳ Loading AI (~20MB first time)...",
         aiReady: "✅ AI Ready! Black plays first",
         aiLoadErr: "AI model fallback to lightweight mode.",
+        aiSmallBoardNotice: "ℹ️ KataGo neural net activates on 9x9+ boards; 5x5 / 7x7 uses lightweight AI.",
         estAnalyzing: "⏳ Analyzing score & winrate...",
         estEven: "⚖️ Even Game (Half-point margin)",
         estBlackLead: "⚫ Black leads by ~{n} pts",
@@ -3404,6 +3423,7 @@
         aiLoading: "⏳ 首次加载神经网络约20MB...",
         aiReady: "✅ AI 已就绪，请执黑先行",
         aiLoadErr: "AI 模型加载失败，已自动切换为轻量陪练模式。",
+        aiSmallBoardNotice: "ℹ️ KataGo 神经网络适用于 9路及以上棋盘；5路/7路小棋盘使用轻量陪练 AI。",
         estAnalyzing: "⏳ 正在分析目数与胜率...",
         estEven: "⚖️ 局势均势（半目胜负）",
         estBlackLead: "⚫ 黑棋领先约 {n} 目",
@@ -3708,7 +3728,9 @@
       if (soundOn) soundPut();
     }
 
-    function initGameEngine(size) {
+    function initGameEngine(size, setupB = [], setupW = []) {
+      gameSessionId++;
+      clearPuzzleTimers();
       stopAutoPlay();
       hidePassNotice();
       clearCaptureEffects();
@@ -3726,6 +3748,8 @@
       BOARD_SIZE = parseInt(size, 10) || 9;
       GRID_SIZE = (canvas.width || 660) / (BOARD_SIZE + 1);
       MARGIN = GRID_SIZE;
+      sgfSetupB = Array.isArray(setupB) ? setupB.map(p => [p[0], p[1]]) : [];
+      sgfSetupW = Array.isArray(setupW) ? setupW.map(p => [p[0], p[1]]) : [];
       moves = [];
       curMove = 0;
       isAIThinking = false;
@@ -3758,11 +3782,18 @@
       lastMoveCoord = null;
       koPoint = null;
 
-      // If in Puzzle Mode, place initial puzzle setup stones first
+      // Place initial setup stones (Puzzle Mode or SGF AB/AW handicap/problem stones)
       if (isPuzzleMode && PUZZLE_BANK[curPuzzleIdx]) {
         const pz = PUZZLE_BANK[curPuzzleIdx];
         pz.b.forEach(([x, y]) => { board[y][x] = 1; });
         pz.w.forEach(([x, y]) => { board[y][x] = 2; });
+      } else {
+        sgfSetupB.forEach(([x, y]) => {
+          if (x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE) board[y][x] = 1;
+        });
+        sgfSetupW.forEach(([x, y]) => {
+          if (x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE) board[y][x] = 2;
+        });
       }
 
       let lastCapturedStones = [];
@@ -4361,6 +4392,7 @@
         return;
       }
 
+      gameSessionId++;
       const steps = (vsAI && curMove >= 2 && nextTurnColor() === 1) ? 2 : 1;
       moves = moves.slice(0, Math.max(0, curMove - steps));
       rebuildBoardToMove(moves.length);
@@ -4402,13 +4434,25 @@
       }
     }
 
-    function changeBoardSize() {
+    async function changeBoardSize() {
       if (isPuzzleMode) {
         document.getElementById('boardSizeSelect').value = "9";
         return;
       }
-      const size = document.getElementById('boardSizeSelect').value;
+      const size = parseInt(document.getElementById('boardSizeSelect').value, 10) || 9;
       initGameEngine(size);
+      if (vsAI && aiLevel >= 3) {
+        if (BOARD_SIZE < 9) {
+          showToast(kt("aiSmallBoardNotice"));
+        } else if (!kgSess) {
+          try {
+            await ensureKataGoLoaded();
+            document.getElementById('moveInfo').innerText = kt("aiReady");
+          } catch (e) {
+            showToast(kt("aiLoadErr"));
+          }
+        }
+      }
     }
 
     function resetBoard() {
@@ -4424,8 +4468,49 @@
       return [nx, ny];
     }
 
-    function isValidPuzzleSetup(bList, wList, ansList) {
+    function isValidPuzzleSetup(bList, wList, ansList, nextW = null, ans2List = null) {
       const testBrd = Array.from({length: 9}, () => Array(9).fill(0));
+      const dirs = [[0,1], [1,0], [0,-1], [-1,0]];
+      const countLibs = (brd, sx, sy, c) => {
+        const vis = new Set([sy * 9 + sx]);
+        const libs = new Set();
+        const stack = [[sx, sy]];
+        const stones = [];
+        while (stack.length) {
+          const [cx, cy] = stack.pop();
+          stones.push([cx, cy]);
+          for (const [dx, dy] of dirs) {
+            const nx = cx + dx, ny = cy + dy;
+            if (nx < 0 || nx >= 9 || ny < 0 || ny >= 9) continue;
+            if (brd[ny][nx] === 0) libs.add(ny * 9 + nx);
+            else if (brd[ny][nx] === c && !vis.has(ny * 9 + nx)) {
+              vis.add(ny * 9 + nx);
+              stack.push([nx, ny]);
+            }
+          }
+        }
+        return { stones, libs: libs.size };
+      };
+      const tryMove = (brd, x, y, c) => {
+        if (x < 0 || x >= 9 || y < 0 || y >= 9 || brd[y][x] !== 0) return null;
+        const nb = brd.map(r => r.slice());
+        nb[y][x] = c;
+        const opp = c === 1 ? 2 : 1;
+        let cap = 0;
+        for (const [dx, dy] of dirs) {
+          const nx = x + dx, ny = y + dy;
+          if (nx >= 0 && nx < 9 && ny >= 0 && ny < 9 && nb[ny][nx] === opp) {
+            const grp = countLibs(nb, nx, ny, opp);
+            if (grp.libs === 0) {
+              grp.stones.forEach(([gx, gy]) => { nb[gy][gx] = 0; });
+              cap += grp.stones.length;
+            }
+          }
+        }
+        if (countLibs(nb, x, y, c).libs === 0 && cap === 0) return null;
+        return nb;
+      };
+
       for (const [x, y] of bList) {
         if (x < 0 || x >= 9 || y < 0 || y >= 9 || testBrd[y][x] !== 0) return false;
         testBrd[y][x] = 1;
@@ -4436,14 +4521,21 @@
       }
       for (let y = 0; y < 9; y++) {
         for (let x = 0; x < 9; x++) {
-          if (testBrd[y][x] !== 0) {
-            if (getGroupAndLiberties(testBrd, x, y, testBrd[y][x]).liberties === 0) return false;
-          }
+          if (testBrd[y][x] !== 0 && countLibs(testBrd, x, y, testBrd[y][x]).libs === 0) return false;
         }
       }
       if (!ansList || !ansList.length) return false;
-      const [ax, ay] = ansList[0];
-      if (testBrd[ay][ax] !== 0) return false;
+      for (const [ax, ay] of ansList) {
+        const afterB1 = tryMove(testBrd, ax, ay, 1);
+        if (!afterB1) return false;
+        if (nextW && ans2List && ans2List.length) {
+          const afterW = tryMove(afterB1, nextW[0], nextW[1], 2);
+          if (!afterW) return false;
+          for (const [a2x, a2y] of ans2List) {
+            if (!tryMove(afterW, a2x, a2y, 1)) return false;
+          }
+        }
+      }
       return true;
     }
 
@@ -4454,7 +4546,7 @@
         // ==================== 📘 第一册：《速成围棋：入门篇（上）》（第1～48题，共12个核心章节） ====================
         { book: 1, chZh: "第2章:吃子(一子)", chEn: "B1 Ch2: Capture",
           b: [[4,3],[3,4],[5,4]], w: [[4,4]], ans: [[4,5]],
-          zh: "【入门上·第2章 吃子】把对方棋子的气全部围住称为吃子。请吃掉只剩一口气的白△！",
+          zh: "【入门上·第2章 吃子】把对方棋子的气全部围住称为吃子。请吃掉只剩一口气的白子！",
           en: "[Book 1 · Ch.2 Capture] Surround the last liberty of the White stone to capture it!" },
 
         { book: 1, chZh: "第2章:吃子(块棋)", chEn: "B1 Ch2: Group Capture",
@@ -4474,13 +4566,13 @@
 
         { book: 1, chZh: "第5章:连接", chEn: "B1 Ch5: Connect",
           b: [[3,4],[5,4]], w: [[4,3],[4,5]], ans: [[4,4]],
-          zh: "【入门上·第5章 连接】白棋上下夹击想分断黑棋，请把左右两颗黑棋连成一体！",
+          zh: "【入门上·第5章 连接】白棋两边夹击想分断黑棋，请把两颗黑棋连成一体！",
           en: "[Book 1 · Ch.5 Connect] White threatens to split your stones. Connect your Black stones solidly!" },
 
         { book: 1, chZh: "第6章:断(分断)", chEn: "B1 Ch6: Cut",
           b: [[2,5],[3,5],[4,5],[4,3]], w: [[4,4],[5,5]], ans: [[5,4]],
-          zh: "【入门上·第6章 断】断是使对方棋子变弱的着法。请果断分断白棋的连接！",
-          en: "[Book 1 · Ch.6 Cut] Cut the two White stones apart so they cannot connect!" },
+          zh: "【入门上·第6章 断】断是使对方棋子变弱的着法。请果断分断白棋的连接并叫吃！",
+          en: "[Book 1 · Ch.6 Cut] Cut the two White stones apart and put one in Atari!" },
 
         { book: 1, chZh: "第7-1章:向一线叫吃", chEn: "B1 Ch7-1: 1st-Line Atari",
           b: [[3,7],[4,6]], w: [[4,7]], ans: [[5,7]],
@@ -4488,9 +4580,9 @@
           en: "[Book 1 · Ch.7-1 Atari to Edge] Atari the White stone toward the 1st line so it cannot escape!" },
 
         { book: 1, chZh: "第7-2章:向己方方向叫吃", chEn: "B1 Ch7-2: Hugging Atari",
-          b: [[3,5],[3,6],[4,4]], w: [[4,5]], ans: [[5,5]],
-          zh: "【入门上·第7-2章 向己方方向叫吃】把白棋往黑棋自己的墙壁方向赶（抱吃），白棋无处可逃！",
-          en: "[Book 1 · Ch.7-2 Hugging Atari] Drive the White stone into your own wall of Black stones!" },
+          b: [[3,3],[3,4],[3,5],[3,6],[4,3],[4,6]], w: [[4,5]], ans: [[5,5]],
+          zh: "【入门上·第7-2章 向己方方向叫吃】把白棋往黑棋自己的墙壁口袋方向赶（抱吃），白棋长气也无处可逃！",
+          en: "[Book 1 · Ch.7-2 Hugging Atari] Drive the White stone into your own Black wall pocket so it cannot escape!" },
 
         { book: 1, chZh: "第7-4章:双叫吃", chEn: "B1 Ch7-4: Double Atari",
           b: [[2,3],[3,3],[4,4],[4,5],[5,5]], w: [[3,2],[4,3],[5,4]], ans: [[5,3]],
@@ -4498,9 +4590,9 @@
           en: "[Book 1 · Ch.7-4 Double Atari] Play one stone that puts two White stones into Atari simultaneously!" },
 
         { book: 1, chZh: "第11章:接不归", chEn: "B1 Ch11: Connect & Die",
-          b: [[2,0],[3,1],[2,2],[1,2],[0,2]], w: [[1,1],[2,1],[3,0],[4,1]], ans: [[1,0]],
-          zh: "【入门上·第11章 接不归】利用接不归在一线叫吃白棋！就算白棋连上也依然只有一口气。",
-          en: "[Book 1 · Ch.11 Connect-and-Die] Atari on the 1st line! Even if White connects, the whole group dies." },
+          b: [[0,0],[4,0],[0,1],[4,1],[0,2],[4,2],[1,3],[3,3]], w: [[1,0],[3,0],[1,1],[2,1],[3,1],[1,2],[3,2],[2,3]], ans: [[2,4]],
+          zh: "【入门上·第11章 接不归】从外侧叫吃白棋的关键子！就算白棋连回虎口，整块白棋依然只剩一口气。",
+          en: "[Book 1 · Ch.11 Connect-and-Die] Atari the key White stone from outside! Even if White connects, the whole group dies." },
 
         { book: 1, chZh: "第12章:倒扑(两步连环)", chEn: "B1 Ch12: Snapback",
           b: [[2,8],[4,5],[4,6],[5,7],[5,8],[3,5]], w: [[2,7],[3,6],[4,7],[4,8],[1,7]],
@@ -4516,63 +4608,63 @@
           en: "[Book 1 · Ch.13 The Net] Cage the White stone loosely on the diagonal so both escape routes are blocked!" },
 
         // ==================== 📗 第二册：《速成围棋：入门篇（中）》（第49～96题，共12个核心章节） ====================
-        { book: 2, chZh: "第1章:虎口与双连接", chEn: "B2 Ch1: Tiger's Mouth & Bamboo",
+        { book: 2, chZh: "第1章:稳固连接", chEn: "B2 Ch1: Solid Connection",
           b: [[3,4],[4,4],[3,6],[4,6]], w: [[2,5],[5,5],[1,3]], ans: [[4,5],[3,5]],
-          zh: "【入门中·第1章 双连接】白棋在两边窥断，请用坚实的“双”把上下黑棋彻底连起来！",
-          en: "[Book 2 · Ch.1 Bamboo Joint] Connect your two pairs of Black stones solidly against White's peep!" },
+          zh: "【入门中·第1章 连接】白棋在两边窥断黑棋的竹节双，请补一手把两组黑棋彻底实连起来！",
+          en: "[Book 2 · Ch.1 Connection] White peeps from both sides of your bamboo joint. Connect your Black groups solidly!" },
 
-        { book: 2, chZh: "第2章:断的要领", chEn: "B2 Ch2: Cutting Technique",
-          b: [[2,4],[3,4],[4,5]], w: [[3,5],[4,4],[2,6],[5,4]], ans: [[3,3]],
-          zh: "【入门中·第2章 断的要领】白棋刚在下方冲断，请从上方打吃征掉切断的黑棋之敌！",
-          en: "[Book 2 · Ch.2 Cutting] White just cut your stones. Atari the cutting White stone from above!" },
+        { book: 2, chZh: "第2章:断的要领", chEn: "B2 Ch2: Cutting Counter",
+          b: [[3,3],[3,4],[4,5],[5,5],[6,4]], w: [[4,4],[2,5],[3,5],[5,2]], ans: [[4,3]],
+          zh: "【入门中·第2章 断的要领】白棋冲断黑棋，请选对方向叫吃这颗断子，把它赶向己方黑子一举吃掉！",
+          en: "[Book 2 · Ch.2 Cutting] White just cut your stones. Atari the cutting stone toward your friendly Black stones!" },
 
         { book: 2, chZh: "第3章:征子方向选择", chEn: "B2 Ch3: Ladder Direction",
-          b: [[3,4],[4,4],[2,5],[5,5]], w: [[2,4],[3,5],[4,5]], ans: [[3,6]],
-          zh: "【入门中·第3章 征子与引征】注意左边有一颗白子！请在 A(D3) 与 B(E3) 中选择正确的方向征吃两颗白子。",
-          en: "[Book 2 · Ch.3 Ladder Direction] Watch out for the White breaker stone on the left! Choose the right Atari side." },
+          b: [[3,4],[4,4],[2,5],[5,5]], w: [[3,5],[4,5],[1,7]], ans: [[3,6]],
+          zh: "【入门中·第3章 征子与引征】远处有一颗白棋引征子！请避开引征子方向，选对方向征吃两颗白子。",
+          en: "[Book 2 · Ch.3 Ladder Direction] Watch out for the White ladder-breaker stone! Atari away from it to capture." },
 
         { book: 2, chZh: "第4章:征不利改用罩", chEn: "B2 Ch4: Net over Ladder",
-          b: [[1,4],[2,4],[2,5],[3,5],[4,6],[4,7]], w: [[4,5],[1,5],[2,6],[3,6],[3,8],[7,4],[7,6]], ans: [[5,5]],
-          zh: "【入门中·第4章 罩(枷)】右边有白子接应，征子不利！请改用“罩（枷）”吃住白子。",
-          en: "[Book 2 · Ch.4 Net] The ladder fails because of White's support on the right. Use a Net (Geta) instead!" },
+          b: [[3,4],[3,5],[4,6],[5,6],[2,4]], w: [[4,5],[2,5],[3,6],[7,2],[7,7]], ans: [[5,4]],
+          zh: "【入门中·第4章 罩(枷)】远处有白子接应，无论哪个方向征子都不利！请改用“罩（枷）”吃住白子。",
+          en: "[Book 2 · Ch.4 Net] Both ladders fail because of White's support stones. Use a Net (Geta) instead!" },
 
         { book: 2, chZh: "第5-2章:对杀先收外气", chEn: "B2 Ch5-2: Outside Liberties",
-          b: [[2,6],[2,7],[2,8],[3,6],[4,5],[5,5],[5,6],[6,7]], w: [[1,5],[1,6],[1,7],[1,8],[2,5],[3,5],[3,7],[4,6],[4,7],[4,8]], ans: [[5,7]],
-          zh: "【入门中·第5-2章 先收外气】在对杀中如果从内侧叫吃会自撞一气！请先从外面收紧白棋的外气。",
-          en: "[Book 2 · Ch.5-2 Outside Liberties] Do not play inside! Tighten White's outside liberty first to win the race." },
+          b: [[1,6],[2,6],[2,7],[2,8],[3,8],[3,5],[4,5],[5,5],[5,6],[5,7]], w: [[0,5],[1,5],[2,5],[0,7],[1,7],[1,8],[3,6],[4,6],[4,7],[4,8]], ans: [[5,8]],
+          zh: "【入门中·第5-2章 先收外气】在对杀中如果先走公气会自撞一气！请先从外面一线收紧白棋的外气。",
+          en: "[Book 2 · Ch.5-2 Outside Liberties] Do not fill the shared liberty! Tighten White's outside liberty first." },
 
         { book: 2, chZh: "第5-3章:收连着棋子的气", chEn: "B2 Ch5-3: Attack Key Stones",
-          b: [[1,6],[1,7],[1,8],[2,4],[3,4],[4,4],[5,5],[5,6],[5,7],[4,8]], w: [[2,8],[2,7],[2,6],[3,7],[4,7],[3,5],[1,4],[1,3],[2,2],[2,5]], ans: [[4,6]],
-          zh: "【入门中·第5-3章 先收连着棋子的气】不要去抓孤立的废子，先紧住包住黑棋的3颗重要白棋的气！",
-          en: "[Book 2 · Ch.5-3 Key Stones] Tighten the liberties of the connected White group surrounding your stones!" },
+          b: [[0,6],[0,7],[0,8],[1,8],[1,5],[2,5],[3,5],[3,6],[4,7],[3,8],[4,8],[5,5],[6,4],[7,5]], w: [[1,6],[2,6],[2,7],[0,4],[6,5]], ans: [[3,7]],
+          zh: "【入门中·第5-3章 先收连着棋子的气】不要去抓孤立的废子，先从外侧紧住包住黑棋的3颗重要白棋的气！",
+          en: "[Book 2 · Ch.5-3 Key Stones] Ignore the isolated stone! Tighten the outside liberty of the 3 White key stones." },
 
         { book: 2, chZh: "第7章:制造假眼", chEn: "B2 Ch7: Make False Eye",
-          b: [[1,8],[2,7],[2,6],[2,4],[3,8]], w: [[4,6],[4,7],[3,7]], ans: [[4,8]],
-          zh: "【入门中·第7章 假眼】眼角被对方占住就会变成假眼！请下在要点破掉或守住角上的眼位。",
-          en: "[Book 2 · Ch.7 False Eye] Play the vital corner point to falsify the eye or secure your own eye!" },
+          b: [[0,5],[1,5],[2,5],[3,5],[4,5],[4,6],[5,7],[5,8]], w: [[0,6],[1,6],[2,6],[3,6],[0,7],[2,7],[4,7],[0,8],[1,8],[2,8],[3,8]], ans: [[4,8]],
+          zh: "【入门中·第7章 假眼】眼角被对方占住就会变成假眼！请在一线打吃破掉白棋第二只眼的眼角。",
+          en: "[Book 2 · Ch.7 False Eye] Play on the 1st-line diagonal to put White in Atari and falsify the second eye!" },
 
         { book: 2, chZh: "第8-1章:四目死活(丁四)", chEn: "B2 Ch8-1: Pyramid Four",
-          b: [[0,6],[1,5],[2,5],[3,5],[4,5],[5,5],[6,6],[6,7],[6,8]], w: [[1,8],[1,7],[2,7],[2,6],[3,6],[3,7],[4,6],[5,7],[5,8]], ans: [[3,8]],
-          zh: "【入门中·第8-1章 四目死活】“丁四”之形，正中间交叉点是做活与点杀的唯一急所！",
-          en: "[Book 2 · Ch.8-1 Pyramid Four] In a Pyramid-Four shape, the center vital point kills White (or makes 2 eyes)!" },
+          b: [[0,6],[0,7],[0,8],[1,5],[2,5],[3,5],[4,5],[5,5],[6,6],[6,7],[6,8]], w: [[1,6],[2,6],[3,6],[4,6],[5,6],[1,7],[2,7],[4,7],[5,7],[1,8],[5,8]], ans: [[3,8]],
+          zh: "【入门中·第8-1章 四目死活】“丁四”之形，正中间交叉点是点杀白棋的唯一急所！",
+          en: "[Book 2 · Ch.8-1 Pyramid Four] In a Pyramid-Four shape, the center vital point kills White!" },
 
         { book: 2, chZh: "第10-1章:扑后接不归(连环)", chEn: "B2 Ch10-1: Throw-In & Connect-Die",
-          b: [[1,4],[3,4],[3,5],[0,6],[1,6],[2,6],[2,7]], w: [[1,7],[2,8],[3,8],[3,7],[3,6],[4,5],[5,6]],
+          b: [[2,5],[3,5],[4,5],[0,6],[1,6],[2,6],[5,6],[4,7],[3,8]], w: [[3,6],[0,7],[1,7],[2,7],[2,8]],
           ans: [[1,8]],
           nextW: [0,8],
-          ans2: [[1,8]],
-          zh: "【入门中·第10-1章 送吃后的接不归】直接叫吃白会连回！第1步：请先在一线“扑（送吃）”一子，制造接不归！",
-          en: "[Book 2 · Ch.10-1 Throw-In] Step 1: Throw in a sacrifice stone on the 1st line, then Atari for Connect-and-Die!" },
+          ans2: [[4,6]],
+          zh: "【入门中·第10-1章 送吃后的接不归】直接叫吃白会连回！第1步：请先在一线“扑（送吃）”缩减白气，再叫吃形成接不归！",
+          en: "[Book 2 · Ch.10-1 Throw-In] Step 1: Throw in on the 1st line to reduce liberties, then Atari for Connect-and-Die!" },
 
         { book: 2, chZh: "第11章:吃重要的棋子", chEn: "B2 Ch11: Capture Key Stone",
-          b: [[1,4],[2,5],[3,4],[5,4],[2,6],[3,6],[4,6]], w: [[2,4],[4,4],[4,5],[5,5],[5,6],[2,2],[4,2]], ans: [[4,3]],
-          zh: "【入门中·第11章 吃重要的棋子】左边白一子已经跑不掉了，请先征吃右边分断黑棋的两颗重要白子（棋筋）！",
-          en: "[Book 2 · Ch.11 Key Stone] Ignore the trapped stone on the left! Capture the cutting White key stones first." },
+          b: [[0,5],[1,4],[2,5],[2,6],[0,6],[4,4],[4,5],[6,4],[6,5],[5,6]], w: [[1,5],[5,4],[5,5],[3,4],[3,5],[4,3],[6,3]], ans: [[5,3]],
+          zh: "【入门中·第11章 吃重要的棋子】孤立的白一子无关紧要，请先提掉分断黑棋的两颗重要白子（棋筋）！",
+          en: "[Book 2 · Ch.11 Key Stone] Ignore the isolated junk stone! Capture the two cutting White key stones first." },
 
         { book: 2, chZh: "第12-2章:死活的见合", chEn: "B2 Ch12-2: Miai for Life",
           b: [[1,6],[2,6],[2,7],[0,7],[1,8]], w: [[0,5],[1,5],[2,5],[3,5],[3,6],[3,7],[3,8],[0,6]], ans: [[2,8]],
-          zh: "【入门中·第12-2章 死活的见合】白棋从左边缩小眼位，请黑棋在下方做眼，与左上虎口形成“见合”活棋！",
-          en: "[Book 2 · Ch.12-2 Miai] White reduced your eye space from the left. Secure the bottom eye to live!" },
+          zh: "【入门中·第12-2章 死活的见合】白棋从外侧破眼压缩空间，请在一线占住眼角要点，确保做出两只真眼活棋！",
+          en: "[Book 2 · Ch.12-2 Living Shape] White reduced your eye space. Secure the 1st-line corner point to make two true eyes!" },
 
         { book: 2, chZh: "第14章:一间跳好形", chEn: "B2 Ch14: Good Shape Jump",
           b: [[2,4],[2,5],[3,6],[4,6]], w: [[1,5],[2,6],[1,7],[3,7]], ans: [[4,4]],
@@ -4583,65 +4675,65 @@
         { book: 3, chZh: "第1章:互相叫吃实战", chEn: "B3 Ch1: Mutual Atari in Combat",
           b: [[3,2],[4,3],[4,4],[1,4],[2,4],[3,5],[3,6],[4,6],[4,7],[5,7],[6,6]],
           w: [[3,3],[3,4],[2,5],[2,6],[2,7],[3,8],[4,5],[5,5],[6,5],[5,6]], ans: [[2,3]],
-          zh: "【入门下·第1章 互相叫吃】白棋叫吃下方黑三子，如果黑棋单纯粘上会被征死！请找出反提上面白二子的手段。",
-          en: "[Book 3 · Ch.1 Mutual Atari] Connecting at the bottom fails! Capture the two upper White stones instead." },
+          zh: "【入门下·第1章 实战吃棋筋】不要错过一击制胜的机会！请果断提掉只剩一口气的两颗白棋棋筋。",
+          en: "[Book 3 · Ch.1 Combat Capture] Seize the decisive blow! Capture the two cutting White key stones in Atari." },
 
         { book: 3, chZh: "第3-3章:征和罩选择", chEn: "B3 Ch3-3: Ladder vs Net",
           b: [[2,4],[2,5],[3,6],[4,6]], w: [[3,5],[1,6],[2,6],[3,7],[7,2]], ans: [[4,4]],
-          zh: "【入门下·第3-3章 征和罩选择哪个】右上角有白棋引征子，征吃不成立！请改选“罩（枷）”吃住白子。",
-          en: "[Book 3 · Ch.3-3 Ladder vs Net] White has a ladder-breaker in the upper right. Choose the Net (Geta)!" },
+          zh: "【入门下·第3-3章 征和罩选择哪个】远方角部有白棋引征子，征吃不成立！请改选“罩（枷）”吃住白子。",
+          en: "[Book 3 · Ch.3-3 Ladder vs Net] White has a ladder-breaker in the far corner. Choose the Net (Geta)!" },
 
         { book: 3, chZh: "第4章:连和断反击", chEn: "B3 Ch4: Cut & Counter",
           b: [[1,4],[2,4],[3,5],[4,5],[5,5],[6,5]], w: [[1,5],[2,5],[3,4],[3,6],[4,6],[5,6]], ans: [[3,3]],
-          zh: "【入门下·第4章 连和断】白1冲断黑棋看似严厉，黑棋只需从上方打吃，就能把切断的白子罩死！",
-          en: "[Book 3 · Ch.4 Connect & Cut] White cut your group, but you can Atari from above to trap the cutting stone!" },
+          zh: "【入门下·第4章 连和断】白棋冲断黑棋看似严厉，黑棋只需选对方向打吃，就能把切断的白子沿黑墙一路征死！",
+          en: "[Book 3 · Ch.4 Connect & Cut] White cut your group—Atari from the open side to drive the cutting stone into a capture!" },
 
         { book: 3, chZh: "第5章:叫吃的要领", chEn: "B3 Ch5: Atari Mastery",
-          b: [[2,6],[3,5],[5,5]], w: [[4,5],[4,6]], ans: [[4,4]],
-          zh: "【入门下·第5章 叫吃的要领】迎头向己方厚势方向叫吃白棋，不给白棋逃向中腹的机会！",
-          en: "[Book 3 · Ch.5 Atari Mastery] Atari from above to drive White into your lower stones!" },
+          b: [[3,5],[3,6],[3,7],[5,5],[5,6],[5,7],[4,8]], w: [[4,5],[4,6]], ans: [[4,4]],
+          zh: "【入门下·第5章 叫吃的要领】迎头向己方厚势口袋方向叫吃两颗白棋，绝不给白棋逃向中腹的机会！",
+          en: "[Book 3 · Ch.5 Atari Mastery] Atari from the center side to drive both White stones into your Black pocket!" },
 
         { book: 3, chZh: "第6章:守空围地", chEn: "B3 Ch6: Defend Territory",
           b: [[2,5],[4,6],[4,7]], w: [[3,5],[3,4]], ans: [[3,6]],
           zh: "【入门下·第6章 地(守空)】白棋侵入黑棋角空，请黑棋果断挡住，守护完整的角地！",
           en: "[Book 3 · Ch.6 Territory] White is invading your corner. Block firmly to protect your territory!" },
 
-        { book: 3, chZh: "第7章:三目死活急所", chEn: "B3 Ch7: 3-Space Vital Point",
-          b: [[1,7],[2,6],[3,6],[4,7],[5,7],[5,8]], w: [[0,7],[0,6],[1,5],[2,5],[3,5],[4,5],[5,6],[6,6],[6,7],[6,8]], ans: [[3,7]],
-          zh: "【入门下·第7章 死活】“曲线三目（曲三）”与“直三”一样，中间交叉点是做活与点杀的急所！",
-          en: "[Book 3 · Ch.7 Life & Death] In a Bent-Three eye shape, the center point is the vital point to make two eyes!" },
+        { book: 3, chZh: "第7章:三目死活急所", chEn: "B3 Ch7: Bent-Three Vital Point",
+          b: [[1,6],[2,6],[3,6],[4,6],[1,7],[2,7],[4,7],[1,8],[4,8]], w: [[1,5],[2,5],[3,5],[4,5],[0,6],[0,7],[0,8],[5,6],[5,7],[5,8]], ans: [[3,8]],
+          zh: "【入门下·第7章 死活】“曲线三目（曲三）”与“直三”一样，正中间交叉点是做活两只真眼的唯一急所！",
+          en: "[Book 3 · Ch.7 Life & Death] In a Bent-Three eye shape, the center point is the vital point to make two true eyes!" },
 
         { book: 3, chZh: "第8章:避免撞气", chEn: "B3 Ch8: Self-Shortage of Liberties",
-          b: [[2,4],[2,5],[1,6],[2,6],[3,6],[4,6]], w: [[3,5],[4,5],[5,5],[5,6],[5,7],[2,7]], ans: [[1,7]],
-          zh: "【入门下·第8章 撞气】如果黑棋在里面叫吃会“自撞一气”被白反杀！请从外侧一线立下吃掉白子。",
-          en: "[Book 3 · Ch.8 Liberty Shortage] Playing inside reduces your own liberties! Play on the 1st line outside." },
+          b: [[3,6],[4,6],[4,7],[1,7],[2,7]], w: [[0,6],[1,6],[2,6],[0,7],[0,8],[3,7],[3,8]], ans: [[4,8]],
+          zh: "【入门下·第8章 撞气】如果黑棋从内侧叫吃会“自撞一气”被白反杀！请从外侧一线立下吃掉白棋二子。",
+          en: "[Book 3 · Ch.8 Liberty Shortage] Playing inside causes self-atari! Descend on the 1st line outside to capture White." },
 
         { book: 3, chZh: "第9-2章:对杀与做活", chEn: "B3 Ch9-2: Semeai & Eye",
           b: [[0,4],[1,4],[2,4],[1,5],[1,6],[1,7],[3,3],[4,3],[5,4],[5,5],[4,6],[4,7],[4,8]],
           w: [[0,3],[1,3],[2,3],[2,2],[3,2],[2,5],[3,5],[2,6],[2,7],[2,8]], ans: [[0,6]],
-          zh: "【入门下·第9-2章 对杀与死活】单纯收气黑棋气不够！请在一线做活（或形成有眼杀无眼）战胜白棋。",
-          en: "[Book 3 · Ch.9-2 Semeai & Life] A direct liberty race fails! Make life on the 1st line to defeat White." },
+          zh: "【入门下·第9-2章 对杀与死活】单纯收气黑棋气不够！请在一线做出两只眼活棋，直接战胜白棋。",
+          en: "[Book 3 · Ch.9-2 Semeai & Life] A direct liberty race fails! Play on the 1st line to live with two eyes." },
 
         { book: 3, chZh: "第9-3章:对杀与长气", chEn: "B3 Ch9-3: Extend Liberties",
-          b: [[1,3],[2,3],[1,4],[2,5],[3,5],[3,6],[2,7],[3,7],[5,6]],
-          w: [[2,4],[3,4],[4,4],[4,5],[1,5],[1,6],[2,6],[1,7],[4,6],[4,7],[6,6]], ans: [[4,6],[5,7]],
-          zh: "【入门下·第9-3章 对杀与长气】黑棋只有2气，白棋有3气。请黑棋向右方好点延气，把气长到4气获胜！",
-          en: "[Book 3 · Ch.9-3 Extend Liberties] Extend at the key point to increase Black's liberties and win the race!" },
+          b: [[2,5],[3,5],[4,4],[5,4],[5,5],[5,6],[5,7],[5,8],[2,7],[3,8]],
+          w: [[2,3],[3,4],[2,6],[3,6],[4,6],[4,5],[4,7]], ans: [[1,5]],
+          zh: "【入门下·第9-3章 对杀与长气】黑二子只有2气，包围它的白棋有3气。请黑棋往开阔处延气，把气长到4气获胜！",
+          en: "[Book 3 · Ch.9-3 Extend Liberties] Black has 2 liberties vs White's 3. Extend into open space to reach 4 liberties!" },
 
         { book: 3, chZh: "第10-2章:扳阻出头", chEn: "B3 Ch10-2: Hane at Head",
           b: [[3,4],[3,5]], w: [[4,4],[4,5]], ans: [[4,3]],
-          zh: "【入门下·第10-2章 扳】围棋格言：“逢靠必扳”、“扳二子头”！请迎头扳住白棋，既防白出头又收紧白气。",
-          en: "[Book 3 · Ch.10-2 Hane] 'Hane at the head of two stones!' Block White from extending into the center." },
+          zh: "【入门下·第10-2章 扳】围棋格言：“逢靠必扳”、“扳二子头”！请向中腹方向迎头扳住白棋，阻其出头。",
+          en: "[Book 3 · Ch.10-2 Hane] 'Hane at the head of two stones!' Block White from extending toward the center." },
 
         { book: 3, chZh: "第11章:长和长气", chEn: "B3 Ch11: Extend for Strength",
           b: [[2,4],[3,4],[6,4]], w: [[2,3],[1,4],[2,5],[3,5]], ans: [[4,4]],
-          zh: "【入门下·第11章 长和长气】白棋在下方扳住叫吃，黑棋若乱扳会被断死！请向右边同伴方向“长”出长气。",
-          en: "[Book 3 · Ch.11 Extend] Do not Hane recklessly when short of liberties! Extend toward your friendly stone." },
+          zh: "【入门下·第11章 长和长气】黑棋只有两口气，若乱扳会被断死！请向远处己方同伴方向稳健“长”出长气。",
+          en: "[Book 3 · Ch.11 Extend] Your two stones only have 2 liberties—extend solidly toward your friendly stone!" },
 
-        { book: 3, chZh: "第13/17章:扳吃与收官", chEn: "B3 Ch13/17: Hane & Endgame",
-          b: [[1,4],[2,4],[3,4],[3,5],[4,4],[5,4],[6,4],[6,5]], w: [[1,5],[2,5],[3,6],[5,5],[6,3]], ans: [[4,5]],
-          zh: "【入门下·第13章 扳吃技术】白棋想跨断联络，请黑棋大胆扳断反击，将分断的白子吃住！",
-          en: "[Book 3 · Ch.13 Hane Capture] Play a bold Hane to cut off the White stone and capture it!" }
+        { book: 3, chZh: "第13/17章:扳吃与收官", chEn: "B3 Ch13/17: Hane Capture",
+          b: [[3,6],[4,6],[5,6],[6,6],[6,7],[6,8],[4,8]], w: [[4,7],[5,7]], ans: [[3,7]],
+          zh: "【入门下·第13章 扳吃技术】二线白棋二子有逃跑企图，请黑棋在二线迎头一扳，把白棋赶进绝境一举吃住！",
+          en: "[Book 3 · Ch.13 Hane Capture] Play a sharp Hane on the 2nd line to trap and capture both White stones!" }
       ];
 
       let idCounter = 1;
@@ -4654,6 +4746,8 @@
           const ansTrans = seed.ans.map(p => tfPt(p[0], p[1], t));
           const nextWTrans = seed.nextW ? tfPt(seed.nextW[0], seed.nextW[1], t) : null;
           const ans2Trans = seed.ans2 ? seed.ans2.map(p => tfPt(p[0], p[1], t)) : null;
+
+          if (!isValidPuzzleSetup(bTrans, wTrans, ansTrans, nextWTrans, ans2Trans)) continue;
 
           PUZZLE_BANK.push({
             id: idCounter++,
@@ -4791,7 +4885,9 @@
     }
 
     function handlePuzzleClick(x, y) {
+      if (isPuzzleWaitingW) return;
       if (puzzleSolved) {
+        clearPuzzleTimers();
         stepPuzzle(1);
         return;
       }
@@ -4803,13 +4899,18 @@
       const promptEl = document.getElementById('puzzlePromptText');
 
       if (isCorrect) {
-        commitMove(x, y, 1);
+        if (!commitMove(x, y, 1)) return;
 
         if (curPuzzleStep === 0 && pz.nextW && pz.ans2) {
           curPuzzleStep = 1;
+          isPuzzleWaitingW = true;
+          const expectedSession = gameSessionId;
+          const expectedIdx = curPuzzleIdx;
           refreshCurrentPuzzleText();
-          setTimeout(() => {
-            if (isPuzzleMode && curPuzzleStep === 1) {
+          puzzleWaitTimer = setTimeout(() => {
+            puzzleWaitTimer = null;
+            isPuzzleWaitingW = false;
+            if (isPuzzleMode && curPuzzleStep === 1 && gameSessionId === expectedSession && curPuzzleIdx === expectedIdx) {
               commitMove(pz.nextW[0], pz.nextW[1], 2);
               refreshCurrentPuzzleText();
             }
@@ -4826,8 +4927,11 @@
             : `🎉 Correct! Great job! (Loading next puzzle...)`;
         }
         showToast(currentLang === 'zh' ? `🎉 闯关成功！第 ${pz.num} 题完成！` : `🎉 Puzzle #${pz.num} Solved!`);
-        setTimeout(() => {
-          if (isPuzzleMode && puzzleSolved && curPuzzleIdx < PUZZLE_BANK.length - 1) {
+        const expectedSession = gameSessionId;
+        const expectedIdx = curPuzzleIdx;
+        puzzleNextTimer = setTimeout(() => {
+          puzzleNextTimer = null;
+          if (isPuzzleMode && puzzleSolved && gameSessionId === expectedSession && curPuzzleIdx === expectedIdx && curPuzzleIdx < PUZZLE_BANK.length - 1) {
             stepPuzzle(1);
           }
         }, 1250);
@@ -4879,6 +4983,7 @@
     }
 
     async function changeOpponent() {
+      clearPuzzleTimers();
       const modeVal = document.getElementById('opponentSelect').value;
       vsAI = (modeVal === 'ai');
       isPuzzleMode = (modeVal === 'puzzle');
@@ -4895,12 +5000,17 @@
 
       syncMetaNames();
       initGameEngine(BOARD_SIZE);
-      if (vsAI && aiLevel >= 3 && BOARD_SIZE >= 9) {
-        try {
-          await ensureKataGoLoaded();
+      if (vsAI && aiLevel >= 3) {
+        if (BOARD_SIZE < 9) {
           document.getElementById('moveInfo').innerText = kt("aiReady");
-        } catch(err) {
-          showToast(kt("aiLoadErr"));
+          showToast(kt("aiSmallBoardNotice"));
+        } else {
+          try {
+            await ensureKataGoLoaded();
+            document.getElementById('moveInfo').innerText = kt("aiReady");
+          } catch(err) {
+            showToast(kt("aiLoadErr"));
+          }
         }
       } else if (vsAI) {
         document.getElementById('moveInfo').innerText = kt("aiReady");
@@ -4910,12 +5020,16 @@
     async function changeAILevel() {
       aiLevel = parseInt(document.getElementById('aiLevelSelect').value, 10);
       syncMetaNames();
-      if (vsAI && aiLevel >= 3 && BOARD_SIZE >= 9 && !kgSess) {
-        try {
-          await ensureKataGoLoaded();
-          document.getElementById('moveInfo').innerText = kt("aiReady");
-        } catch(e) {
-          showToast(kt("aiLoadErr"));
+      if (vsAI && aiLevel >= 3) {
+        if (BOARD_SIZE < 9) {
+          showToast(kt("aiSmallBoardNotice"));
+        } else if (!kgSess) {
+          try {
+            await ensureKataGoLoaded();
+            document.getElementById('moveInfo').innerText = kt("aiReady");
+          } catch(e) {
+            showToast(kt("aiLoadErr"));
+          }
         }
       }
     }
@@ -5032,6 +5146,18 @@
       }
       function encode(setup, moveList, komi, plaIn) {
         var g = new Int8Array(NN), ko = -1, hist = [], i, k;
+        if (setup && Array.isArray(setup.b)) {
+          for (i = 0; i < setup.b.length; i++) {
+            var bp = setup.b[i];
+            if (bp[0] >= 0 && bp[0] < N && bp[1] >= 0 && bp[1] < N) g[bp[1] * N + bp[0]] = 1;
+          }
+        }
+        if (setup && Array.isArray(setup.w)) {
+          for (i = 0; i < setup.w.length; i++) {
+            var wp = setup.w[i];
+            if (wp[0] >= 0 && wp[0] < N && wp[1] >= 0 && wp[1] < N) g[wp[1] * N + wp[0]] = 2;
+          }
+        }
         for (i = 0; i < moveList.length; i++) {
           var m = moveList[i];
           if (m.p < 0) { ko = -1; hist.push(m); continue; }
@@ -5072,11 +5198,17 @@
 
     async function triggerAI() {
       if (isAIThinking) return;
+      const mySession = gameSessionId;
       isAIThinking = true;
       updateUI();
 
       if (aiLevel <= 2 || BOARD_SIZE < 9) {
         setTimeout(() => {
+          if (mySession !== gameSessionId || !vsAI || isPuzzleMode || nextTurnColor() !== aiColor) {
+            isAIThinking = false;
+            updateUI();
+            return;
+          }
           const mv = pickHeuristicMove(aiLevel);
           isAIThinking = false;
           if (mv) {
@@ -5091,14 +5223,25 @@
       try {
         const sess = await ensureKataGoLoaded();
         await new Promise(r => setTimeout(r, 80));
+        if (mySession !== gameSessionId || !vsAI || isPuzzleMode || nextTurnColor() !== aiColor) {
+          isAIThinking = false;
+          updateUI();
+          return;
+        }
 
         const enc = kgEncs[BOARD_SIZE] || (kgEncs[BOARD_SIZE] = KGEnc(BOARD_SIZE));
-        const r = enc.encode({}, getEncodedHistory(), 7.5, aiColor);
+        const r = enc.encode({ b: sgfSetupB, w: sgfSetupW }, getEncodedHistory(), 7.5, aiColor);
 
         const tensorBin = new ort.Tensor("float32", r.bin, [1, 22, BOARD_SIZE, BOARD_SIZE]);
         const tensorGlob = new ort.Tensor("float32", r.glob, [1, 19]);
 
         const out = await sess.run({ input_binary: tensorBin, input_global: tensorGlob });
+        if (mySession !== gameSessionId || !vsAI || isPuzzleMode || nextTurnColor() !== aiColor) {
+          isAIThinking = false;
+          updateUI();
+          return;
+        }
+
         const pol = out.output_policy.data;
         const passLogit = pol[BOARD_SIZE * BOARD_SIZE];
         const humanPassedLast = curMove > 0 && moves[curMove - 1].x < 0;
@@ -5154,6 +5297,10 @@
         commitMove(chosen.x, chosen.y, aiColor);
       } catch(err) {
         isAIThinking = false;
+        if (mySession !== gameSessionId || !vsAI || isPuzzleMode || nextTurnColor() !== aiColor) {
+          updateUI();
+          return;
+        }
         const fallback = pickHeuristicMove(2);
         if (fallback) commitMove(fallback.x, fallback.y, aiColor);
         else passTurn(true);
@@ -5175,7 +5322,8 @@
     function runSimpleInfluenceEstimate() {
       const N = BOARD_SIZE, N2 = N * N;
       estOwnership = new Float32Array(N2);
-      let scoreB = capB, scoreW = capW;
+      // Area scoring (数子法): count live stones on board + surrounded territory (do not double-count captures)
+      let scoreB = 0, scoreW = 0;
 
       for (let y = 0; y < N; y++) {
         for (let x = 0; x < N; x++) {
@@ -5215,17 +5363,20 @@
         return;
       }
 
+      const mySession = gameSessionId;
       document.getElementById('estLeadText').innerText = kt("estAnalyzing");
       document.getElementById('estSourceNote').innerText = kt("estNoteKata");
       try {
         const sess = await ensureKataGoLoaded();
+        if (!estActive || mySession !== gameSessionId) return;
         const pla = nextTurnColor();
         const enc = kgEncs[BOARD_SIZE] || (kgEncs[BOARD_SIZE] = KGEnc(BOARD_SIZE));
-        const r = enc.encode({}, getEncodedHistory(), 7.5, pla);
+        const r = enc.encode({ b: sgfSetupB, w: sgfSetupW }, getEncodedHistory(), 7.5, pla);
 
         const tensorBin = new ort.Tensor("float32", r.bin, [1, 22, BOARD_SIZE, BOARD_SIZE]);
         const tensorGlob = new ort.Tensor("float32", r.glob, [1, 19]);
         const out = await sess.run({ input_binary: tensorBin, input_global: tensorGlob });
+        if (!estActive || mySession !== gameSessionId) return;
 
         const rawOwn = out.output_ownership.data;
         const N2 = BOARD_SIZE * BOARD_SIZE;
@@ -5252,7 +5403,7 @@
 
         drawBoard();
       } catch(e) {
-        runSimpleInfluenceEstimate();
+        if (estActive && mySession === gameSessionId) runSimpleInfluenceEstimate();
       }
     }
 
@@ -5265,14 +5416,13 @@
       const pw = sanitizeSgfField(document.getElementById('metaPW').value) || (vsAI ? getAIName(aiLevel) : "White");
       let sgf = `(;GM[1]FF[4]SZ[${BOARD_SIZE}]KM[7.5]PB[${pb}]PW[${pw}]`;
 
-      if (isPuzzleMode && PUZZLE_BANK[curPuzzleIdx]) {
-        const pz = PUZZLE_BANK[curPuzzleIdx];
-        if (pz.b && pz.b.length) {
-          sgf += "AB" + pz.b.map(([x, y]) => `[${String.fromCharCode(97 + x)}${String.fromCharCode(97 + y)}]`).join("");
-        }
-        if (pz.w && pz.w.length) {
-          sgf += "AW" + pz.w.map(([x, y]) => `[${String.fromCharCode(97 + x)}${String.fromCharCode(97 + y)}]`).join("");
-        }
+      const setupB = (isPuzzleMode && PUZZLE_BANK[curPuzzleIdx]) ? (PUZZLE_BANK[curPuzzleIdx].b || []) : sgfSetupB;
+      const setupW = (isPuzzleMode && PUZZLE_BANK[curPuzzleIdx]) ? (PUZZLE_BANK[curPuzzleIdx].w || []) : sgfSetupW;
+      if (setupB.length) {
+        sgf += "AB" + setupB.map(([x, y]) => `[${String.fromCharCode(97 + x)}${String.fromCharCode(97 + y)}]`).join("");
+      }
+      if (setupW.length) {
+        sgf += "AW" + setupW.map(([x, y]) => `[${String.fromCharCode(97 + x)}${String.fromCharCode(97 + y)}]`).join("");
       }
 
       for (let i = 0; i < moves.length; i++) {
@@ -5292,30 +5442,121 @@
     }
 
     function parseSgfText(sgf) {
-      const sizeMatch = sgf.match(/SZ\[(\d+)\]/i);
+      const str = String(sgf || "");
       let sz = BOARD_SIZE;
-      if (sizeMatch && [5, 7, 9, 13, 19].includes(parseInt(sizeMatch[1], 10))) {
-        sz = parseInt(sizeMatch[1], 10);
-      }
+      const setupB = [];
+      const setupW = [];
       const list = [];
-      const regex = /;([BW])\[([a-z]{0,2})\]/ig;
-      let match;
-      while ((match = regex.exec(sgf)) !== null) {
-        const color = match[1].toUpperCase() === 'B' ? 1 : 2;
-        const coord = match[2].toLowerCase();
-        if (coord.length === 2 && coord !== 'tt') {
-          const x = coord.charCodeAt(0) - 97;
-          const y = coord.charCodeAt(1) - 97;
-          if (x >= 0 && x < sz && y >= 0 && y < sz) {
-            list.push({ x, y, c: color });
-          } else {
-            list.push({ x: -1, y: -1, c: color });
+      let pb = "", pw = "";
+
+      const expandSgfPoint = (val, targetArr) => {
+        const s = val.trim().toLowerCase();
+        if (s.length === 5 && s[2] === ':') {
+          const x1 = s.charCodeAt(0) - 97, y1 = s.charCodeAt(1) - 97;
+          const x2 = s.charCodeAt(3) - 97, y2 = s.charCodeAt(4) - 97;
+          for (let y = Math.min(y1, y2); y <= Math.max(y1, y2); y++) {
+            for (let x = Math.min(x1, x2); x <= Math.max(x1, x2); x++) {
+              if (x >= 0 && x < sz && y >= 0 && y < sz) targetArr.push([x, y]);
+            }
           }
-        } else {
-          list.push({ x: -1, y: -1, c: color });
+        } else if (s.length === 2 && s !== 'tt') {
+          const x = s.charCodeAt(0) - 97, y = s.charCodeAt(1) - 97;
+          if (x >= 0 && x < sz && y >= 0 && y < sz) targetArr.push([x, y]);
         }
+      };
+
+      // Parse main-line tree only (ignores sibling variations and safely skips comments/escaped brackets)
+      let i = str.indexOf('(');
+      if (i < 0) return { size: sz, moves: list, setupB, setupW, pb, pw };
+      const stack = [];
+
+      while (i < str.length) {
+        const ch = str[i];
+        if (ch === '(') {
+          if (stack.length > 0 && stack[stack.length - 1].hasChildBranch) {
+            // Skip sibling variation completely
+            let skipDepth = 1;
+            i++;
+            while (i < str.length && skipDepth > 0) {
+              if (str[i] === '[') {
+                i++;
+                while (i < str.length) {
+                  if (str[i] === '\\') { i += 2; continue; }
+                  if (str[i] === ']') { i++; break; }
+                  i++;
+                }
+                continue;
+              }
+              if (str[i] === '(') skipDepth++;
+              else if (str[i] === ')') skipDepth--;
+              i++;
+            }
+            continue;
+          }
+          if (stack.length > 0) stack[stack.length - 1].hasChildBranch = true;
+          stack.push({ hasChildBranch: false });
+          i++;
+          continue;
+        }
+        if (ch === ')') {
+          stack.pop();
+          if (stack.length === 0) break;
+          i++;
+          continue;
+        }
+        if (/[A-Za-z]/.test(ch)) {
+          let ident = "";
+          while (i < str.length && /[A-Za-z]/.test(str[i])) {
+            ident += str[i++];
+          }
+          const prop = ident.toUpperCase();
+          const vals = [];
+          while (i < str.length) {
+            while (i < str.length && /\s/.test(str[i])) i++;
+            if (str[i] !== '[') break;
+            i++;
+            let val = "";
+            while (i < str.length) {
+              if (str[i] === '\\' && i + 1 < str.length) {
+                val += str[i + 1];
+                i += 2;
+                continue;
+              }
+              if (str[i] === ']') { i++; break; }
+              val += str[i++];
+            }
+            vals.push(val);
+          }
+          if (!vals.length) continue;
+          if (prop === 'SZ') {
+            const parsedSz = parseInt(vals[0], 10);
+            if ([5, 7, 9, 13, 19].includes(parsedSz)) sz = parsedSz;
+          } else if (prop === 'PB' && !pb) {
+            pb = vals[0].trim();
+          } else if (prop === 'PW' && !pw) {
+            pw = vals[0].trim();
+          } else if (prop === 'AB') {
+            vals.forEach(v => expandSgfPoint(v, setupB));
+          } else if (prop === 'AW') {
+            vals.forEach(v => expandSgfPoint(v, setupW));
+          } else if (prop === 'B' || prop === 'W') {
+            const color = prop === 'B' ? 1 : 2;
+            const coord = vals[0].trim().toLowerCase();
+            if (coord.length === 2 && coord !== 'tt') {
+              const x = coord.charCodeAt(0) - 97;
+              const y = coord.charCodeAt(1) - 97;
+              if (x >= 0 && x < sz && y >= 0 && y < sz) list.push({ x, y, c: color });
+              else list.push({ x: -1, y: -1, c: color });
+            } else {
+              list.push({ x: -1, y: -1, c: color });
+            }
+          }
+          continue;
+        }
+        i++;
       }
-      return { size: sz, moves: list };
+
+      return { size: sz, moves: list, setupB, setupW, pb, pw };
     }
 
     function handleSgfFileUpload(e) {
@@ -5337,15 +5578,13 @@
       stopAutoPlay();
       const sgf = document.getElementById('sgfInput').value.trim();
       const parsed = parseSgfText(sgf);
-      if (parsed.moves.length === 0) {
+      if (parsed.moves.length === 0 && parsed.setupB.length === 0 && parsed.setupW.length === 0) {
         showToast(kt("sgfLoadErr"));
         return;
       }
 
-      const pbMatch = sgf.match(/PB\[([^\]]*)\]/i);
-      const pwMatch = sgf.match(/PW\[([^\]]*)\]/i);
-      if (pbMatch && pbMatch[1]) document.getElementById('metaPB').value = pbMatch[1].trim();
-      if (pwMatch && pwMatch[1]) document.getElementById('metaPW').value = pwMatch[1].trim();
+      if (parsed.pb) document.getElementById('metaPB').value = parsed.pb;
+      if (parsed.pw) document.getElementById('metaPW').value = parsed.pw;
 
       vsAI = false;
       isPuzzleMode = false;
@@ -5355,7 +5594,7 @@
       if (pzBar) pzBar.style.display = 'none';
       document.getElementById('boardSizeSelect').value = parsed.size;
 
-      initGameEngine(parsed.size);
+      initGameEngine(parsed.size, parsed.setupB, parsed.setupW);
       moves = parsed.moves;
       rebuildBoardToMove(moves.length);
       syncMetaNames();
@@ -5385,7 +5624,7 @@
       if (pzBar) pzBar.style.display = 'none';
       document.getElementById('boardSizeSelect').value = parsed.size;
 
-      initGameEngine(parsed.size);
+      initGameEngine(parsed.size, parsed.setupB, parsed.setupW);
       moves = parsed.moves;
       rebuildBoardToMove(0);
 
