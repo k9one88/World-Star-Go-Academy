@@ -176,7 +176,7 @@ def check_i18n_parity(html: str) -> CheckResult:
 def check_puzzles(html: str) -> CheckResult:
     m = re.search(r"const\s+seeds\s*=\s*(\[.*?\n\s*\]);", html, flags=re.S)
     if not m:
-        return CheckResult("Speed Go Puzzles (144)", False, "Could not locate `seeds` array in index.html.")
+        return CheckResult("Go Intro Puzzles (L1–L24 · 72)", False, "Could not locate `seeds` array in index.html.")
     try:
         raw_json = subprocess.check_output(
             ["node", "-e", f"const seeds = {m.group(1)}; console.log(JSON.stringify(seeds));"],
@@ -184,13 +184,9 @@ def check_puzzles(html: str) -> CheckResult:
         )
         seeds = json.loads(raw_json)
     except Exception as exc:
-        return CheckResult("Speed Go Puzzles (144)", False, f"Failed to parse puzzle seeds: {exc}")
+        return CheckResult("Go Intro Puzzles (L1–L24 · 72)", False, f"Failed to parse puzzle seeds: {exc}")
 
     dirs = ((1, 0), (-1, 0), (0, 1), (0, -1))
-
-    def tf_pt(x: int, y: int, t: int) -> tuple[int, int]:
-        nx, ny = (8 - x if t & 1 else x), (8 - y if t & 2 else y)
-        return (ny, nx) if (t & 4) else (nx, ny)
 
     def get_group(brd: list[list[int]], sx: int, sy: int) -> tuple[set[tuple[int, int]], set[tuple[int, int]]]:
         c = brd[sy][sx]
@@ -232,58 +228,83 @@ def check_puzzles(html: str) -> CheckResult:
         return nb, cap, "OK"
 
     problems: list[str] = []
-    dir_re = re.compile(r"(左边|右边|上方|下方|左上|右上|左下|右下|左方|右方|上面|下面|[A-J][1-9])")
-    total_variants = 0
+    if len(seeds) != 72:
+        problems.append(f"Expected 72 puzzles (24 lessons × 3), found {len(seeds)}")
+
+    lessons_seen: Counter[int] = Counter()
+    stages_seen: Counter[int] = Counter()
+    board_sigs: set[tuple[tuple[tuple[int, int], ...], tuple[tuple[int, int], ...]]] = set()
 
     for s_idx, seed in enumerate(seeds):
-        if dir_re.search(seed.get("zh", "")):
-            problems.append(f"Seed #{s_idx + 1} has rotation-sensitive text in zh")
-        for v in range(4):
-            total_variants += 1
-            t = (s_idx + v * 2) % 8
-            brd = [[0] * 9 for _ in range(9)]
-            for x, y in seed["b"]:
-                tx, ty = tf_pt(x, y, t)
-                if not (0 <= tx < 9 and 0 <= ty < 9) or brd[ty][tx] != 0:
-                    problems.append(f"Seed #{s_idx + 1} v{v}: invalid/overlapping B {(tx, ty)}")
+        num = s_idx + 1
+        lesson = seed.get("lesson")
+        book = seed.get("book")
+        if isinstance(lesson, int):
+            lessons_seen[lesson] += 1
+        else:
+            problems.append(f"Puzzle #{num}: missing integer `lesson`")
+        if isinstance(book, int) and 1 <= book <= 4:
+            stages_seen[book] += 1
+        else:
+            problems.append(f"Puzzle #{num}: invalid `book` stage {book}")
+
+        sig = (
+            tuple(sorted((int(x), int(y)) for x, y in seed["b"])),
+            tuple(sorted((int(x), int(y)) for x, y in seed["w"])),
+        )
+        if sig in board_sigs:
+            problems.append(f"Puzzle #{num}: duplicate board setup")
+        board_sigs.add(sig)
+
+        brd = [[0] * 9 for _ in range(9)]
+        for x, y in seed["b"]:
+            if not (0 <= x < 9 and 0 <= y < 9) or brd[y][x] != 0:
+                problems.append(f"Puzzle #{num}: invalid/overlapping B {(x, y)}")
+                continue
+            brd[y][x] = 1
+        for x, y in seed["w"]:
+            if not (0 <= x < 9 and 0 <= y < 9) or brd[y][x] != 0:
+                problems.append(f"Puzzle #{num}: invalid/overlapping W {(x, y)}")
+                continue
+            brd[y][x] = 2
+        for y in range(9):
+            for x in range(9):
+                if brd[y][x] != 0 and len(get_group(brd, x, y)[1]) == 0:
+                    problems.append(f"Puzzle #{num}: 0-liberty initial stone at {(x, y)}")
+        if not seed.get("ans"):
+            problems.append(f"Puzzle #{num}: empty `ans`")
+            continue
+        for ax, ay in seed["ans"]:
+            b1, _, st1 = play_move(brd, ax, ay, 1)
+            if st1 != "OK" or b1 is None:
+                problems.append(f"Puzzle #{num}: ans {(ax, ay)} {st1}")
+                continue
+            if seed.get("nextW") and seed.get("ans2"):
+                wx, wy = seed["nextW"]
+                b2, wcap, stw = play_move(b1, wx, wy, 2)
+                if stw != "OK" or b2 is None:
+                    problems.append(f"Puzzle #{num}: nextW {(wx, wy)} {stw}")
                     continue
-                brd[ty][tx] = 1
-            for x, y in seed["w"]:
-                tx, ty = tf_pt(x, y, t)
-                if not (0 <= tx < 9 and 0 <= ty < 9) or brd[ty][tx] != 0:
-                    problems.append(f"Seed #{s_idx + 1} v{v}: invalid/overlapping W {(tx, ty)}")
-                    continue
-                brd[ty][tx] = 2
-            for y in range(9):
-                for x in range(9):
-                    if brd[y][x] != 0 and len(get_group(brd, x, y)[1]) == 0:
-                        problems.append(f"Seed #{s_idx + 1} v{v}: 0-liberty initial stone at {(x, y)}")
-            for ax, ay in seed["ans"]:
-                tax, tay = tf_pt(ax, ay, t)
-                b1, _, st1 = play_move(brd, tax, tay, 1)
-                if st1 != "OK" or b1 is None:
-                    problems.append(f"Seed #{s_idx + 1} v{v}: ans {(tax, tay)} {st1}")
-                    continue
-                if seed.get("nextW") and seed.get("ans2"):
-                    wx, wy = tf_pt(seed["nextW"][0], seed["nextW"][1], t)
-                    b2, wcap, stw = play_move(b1, wx, wy, 2)
-                    if stw != "OK" or b2 is None:
-                        problems.append(f"Seed #{s_idx + 1} v{v}: nextW {(wx, wy)} {stw}")
-                        continue
-                    for a2x, a2y in seed["ans2"]:
-                        ta2x, ta2y = tf_pt(a2x, a2y, t)
-                        b3, cap2, st2 = play_move(b2, ta2x, ta2y, 1)
-                        if st2 != "OK" or b3 is None:
-                            problems.append(f"Seed #{s_idx + 1} v{v}: ans2 {(ta2x, ta2y)} {st2}")
-                        elif wcap == 1 and cap2 == 1 and b3 == b1:
-                            problems.append(f"Seed #{s_idx + 1} v{v}: ans2 {(ta2x, ta2y)} illegal Ko")
+                for a2x, a2y in seed["ans2"]:
+                    b3, cap2, st2 = play_move(b2, a2x, a2y, 1)
+                    if st2 != "OK" or b3 is None:
+                        problems.append(f"Puzzle #{num}: ans2 {(a2x, a2y)} {st2}")
+                    elif wcap == 1 and cap2 == 1 and b3 == b1:
+                        problems.append(f"Puzzle #{num}: ans2 {(a2x, a2y)} illegal Ko")
+
+    missing_lessons = [l for l in range(1, 25) if lessons_seen[l] != 3]
+    if missing_lessons:
+        problems.append(f"Lessons not having 3 puzzles: {missing_lessons[:6]}")
+    bad_stages = [s for s in range(1, 5) if stages_seen[s] != 18]
+    if bad_stages:
+        problems.append(f"Stages not having 18 puzzles: {bad_stages}")
 
     if problems:
-        return CheckResult("Speed Go Puzzles (144)", False, "; ".join(problems[:5]))
+        return CheckResult("Go Intro Puzzles (L1–L24 · 72)", False, "; ".join(problems[:5]))
     return CheckResult(
-        "Speed Go Puzzles (144)",
+        "Go Intro Puzzles (L1–L24 · 72)",
         True,
-        f"All {len(seeds)} seeds ({total_variants} rotated puzzles) passed Go legality, Ko, and orientation-safe text checks.",
+        f"All {len(seeds)} distinct curriculum puzzles (4 stages × 24 lessons) passed Go legality, Ko, and uniqueness checks.",
     )
 
 
@@ -327,12 +348,21 @@ def check_browser_e2e(index_path: pathlib.Path) -> CheckResult:
             page.click("#btn-en")
             page.wait_for_timeout(200)
 
-            # Verify Kifu tab, 144 puzzles loaded, and SGF AB/AW + main-line branch parsing
+            # Verify Kifu tab, 72 Go Intro (L1-L24) puzzles across 4 stages, and SGF AB/AW + main-line branch parsing
             kifu_check = page.evaluate("""() => {
                 build100Puzzles();
+                switchMainView('kifu');
+                document.getElementById('opponentSelect').value = 'puzzle';
+                changeOpponent();
+                const stageCounts = [1, 2, 3, 4].map(st => {
+                    filterPuzzleByBook(String(st));
+                    return document.getElementById('puzzleSelect').options.length;
+                });
+                filterPuzzleByBook('all');
                 const parsed = parseSgfText('(;GM[1]FF[4]SZ[9]AB[cc][gg]AW[cg](;B[ee];W[ef])(;B[aa];W[bb]))');
                 return {
                     puzzleCount: PUZZLE_BANK.length,
+                    stageCounts,
                     setupB: parsed.setupB.length,
                     setupW: parsed.setupW.length,
                     mainMoves: parsed.moves.length
@@ -353,8 +383,10 @@ def check_browser_e2e(index_path: pathlib.Path) -> CheckResult:
         problems.append("Go board <canvas> not rendered")
     if not h1_en or h1_en == h1_zh or not lang_zh.startswith("zh"):
         problems.append("EN/ZH language switch did not update page content")
-    if kifu_check["puzzleCount"] != 144:
-        problems.append(f"Expected 144 puzzles, got {kifu_check['puzzleCount']}")
+    if kifu_check["puzzleCount"] != 72:
+        problems.append(f"Expected 72 puzzles, got {kifu_check['puzzleCount']}")
+    if kifu_check["stageCounts"] != [18, 18, 18, 18]:
+        problems.append(f"Expected 4 stages × 18 puzzles, got {kifu_check['stageCounts']}")
     if kifu_check["setupB"] != 2 or kifu_check["setupW"] != 1 or kifu_check["mainMoves"] != 2:
         problems.append(f"SGF parser mismatch: {kifu_check}")
     if desktop_overflow:
@@ -367,7 +399,7 @@ def check_browser_e2e(index_path: pathlib.Path) -> CheckResult:
     return CheckResult(
         "Headless browser E2E",
         True,
-        "Zero JS page errors, `<canvas>` rendered, EN/ZH toggle, 144 puzzles & SGF parser OK, no desktop/mobile overflow.",
+        "Zero JS page errors, `<canvas>` rendered, EN/ZH toggle, 72 curriculum puzzles (4 stages × 18) & SGF parser OK, no desktop/mobile overflow.",
     )
 
 

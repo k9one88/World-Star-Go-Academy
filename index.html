@@ -2219,7 +2219,7 @@
   </main>
 
   <!-- =========================================================
-       View 2: Online Game Recorder, Graded KataGo AI & 144 Beginner Puzzles
+       View 2: Online Game Recorder, Graded KataGo AI & Go Intro Lessons 1-24 Puzzles (72)
        ========================================================= -->
   <main id="view-kifu" class="app-view">
     <section class="kifu-view-sec">
@@ -2228,7 +2228,7 @@
           <div>
             <span class="tag-badge" style="margin-bottom: 6px;">INTERACTIVE BOARD & GRADED AI</span>
             <h2 style="font-size: 1.65rem;" data-i18n="sgf_title">⚫⚪ Online Game Recorder & Graded AI</h2>
-            <p style="font-size: 0.92rem; color: var(--text-muted);" data-i18n="sgf_sub">Switch between 5x5 to 19x19 boards, 5 AI difficulty levels, or 144 Speed Go Intro Puzzles. Record SGF or send to your coach for review.</p>
+            <p style="font-size: 0.92rem; color: var(--text-muted);" data-i18n="sgf_sub">Switch between 5x5 to 19x19 boards, 5 AI difficulty levels, or 72 Go Intro (Lessons 1–24) Puzzles. Record SGF or send to your coach for review.</p>
           </div>
           <button type="button" class="btn btn-outline" onclick="switchMainView('home')" data-i18n="back_home_btn">
             ← Back to Programs & Trial Booking
@@ -2252,13 +2252,13 @@
                   </select>
                 </div>
 
-                <!-- Mode Selector (Includes Speed Go Intro Puzzles) -->
+                <!-- Mode Selector (Includes Go Intro Lessons 1-24 Puzzles) -->
                 <div class="pill-group">
                   <span class="pill-label" data-i18n="lbl_mode">Mode</span>
                   <select id="opponentSelect" class="pill-select" onchange="changeOpponent()">
                     <option value="human" data-i18n="md_opt_human">👥 2-Player / Free Record</option>
                     <option value="ai" data-i18n="md_opt_ai">🤖 vs Computer AI (White)</option>
-                    <option value="puzzle" data-i18n="md_opt_puzzle">🧩 Speed Go Intro Puzzles (144)</option>
+                    <option value="puzzle" data-i18n="md_opt_puzzle">🧩 Go Intro Lessons 1–24 Puzzles (72)</option>
                   </select>
                 </div>
 
@@ -2283,16 +2283,17 @@
               </div>
             </div>
 
-            <!-- Speed Go Intro (Upper / Middle / Lower) 144 Puzzles Control Bar -->
+            <!-- Go Intro Lessons 1-24 (4 Stages · 72 Puzzles) Control Bar -->
             <div id="puzzleCtrlBar" style="display: none; background: #FFFBEB; border: 2px solid #F59E0B; border-radius: 16px; padding: 12px 16px; margin-bottom: 14px;">
               <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
                 <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                  <span style="font-weight: 800; color: #B45309; font-size: 0.9rem;" id="pzStageBadge">📘 入门(上)</span>
+                  <span style="font-weight: 800; color: #B45309; font-size: 0.9rem;" id="pzStageBadge">📘 第1阶段 (1-6课)</span>
                   <select id="puzzleBookSelect" class="pill-select" style="background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 8px; padding: 4px 8px; font-size: 0.84rem; color: #B45309;" onchange="filterPuzzleByBook(this.value)">
-                    <option value="all">📚 All 3 Books (144)</option>
-                    <option value="1">📘 Book 1: Intro Upper (1-48)</option>
-                    <option value="2">📗 Book 2: Intro Middle (49-96)</option>
-                    <option value="3">📙 Book 3: Intro Lower (97-144)</option>
+                    <option value="all">📚 All 24 Lessons (1-72)</option>
+                    <option value="1">📘 Stage 1: L1-L6 Rules, Capture &amp; Escape (1-18)</option>
+                    <option value="2">📗 Stage 2: L7-L12 Tiger's Mouth, Cut &amp; Tactics (19-36)</option>
+                    <option value="3">📙 Stage 3: L13-L18 Ladder, Net, Snapback &amp; Ko (37-54)</option>
+                    <option value="4">📕 Stage 4: L19-L24 Eyes, Life/Death &amp; Semeai (55-72)</option>
                   </select>
                   <select id="puzzleSelect" class="pill-select" style="background: #FFFFFF; border: 1px solid #F59E0B; border-radius: 8px; padding: 4px 10px; font-size: 0.84rem;" onchange="loadPuzzleByIndex(this.value)"></select>
                 </div>
@@ -2560,7 +2561,7 @@
         sz_opt_19: "19x19 (Standard)",
         md_opt_human: "👥 2-Player / Free Record",
         md_opt_ai: "🤖 vs Computer AI (White)",
-        md_opt_puzzle: "🧩 Speed Go Intro Puzzles (144)",
+        md_opt_puzzle: "🧩 Go Intro Lessons 1–24 Puzzles (72)",
         lv_opt_1: "🌱 Lv.1 Gentle (For Novices)",
         lv_opt_2: "🐣 Lv.2 Easy (~18k)",
         lv_opt_3: "⚔️ Lv.3 Medium (~10k)",
@@ -2688,7 +2689,7 @@
         g4_t: "Courage on the Tournament Floor",
         g4_d: "Representing the academy in regional and national youth tournaments with proper etiquette and resilience.",
         sgf_title: "⚫⚪ Online Game Recorder & Graded AI",
-        sgf_sub: "Switch between 5x5 to 19x19 boards, 5 AI difficulty levels, or 144 Speed Go Intro Puzzles. Record SGF or send to your coach for review.",
+        sgf_sub: "Switch between 5x5 to 19x19 boards, 5 AI difficulty levels, or 72 Go Intro (Lessons 1–24) Puzzles. Record SGF or send to your coach for review.",
         bk_title: "Book a Trial Class in 30 Seconds",
         bk_sub: "Fill in the quick form below and Coach Meng Chun will arrange the most suitable trial slot for you.",
         bk_left_t: "🎯 What Happens in a Trial Session?",
@@ -2753,7 +2754,7 @@
         sz_opt_19: "19 路盘 (标准棋盘)",
         md_opt_human: "👥 双人记谱 / 自由打谱",
         md_opt_ai: "🤖 vs 电脑 AI (AI执白)",
-        md_opt_puzzle: "🧩 Speed Go Intro Puzzles (上·中·下 144)",
+        md_opt_puzzle: "🧩 围棋启蒙 第1–24课题库 (72题)",
         lv_opt_1: "🌱 Lv.1 启蒙陪练 (新手推荐)",
         lv_opt_2: "🐣 Lv.2 初级入门 (约18级)",
         lv_opt_3: "⚔️ Lv.3 进阶挑战 (约10级)",
@@ -2881,7 +2882,7 @@
         g4_t: "勇敢走上赛场的历练",
         g4_d: "代表棋院参加全马及区域青少年围棋赛，在庄重的赛场礼仪中握手对局，见证每一次成长蜕变。",
         sgf_title: "⚫⚪ 线上记谱与分级 AI 对弈",
-        sgf_sub: "支持 5路至19路棋盘切换、5 档 AI 难度调节与 144 道速成围棋启蒙题，可随时记谱或一键发送给导师复盘。",
+        sgf_sub: "支持 5路至19路棋盘切换、5 档 AI 难度调节与 72 道《围棋启蒙 第1–24课》同步练习题，可随时记谱或一键发送给导师复盘。",
         bk_title: "30秒在线预约体验课",
         bk_sub: "填写下方简短资料，明俊老师将为您匹配最适合的体验课时段。",
         bk_left_t: "🎯 一堂体验课包含什么？",
@@ -3070,7 +3071,7 @@
   </script>
 
   <!-- =====================================================
-       Script Part 2: 5x5–19x19 Interactive Go Board + Punigo Stone Faces + Capture Sparkles + 144 Puzzles + Graded AI
+       Script Part 2: 5x5–19x19 Interactive Go Board + Punigo Stone Faces + Capture Sparkles + 72 Go Intro Puzzles (L1–L24) + Graded AI
        ===================================================== -->
   <script>
     const canvas = document.getElementById('goBoard');
@@ -3303,7 +3304,7 @@
       });
     }
 
-    // 《速成围棋：入门篇（上·中·下）》144道章节题库状态变量
+    // 《围棋启蒙 第1–24课》4阶段·72道同步练习题库状态变量
     let isPuzzleMode = false;
     let curPuzzleIdx = 0;
     let curPuzzleStep = 0; // 0 = 等待第1手, 1 = 连环题等待第2手
@@ -4459,15 +4460,7 @@
       startNewGame();
     }
 
-    // ================= 黄焰、金成来著《速成围棋：入门篇（上·中·下）》36章·144题全套题库引擎 =================
-    function tfPt(x, y, t) {
-      let nx = x, ny = y, S = 8;
-      if (t & 1) nx = S - x;
-      if (t & 2) ny = S - y;
-      if (t & 4) { let tmp = nx; nx = ny; ny = tmp; }
-      return [nx, ny];
-    }
-
+    // ================= 《围棋启蒙 第1–24课》4阶段·24课·72道实选题库引擎 =================
     function isValidPuzzleSetup(bList, wList, ansList, nextW = null, ans2List = null) {
       const testBrd = Array.from({length: 9}, () => Array(9).fill(0));
       const dirs = [[0,1], [1,0], [0,-1], [-1,0]];
@@ -4543,226 +4536,331 @@
       if (PUZZLE_BANK.length > 0) return;
 
       const seeds = [
-        // ==================== 📘 第一册：《速成围棋：入门篇（上）》（第1～48题，共12个核心章节） ====================
-        { book: 1, chZh: "第2章:吃子(一子)", chEn: "B1 Ch2: Capture",
-          b: [[4,3],[3,4],[5,4]], w: [[4,4]], ans: [[4,5]],
-          zh: "【入门上·第2章 吃子】把对方棋子的气全部围住称为吃子。请吃掉只剩一口气的白子！",
-          en: "[Book 1 · Ch.2 Capture] Surround the last liberty of the White stone to capture it!" },
+        // ==================== 📘 第一阶段：第1–6课 围棋规则、吃子与逃跑（第1～18题） ====================
+        { book: 1, lesson: 1, chZh: "第1课:认识天元", chEn: "L1: Find Tengen",
+          b: [], w: [], ans: [[4,4]],
+          zh: "【第1课·围棋礼仪与规则】棋盘正中央唯一的星位叫做“天元”。请在9路棋盘上找出“天元”（E5）并落子！",
+          en: "[L1 · Rules & Board] The single center star point is called 'Tengen'. Click Tengen (E5) on the 9×9 board!" },
+        { book: 1, lesson: 1, chZh: "第1课:认识角星位", chEn: "L1: Corner Star Point",
+          b: [[4,4]], w: [], ans: [[2,2],[6,2],[2,6],[6,6]],
+          zh: "【第1课·围棋礼仪与规则】棋盘四个角落标有小黑点的交叉点叫做“星位”。请在四个角星位中任意选一个落子！",
+          en: "[L1 · Rules & Board] The four marked corner intersections are Star Points (Hoshi). Play on any corner star point!" },
+        { book: 1, lesson: 1, chZh: "第1课:角点两口气", chEn: "L1: Corner Point (2 Liberties)",
+          b: [[4,4]], w: [[4,0]], ans: [[0,0],[8,0],[0,8],[8,8]],
+          zh: "【第1课·围棋礼仪与规则】中腹一子有4口气，边上3口气，角上只有2口气。请找出棋盘四个“角点”中任意一个只有2口气的位置！",
+          en: "[L1 · Rules & Board] A center stone has 4 liberties, an edge stone has 3, and a corner stone has only 2. Click any of the 4 corners!" },
+        { book: 1, lesson: 2, chZh: "第2课:边上提一子", chEn: "L2: Edge Capture",
+          b: [[4,0],[6,0]], w: [[5,0]], ans: [[5,1]],
+          zh: "【第2课·数气、提子】白子在边上只剩最后1口气了！请下在它最后一口气的位置，把白子提掉。",
+          en: "[L2 · Liberties & Capture] The White stone on the edge has only 1 liberty left. Play there to capture it!" },
+        { book: 1, lesson: 2, chZh: "第2课:角上提一子", chEn: "L2: Corner Capture",
+          b: [[8,1]], w: [[8,0]], ans: [[7,0]],
+          zh: "【第2课·数气、提子】角上的白子原本只有2口气，已被黑棋紧住1口，请提掉这颗只剩1口气的角上白子！",
+          en: "[L2 · Liberties & Capture] The White corner stone is down to 1 liberty. Capture it on the top edge!" },
+        { book: 1, lesson: 2, chZh: "第2课:提吃两白子", chEn: "L2: Capture Two Stones",
+          b: [[4,0],[7,0],[6,1]], w: [[5,0],[6,0]], ans: [[5,1]],
+          zh: "【第2课·数气、提子】两颗连在一起的白棋共用最后1口气！请找到可以一次性提掉两颗白子的位置。",
+          en: "[L2 · Liberties & Capture] The two connected White stones share 1 final liberty. Capture both together!" },
+        { book: 1, lesson: 3, chZh: "第3课:向一线打吃", chEn: "L3: Atari to Edge",
+          b: [[3,0]], w: [[2,0]], ans: [[2,1]],
+          zh: "【第3课·打吃方向】白子在边上有2口气，请选对方向往一线（死亡线）方向打吃白棋，不让它逃向中腹！",
+          en: "[L3 · Atari Direction] Atari the White stone toward the 1st line (edge) so it cannot escape to the center!" },
+        { book: 1, lesson: 3, chZh: "第3课:二子打吃方向", chEn: "L3: Group Atari Direction",
+          b: [[5,0],[3,1],[5,1]], w: [[4,0],[4,1]], ans: [[3,0]],
+          zh: "【第3课·打吃方向】两颗白子还剩2口气，请选对方向打吃，把它往黑棋包围的一侧赶过去！",
+          en: "[L3 · Atari Direction] Put the two White stones into Atari from the side that traps them against your wall!" },
+        { book: 1, lesson: 3, chZh: "第3课:往己方口袋打吃", chEn: "L3: Atari into Pocket",
+          b: [[3,4],[5,4],[3,5],[5,5]], w: [[4,4]], ans: [[4,3]],
+          zh: "【第3课·打吃方向】请把白子往黑棋自己围成的“口袋”里面打吃，就算白棋逃跑也会撞进死胡同！",
+          en: "[L3 · Atari Direction] Atari the White stone from outside to push it straight into your Black pocket!" },
+        { book: 1, lesson: 4, chZh: "第4课:长气逃跑", chEn: "L4: Escape into Center",
+          b: [[3,1]], w: [[3,0],[2,1],[3,2]], ans: [[4,1]],
+          zh: "【第4课·逃跑方向】黑子被白棋打吃只剩1口气！请往开阔处长出，把气从1口长到3口气。",
+          en: "[L4 · Escape] Your Black stone is in Atari! Extend into open space to gain 3 liberties." },
+        { book: 1, lesson: 4, chZh: "第4课:远离边线逃跑", chEn: "L4: Escape off Edge",
+          b: [[3,0]], w: [[2,0],[4,0]], ans: [[3,1]],
+          zh: "【第4课·逃跑方向】一线黑子被白棋夹击打吃，请向中腹方向逃跑长气！",
+          en: "[L4 · Escape] Your 1st-line Black stone is in Atari. Escape toward the center to survive!" },
+        { book: 1, lesson: 4, chZh: "第4课:块棋逃跑长气", chEn: "L4: Group Escape",
+          b: [[4,0],[5,0],[4,1]], w: [[3,0],[6,0],[3,1],[5,1]], ans: [[4,2]],
+          zh: "【第4课·逃跑方向】三颗黑棋连成一块只剩1口气，快往下方开阔地带长出救回整块黑棋！",
+          en: "[L4 · Escape] Your 3-stone Black group has only 1 liberty left. Extend downward into open space!" },
+        { book: 1, lesson: 5, chZh: "第5课:互相叫吃先提", chEn: "L5: Mutual Atari I",
+          b: [[3,4],[5,4],[4,5]], w: [[3,3],[2,4],[4,4]], ans: [[4,3]],
+          zh: "【第5课·互相叫吃】黑白两子都在互相叫吃！黑先，先提掉对方的白子就能救出自己的黑子。",
+          en: "[L5 · Mutual Atari] Both sides are in Atari! Capture the White stone first to save yours." },
+        { book: 1, lesson: 5, chZh: "第5课:一线互相叫吃", chEn: "L5: Edge Mutual Atari",
+          b: [[4,0],[5,1]], w: [[5,0],[4,1],[6,1]], ans: [[6,0]],
+          zh: "【第5课·互相叫吃】边上黑白互相叫吃！别忘了黑先可以立刻提掉只剩1口气的白子获胜。",
+          en: "[L5 · Mutual Atari] Both stones on the edge are in Atari. Capture White's stone first!" },
+        { book: 1, lesson: 5, chZh: "第5课:中腹互相叫吃", chEn: "L5: Center Mutual Atari",
+          b: [[3,3],[4,4],[3,5]], w: [[4,3],[3,4],[4,5]], ans: [[2,4]],
+          zh: "【第5课·互相叫吃】棋盘中央黑白棋都在1口气边缘！黑先，立刻提吃打吃黑棋的那颗白子。",
+          en: "[L5 · Mutual Atari] Capture the attacking White stone immediately to rescue your Black stone!" },
+        { book: 1, lesson: 6, chZh: "第6课:综合·角部提子", chEn: "L6: Review · Corner Capture",
+          b: [[7,1],[8,2]], w: [[8,0],[8,1]], ans: [[7,0]],
+          zh: "【第6课·综合练习①】回顾第一阶段：角上两颗白棋只剩最后1口气，请一举提掉它们！",
+          en: "[L6 · Stage 1 Review] Capture the two corner White stones that are down to 1 liberty!" },
+        { book: 1, lesson: 6, chZh: "第6课:综合·块棋逃出", chEn: "L6: Review · Group Escape",
+          b: [[1,5],[2,5],[3,5]], w: [[1,4],[2,4],[3,4],[1,6],[2,6],[3,6]], ans: [[4,5]],
+          zh: "【第6课·综合练习①】三颗黑棋被白棋上下夹击，往左边是死路（只有2气），请选对方向往右边开阔处逃出！",
+          en: "[L6 · Stage 1 Review] Escape toward the open center on the right instead of the cramped edge!" },
+        { book: 1, lesson: 6, chZh: "第6课:综合·正确逃跑方向", chEn: "L6: Review · Escape Direction",
+          b: [[7,4],[6,5],[7,5],[6,6]], w: [[6,3],[7,3],[6,4],[5,6],[7,6],[6,7],[7,7]], ans: [[5,5]],
+          zh: "【第6课·综合练习①】黑棋块棋被白棋紧紧包围，请找出能让黑棋长出最多气、成功逃向中腹的唯一一手！",
+          en: "[L6 · Stage 1 Review] Find the only escape move toward the open left side to save your Black group!" },
 
-        { book: 1, chZh: "第2章:吃子(块棋)", chEn: "B1 Ch2: Group Capture",
-          b: [[3,3],[4,3],[2,4],[5,4],[3,5]], w: [[3,4],[4,4]], ans: [[4,5]],
-          zh: "【入门上·第2章 吃子】两颗连在一起的白棋只剩最后一口气，请把它们一起提掉！",
-          en: "[Book 1 · Ch.2 Capture] The two connected White stones have only 1 liberty left. Capture both!" },
+        // ==================== 📗 第二阶段：第7–12课 虎口、连断与吃子技巧（第19～36题） ====================
+        { book: 2, lesson: 7, chZh: "第7课:找出中腹禁入点", chEn: "L7: Center Forbidden Point",
+          b: [[4,3],[3,4],[5,4],[4,5]], w: [], ans: [[4,4]],
+          zh: "【第7课·虎口与禁入点】四颗黑棋围住的交叉点没有气，白棋不能落子（禁入点）。请点击找出白棋的禁入点！",
+          en: "[L7 · Tiger's Mouth & Suicide] A point with 0 liberties is forbidden for White. Click White's forbidden point!" },
+        { book: 2, lesson: 7, chZh: "第7课:找出边上禁入点", chEn: "L7: Edge Forbidden Point",
+          b: [[8,2],[7,3],[8,4]], w: [], ans: [[8,3]],
+          zh: "【第7课·虎口与禁入点】边上只需要3颗黑棋就能围出禁入点！请点击找出边上白棋不能落的禁入点。",
+          en: "[L7 · Tiger's Mouth & Suicide] Only 3 stones form a forbidden point on the edge. Click White's forbidden point!" },
+        { book: 2, lesson: 7, chZh: "第7课:提吃虎口白子", chEn: "L7: Capture in Tiger's Mouth",
+          b: [[3,3],[4,3],[2,4],[5,4],[3,5],[4,5]], w: [[3,4]], ans: [[4,4]],
+          zh: "【第7课·虎口与禁入点】白子不小心钻进了黑棋的“虎口”只剩1口气！请立刻合上虎口把它提掉。",
+          en: "[L7 · Tiger's Mouth] White stepped into your Tiger's Mouth and has 1 liberty left. Close it to capture!" },
+        { book: 2, lesson: 8, chZh: "第8课:实连两黑子", chEn: "L8: Solid Connection I",
+          b: [[4,3],[4,5]], w: [[3,4],[5,4]], ans: [[4,4]],
+          zh: "【第8课·连接与切断①】两颗黑子被白棋左右窥断，请把两颗黑棋牢牢连在一起！",
+          en: "[L8 · Connect & Cut I] White threatens to split your stones. Connect your two Black stones solidly!" },
+        { book: 2, lesson: 8, chZh: "第8课:连回被叫吃黑子", chEn: "L8: Connect & Rescue",
+          b: [[3,4],[3,6]], w: [[2,5],[2,6],[4,6]], ans: [[3,5]],
+          zh: "【第8课·连接与切断①】下方黑子只剩1口气了！请下在连接点把两颗黑子连成一体、救回同伴。",
+          en: "[L8 · Connect & Cut I] Your lower Black stone is in Atari! Connect it with your upper stone to rescue it." },
+        { book: 2, lesson: 8, chZh: "第8课:虎口连接", chEn: "L8: Connect Through Gap",
+          b: [[5,4],[5,6]], w: [[4,4],[3,5],[6,5]], ans: [[5,5]],
+          zh: "【第8课·连接与切断①】请把棋盘上被白棋隔开的两颗黑子连在一起，形成强壮的整体！",
+          en: "[L8 · Connect & Cut I] Connect the two separated Black stones together into one strong group!" },
+        { book: 2, lesson: 9, chZh: "第9课:找出白棋唯一断点", chEn: "L9: Find the Cutting Point",
+          b: [[5,5]], w: [[5,4],[4,5]], ans: [[4,4]],
+          zh: "【第9课·连接与切断②】两颗斜着放（尖）的白棋存在断点！黑先，请找出并切断白棋唯一的断点。",
+          en: "[L9 · Connect & Cut II] Two diagonal White stones have a cutting point. Cut them apart!" },
+        { book: 2, lesson: 9, chZh: "第9课:切断白棋联络", chEn: "L9: Cut White Apart",
+          b: [[3,2],[4,3],[6,5]], w: [[6,2],[6,3],[3,5],[4,5]], ans: [[5,4]],
+          zh: "【第9课·连接与切断②】白棋上方两子与下方两子之间存在明显断点，请黑棋果断切断白棋！",
+          en: "[L9 · Connect & Cut II] Cut between White's upper and lower groups at the vital diagonal point!" },
+        { book: 2, lesson: 9, chZh: "第9课:连回防被断", chEn: "L9: Defend Cutting Point",
+          b: [[5,5],[5,7]], w: [[4,6],[6,6]], ans: [[5,6]],
+          zh: "【第9课·连接与切断②】白棋左右虎视眈眈准备分断黑棋，请黑棋抢先占住要点将两子连成一体！",
+          en: "[L9 · Connect & Cut II] Connect your two Black stones before White can cut them apart!" },
+        { book: 2, lesson: 10, chZh: "第10课:经典抱吃", chEn: "L10: Hugging Atari",
+          b: [[3,2],[4,2],[2,3],[5,3]], w: [[3,3],[2,6],[3,6],[4,6]], ans: [[3,4]],
+          zh: "【第10课·抱吃与门吃】把白棋赶向己方强子并使其长气也不超过2口称为“抱吃”。请用抱吃吃掉这颗白子！",
+          en: "[L10 · Hugging & Gate Capture] Play a Hugging Atari to drive White into your own Black stones!" },
+        { book: 2, lesson: 10, chZh: "第10课:门吃关门", chEn: "L10: Gate Capture I",
+          b: [[3,1],[2,2],[4,2],[4,3],[2,4]], w: [[3,2],[3,3],[4,4],[5,4]], ans: [[3,4]],
+          zh: "【第10课·抱吃与门吃】白棋两子像被关在门里一样！请黑棋“关上大门”（门吃），让白棋无路可逃。",
+          en: "[L10 · Gate Capture] Close the gate on the two White stones so they cannot escape!" },
+        { book: 2, lesson: 10, chZh: "第10课:门吃二白子", chEn: "L10: Gate Capture II",
+          b: [[2,4],[2,5],[5,5],[3,6],[4,6]], w: [[5,3],[3,5],[4,5]], ans: [[4,4]],
+          zh: "【第10课·抱吃与门吃】上方已有白子接应，直接打吃会被跑掉！请用“门吃”一举关住两颗白子。",
+          en: "[L10 · Gate Capture] Use a Gate Capture to trap both White stones before they connect out!" },
+        { book: 2, lesson: 11, chZh: "第11课:断吃白子", chEn: "L11: Cutting Atari",
+          b: [[6,0],[4,1],[7,1],[5,2]], w: [[6,1],[7,2],[5,3],[6,3]], ans: [[6,2]],
+          zh: "【第11课·断吃与双吃】一手棋既切断白棋的联络，又同时打吃对方称为“断吃”！请断吃白子。",
+          en: "[L11 · Cutting & Double Atari] Cut White apart and put the isolated stone into Atari in one move!" },
+        { book: 2, lesson: 11, chZh: "第11课:双打吃(一)", chEn: "L11: Double Atari I",
+          b: [[6,4],[5,5],[6,5],[4,6]], w: [[5,4],[4,5]], ans: [[4,4]],
+          zh: "【第11课·断吃与双吃】一手棋同时打吃两块白棋称为“双吃”，白棋顾此失彼必死其一！请找出双吃点。",
+          en: "[L11 · Double Atari] Play one move that puts two White stones in Atari at the same time!" },
+        { book: 2, lesson: 11, chZh: "第11课:双打吃(二)", chEn: "L11: Double Atari II",
+          b: [[4,3],[5,4],[4,6],[5,6]], w: [[3,3],[4,4],[3,5],[5,5]], ans: [[4,5]],
+          zh: "【第11课·断吃与双吃】请找出同时对两边白棋形成双打吃的犀利一手！",
+          en: "[L11 · Double Atari] Find the sharp Double Atari that attacks both White groups at once!" },
+        { book: 2, lesson: 12, chZh: "第12课:综合·连接反击", chEn: "L12: Review · Connect & Cut",
+          b: [[4,2],[5,2],[3,4],[4,4],[5,4]], w: [[2,3],[3,3],[5,3],[6,3],[6,4]], ans: [[4,3]],
+          zh: "【第12课·综合练习②】白棋两面虎视眈眈，请占住中央要点，一手把上下黑棋连成铁壁并分断白棋！",
+          en: "[L12 · Stage 2 Review] Play the central vital point to connect all Black stones and split White!" },
+        { book: 2, lesson: 12, chZh: "第12课:综合·双吃要点", chEn: "L12: Review · Double Atari",
+          b: [[5,3],[3,4],[4,4],[4,6]], w: [[5,4],[4,5],[3,6],[4,7]], ans: [[5,5]],
+          zh: "【第12课·综合练习②】运用第二阶段所学的双打吃技巧，找出能同时打吃两颗白棋的要点！",
+          en: "[L12 · Stage 2 Review] Use Double Atari to attack two White stones simultaneously!" },
+        { book: 2, lesson: 12, chZh: "第12课:综合·双吃制胜", chEn: "L12: Review · Combat Double Atari",
+          b: [[2,3],[3,3],[5,3],[2,4]], w: [[4,3],[3,4],[2,5],[5,5]], ans: [[4,4]],
+          zh: "【第12课·综合练习②】不要错过双吃良机！黑先，一手棋同时打吃两处白棋锁定胜局。",
+          en: "[L12 · Stage 2 Review] Seize the Double Atari to guarantee capturing White stones!" },
 
-        { book: 1, chZh: "第3章:逃(长气逃跑)", chEn: "B1 Ch3: Escape",
-          b: [[4,4]], w: [[4,3],[3,4],[5,4]], ans: [[4,5]],
-          zh: "【入门上·第3章 逃跑】黑子被白棋叫吃只剩一口气了！快通过长气救出被叫吃的黑棋。",
-          en: "[Book 1 · Ch.3 Escape] Your Black stone is in Atari! Extend into open space to gain 3 liberties." },
+        // ==================== 📙 第三阶段：第13–18课 征枷扑接与打劫（第37～54题） ====================
+        { book: 3, lesson: 13, chZh: "第13课:认识征子", chEn: "L13: Basic Ladder",
+          b: [[4,3],[3,4],[3,5]], w: [[4,4]], ans: [[5,4]],
+          zh: "【第13课·征吃】连续左右打吃把对方赶向边角吃掉称为“征子”。请选对方向迈出征吃的第一步！",
+          en: "[L13 · Ladder] Start a Ladder (Shicho) by Atari-ing from the right side to drive White into the edge!" },
+        { book: 3, lesson: 13, chZh: "第13课:征吃方向", chEn: "L13: Ladder Direction",
+          b: [[3,3],[4,4],[5,4]], w: [[4,3]], ans: [[4,2]],
+          zh: "【第13课·征吃】白子还剩2口气，请从上方压住打吃，将它一路征向棋盘边角！",
+          en: "[L13 · Ladder] Choose the correct direction to start a working Ladder against the White stone!" },
+        { book: 3, lesson: 13, chZh: "第13课:征吃三白子", chEn: "L13: Ladder Three Stones",
+          b: [[5,4],[3,5],[6,5],[4,6],[5,6]], w: [[4,4],[4,5],[5,5]], ans: [[4,3]],
+          zh: "【第13课·征吃】三颗白棋气紧，请选对方向打吃发动征子，一路追杀到底！",
+          en: "[L13 · Ladder] Atari from the top to initiate a Ladder that captures all three White stones!" },
+        { book: 3, lesson: 14, chZh: "第14课:征不利改枷吃", chEn: "L14: Net over Ladder I",
+          b: [[6,4],[6,5],[3,6],[4,6],[5,6]], w: [[3,2],[4,5],[5,5]], ans: [[3,4]],
+          zh: "【第14课·枷吃】左上方有白棋“引征子”，征子会失败！请改用斜罩一格的“枷吃”把两颗白子网罗其中。",
+          en: "[L14 · The Net (Geta)] A White ladder-breaker sits in the upper-left! Use a loose Net instead of a Ladder." },
+        { book: 3, lesson: 14, chZh: "第14课:枷吃二白子", chEn: "L14: Net over Ladder II",
+          b: [[5,1],[6,1],[7,2],[7,3],[7,4]], w: [[6,2],[6,3],[3,4]], ans: [[5,4]],
+          zh: "【第14课·枷吃】左边有白子接应，直接打吃白棋会逃脱！请下出凌空“枷吃”封住白棋两子的出路。",
+          en: "[L14 · The Net (Geta)] Direct Atari fails due to White's support stone. Play a loose Net to cage both stones!" },
+        { book: 3, lesson: 14, chZh: "第14课:斜枷封锁", chEn: "L14: Diagonal Net",
+          b: [[7,5],[7,6],[4,7],[5,7],[6,7]], w: [[4,3],[5,6],[6,6]], ans: [[4,5]],
+          zh: "【第14课·枷吃】远处白棋引征，请用漂亮的“枷吃”像渔网一样罩住两颗白棋！",
+          en: "[L14 · The Net (Geta)] Capture the two White stones in a Net so whichever way they push, they are trapped!" },
+        { book: 3, lesson: 15, chZh: "第15课:倒扑吃三子(两步)", chEn: "L15: Snapback I (2-Step)",
+          b: [[4,2],[5,2],[3,3],[6,3],[6,4],[5,5]], w: [[4,3],[5,3],[3,4],[4,5]], ans: [[4,4]],
+          nextW: [5,4], ans2: [[4,4]],
+          zh: "【第15课·扑与倒扑】第1步：请大胆往白棋虎口里“扑（送吃）”一子！等白棋提掉后再反提三颗白子。",
+          en: "[L15 · Snapback] Step 1: Throw in a sacrifice stone! After White captures it, recapture 3 White stones." },
+        { book: 3, lesson: 15, chZh: "第15课:倒扑吃四子(两步)", chEn: "L15: Snapback II (2-Step)",
+          b: [[3,3],[2,4],[1,5],[5,5],[2,6],[3,6],[4,6]], w: [[4,3],[5,4],[2,5],[3,5],[4,5]], ans: [[4,4]],
+          nextW: [3,4], ans2: [[4,4]],
+          zh: "【第15课·扑与倒扑】第1步：请往白棋气紧的虎口中送吃一子（扑），再用倒扑反提四颗白棋！",
+          en: "[L15 · Snapback] Step 1: Sacrifice a stone into White's shortage of liberties to set up a 4-stone Snapback!" },
+        { book: 3, lesson: 15, chZh: "第15课:连环倒扑(两步)", chEn: "L15: Snapback III (2-Step)",
+          b: [[2,2],[3,2],[4,2],[1,3],[5,3],[2,4],[3,5]], w: [[2,3],[3,3],[3,4],[5,4],[4,5]], ans: [[4,4]],
+          nextW: [4,3], ans2: [[4,4]],
+          zh: "【第15课·扑与倒扑】第1步：请找准虎口送吃一子，诱使白棋自撞成1口气后再反手全提！",
+          en: "[L15 · Snapback] Step 1: Play the throw-in sacrifice, then snap back to capture the whole White group!" },
+        { book: 3, lesson: 16, chZh: "第16课:认识接不归", chEn: "L16: Connect & Die I",
+          b: [[3,2],[4,2],[2,3],[2,4],[2,5],[4,5],[3,6]], w: [[5,2],[4,3],[6,3],[3,4],[3,5]], ans: [[4,4]],
+          zh: "【第16课·接不归】从下方打吃白棋两子！就算白棋连回虎口，整块白棋依然只剩1口气，这就是“接不归”！",
+          en: "[L16 · Connect & Die] Atari the White stones! Even if White connects, the entire group remains in Atari." },
+        { book: 3, lesson: 16, chZh: "第16课:边路接不归", chEn: "L16: Edge Connect & Die",
+          b: [[7,0],[6,1],[6,2],[6,3],[7,3],[6,4],[6,5]], w: [[7,1],[7,2],[8,3],[7,4],[7,5],[8,5],[5,6],[6,6],[7,6]], ans: [[8,1]],
+          zh: "【第16课·接不归】一线打吃白棋两子，让白棋无论接不接都难逃被提吃的命运！",
+          en: "[L16 · Connect & Die] Atari on the 1st line! Connecting only adds more stones to White's dead 1-liberty group." },
+        { book: 3, lesson: 16, chZh: "第16课:角部接不归", chEn: "L16: Corner Connect & Die",
+          b: [[6,0],[6,1],[6,2],[7,2],[6,3]], w: [[8,0],[7,1],[8,2],[7,3],[6,4],[8,4],[7,5]], ans: [[7,0]],
+          zh: "【第16课·接不归】在边角处打吃白子，即使白棋在虎口粘住也依然只剩1口气！请找出接不归要点。",
+          en: "[L16 · Connect & Die] Play on the 1st line to force a classic corner Connect-and-Die!" },
+        { book: 3, lesson: 17, chZh: "第17课:认识打劫(一)", chEn: "L17: Basic Ko I",
+          b: [[5,0],[6,1],[5,2],[5,3]], w: [[4,0],[3,1],[5,1],[4,2],[6,2]], ans: [[4,1]],
+          zh: "【第17课·打劫与打二还一】双方互相能提吃一子的棋形叫做“劫”。黑先，请提吃白子形成打劫！",
+          en: "[L17 · Ko & Snapback-2] Capture the single White stone to start a Ko fight!" },
+        { book: 3, lesson: 17, chZh: "第17课:认识打劫(二)", chEn: "L17: Basic Ko II",
+          b: [[5,1],[4,2],[5,3],[6,4]], w: [[4,1],[6,1],[5,2],[7,2],[6,3]], ans: [[6,2]],
+          zh: "【第17课·打劫与打二还一】请提掉只剩1口气的白子形成打劫（提劫后白棋不能立刻回提，须先找劫材）。",
+          en: "[L17 · Ko] Capture the White stone in Atari to form a Ko (White cannot recapture immediately)!" },
+        { book: 3, lesson: 17, chZh: "第17课:打二还一", chEn: "L17: Capture Two, Lose One",
+          b: [[3,3],[4,3],[2,4],[3,5],[4,5]], w: [[5,3],[3,4],[4,4],[6,4],[5,5]], ans: [[5,4]],
+          zh: "【第17课·打劫与打二还一】黑棋提掉两颗白子后，白棋可以立刻反提一子，不受打劫限制！请提吃两颗白子。",
+          en: "[L17 · Capture Two] Capture both White stones! Unlike Ko, capturing 2 stones is not subject to the Ko rule." },
+        { book: 3, lesson: 18, chZh: "第18课:综合·征吃二子", chEn: "L18: Review · Ladder",
+          b: [[4,3],[5,3],[3,4],[6,4]], w: [[2,3],[3,3],[4,4],[5,4]], ans: [[4,5],[5,5]],
+          zh: "【第18课·综合练习③】运用第三阶段征吃技巧，选对方向从下方打吃并一路征死两颗白棋！",
+          en: "[L18 · Stage 3 Review] Atari from below to start a working Ladder against the two White stones!" },
+        { book: 3, lesson: 18, chZh: "第18课:综合·找出接不归", chEn: "L18: Review · Connect & Die I",
+          b: [[3,5],[4,5],[5,5],[6,5],[3,6],[6,6],[3,7],[7,7],[5,8]], w: [[7,3],[6,4],[7,5],[4,6],[5,6],[7,6],[4,7],[6,7],[4,8],[7,8]], ans: [[5,7]],
+          zh: "【第18课·综合练习③】黑先，找到棋盘下方白棋唯一的“接不归”打吃要点！",
+          en: "[L18 · Stage 3 Review] Find the vital Connect-and-Die Atari against White's lower group!" },
+        { book: 3, lesson: 18, chZh: "第18课:综合·一线接不归", chEn: "L18: Review · Connect & Die II",
+          b: [[3,6],[4,6],[5,6],[6,6],[4,7],[7,7]], w: [[2,6],[1,7],[3,7],[5,7],[6,7],[2,8],[4,8]], ans: [[6,8]],
+          zh: "【第18课·综合练习③】在一线打吃白棋两子，白棋即使连接依然只剩1口气（接不归）！",
+          en: "[L18 · Stage 3 Review] Atari on the 1st line to trap White's group in a Connect-and-Die!" },
 
-        { book: 1, chZh: "第4章:互相叫吃", chEn: "B1 Ch4: Mutual Atari",
-          b: [[3,3],[4,3],[3,5],[4,5],[5,4],[5,5]], w: [[3,2],[4,2],[5,2],[3,4],[4,4],[5,3]], ans: [[2,4]],
-          zh: "【入门上·第4章 互相叫吃】黑白双方互相都被叫吃！这时先提掉对方棋子的一方获胜。",
-          en: "[Book 1 · Ch.4 Mutual Atari] Both sides are in Atari! Capture the White stones first to rescue yours." },
-
-        { book: 1, chZh: "第5章:连接", chEn: "B1 Ch5: Connect",
-          b: [[3,4],[5,4]], w: [[4,3],[4,5]], ans: [[4,4]],
-          zh: "【入门上·第5章 连接】白棋两边夹击想分断黑棋，请把两颗黑棋连成一体！",
-          en: "[Book 1 · Ch.5 Connect] White threatens to split your stones. Connect your Black stones solidly!" },
-
-        { book: 1, chZh: "第6章:断(分断)", chEn: "B1 Ch6: Cut",
-          b: [[2,5],[3,5],[4,5],[4,3]], w: [[4,4],[5,5]], ans: [[5,4]],
-          zh: "【入门上·第6章 断】断是使对方棋子变弱的着法。请果断分断白棋的连接并叫吃！",
-          en: "[Book 1 · Ch.6 Cut] Cut the two White stones apart and put one in Atari!" },
-
-        { book: 1, chZh: "第7-1章:向一线叫吃", chEn: "B1 Ch7-1: 1st-Line Atari",
-          b: [[3,7],[4,6]], w: [[4,7]], ans: [[5,7]],
-          zh: "【入门上·第7-1章 向一线叫吃】将二线白子往一线（棋盘最外围死亡线）方向叫吃，白棋长气也逃不掉！",
-          en: "[Book 1 · Ch.7-1 Atari to Edge] Atari the White stone toward the 1st line so it cannot escape!" },
-
-        { book: 1, chZh: "第7-2章:向己方方向叫吃", chEn: "B1 Ch7-2: Hugging Atari",
-          b: [[3,3],[3,4],[3,5],[3,6],[4,3],[4,6]], w: [[4,5]], ans: [[5,5]],
-          zh: "【入门上·第7-2章 向己方方向叫吃】把白棋往黑棋自己的墙壁口袋方向赶（抱吃），白棋长气也无处可逃！",
-          en: "[Book 1 · Ch.7-2 Hugging Atari] Drive the White stone into your own Black wall pocket so it cannot escape!" },
-
-        { book: 1, chZh: "第7-4章:双叫吃", chEn: "B1 Ch7-4: Double Atari",
-          b: [[2,3],[3,3],[4,4],[4,5],[5,5]], w: [[3,2],[4,3],[5,4]], ans: [[5,3]],
-          zh: "【入门上·第7-4章 双叫吃】一手棋同时做出两个叫吃！请找出双叫吃白棋的要点。",
-          en: "[Book 1 · Ch.7-4 Double Atari] Play one stone that puts two White stones into Atari simultaneously!" },
-
-        { book: 1, chZh: "第11章:接不归", chEn: "B1 Ch11: Connect & Die",
-          b: [[0,0],[4,0],[0,1],[4,1],[0,2],[4,2],[1,3],[3,3]], w: [[1,0],[3,0],[1,1],[2,1],[3,1],[1,2],[3,2],[2,3]], ans: [[2,4]],
-          zh: "【入门上·第11章 接不归】从外侧叫吃白棋的关键子！就算白棋连回虎口，整块白棋依然只剩一口气。",
-          en: "[Book 1 · Ch.11 Connect-and-Die] Atari the key White stone from outside! Even if White connects, the whole group dies." },
-
-        { book: 1, chZh: "第12章:倒扑(两步连环)", chEn: "B1 Ch12: Snapback",
-          b: [[2,8],[4,5],[4,6],[5,7],[5,8],[3,5]], w: [[2,7],[3,6],[4,7],[4,8],[1,7]],
-          ans: [[3,7]],
-          nextW: [3,8],
-          ans2: [[3,7]],
-          zh: "【入门上·第12章 倒扑】第1步：请先往白棋虎口里“送吃（扑）”一子！等白棋提掉后再反提三子。",
-          en: "[Book 1 · Ch.12 Snapback] Step 1: Sacrifice a stone into White's tiger's mouth, then recapture!" },
-
-        { book: 1, chZh: "第13-14章:罩(枷)与征子", chEn: "B1 Ch13-14: Net & Ladder",
-          b: [[2,4],[2,5],[3,6],[4,6]], w: [[3,5],[5,3]], ans: [[4,4]],
-          zh: "【入门上·第13章 罩(枷)】用“罩（枷吃）”将白子网罗在黑棋中间，让它往哪边冲都跑不掉！",
-          en: "[Book 1 · Ch.13 The Net] Cage the White stone loosely on the diagonal so both escape routes are blocked!" },
-
-        // ==================== 📗 第二册：《速成围棋：入门篇（中）》（第49～96题，共12个核心章节） ====================
-        { book: 2, chZh: "第1章:稳固连接", chEn: "B2 Ch1: Solid Connection",
-          b: [[3,4],[4,4],[3,6],[4,6]], w: [[2,5],[5,5],[1,3]], ans: [[4,5],[3,5]],
-          zh: "【入门中·第1章 连接】白棋在两边窥断黑棋的竹节双，请补一手把两组黑棋彻底实连起来！",
-          en: "[Book 2 · Ch.1 Connection] White peeps from both sides of your bamboo joint. Connect your Black groups solidly!" },
-
-        { book: 2, chZh: "第2章:断的要领", chEn: "B2 Ch2: Cutting Counter",
-          b: [[3,3],[3,4],[4,5],[5,5],[6,4]], w: [[4,4],[2,5],[3,5],[5,2]], ans: [[4,3]],
-          zh: "【入门中·第2章 断的要领】白棋冲断黑棋，请选对方向叫吃这颗断子，把它赶向己方黑子一举吃掉！",
-          en: "[Book 2 · Ch.2 Cutting] White just cut your stones. Atari the cutting stone toward your friendly Black stones!" },
-
-        { book: 2, chZh: "第3章:征子方向选择", chEn: "B2 Ch3: Ladder Direction",
-          b: [[3,4],[4,4],[2,5],[5,5]], w: [[3,5],[4,5],[1,7]], ans: [[3,6]],
-          zh: "【入门中·第3章 征子与引征】远处有一颗白棋引征子！请避开引征子方向，选对方向征吃两颗白子。",
-          en: "[Book 2 · Ch.3 Ladder Direction] Watch out for the White ladder-breaker stone! Atari away from it to capture." },
-
-        { book: 2, chZh: "第4章:征不利改用罩", chEn: "B2 Ch4: Net over Ladder",
-          b: [[3,4],[3,5],[4,6],[5,6],[2,4]], w: [[4,5],[2,5],[3,6],[7,2],[7,7]], ans: [[5,4]],
-          zh: "【入门中·第4章 罩(枷)】远处有白子接应，无论哪个方向征子都不利！请改用“罩（枷）”吃住白子。",
-          en: "[Book 2 · Ch.4 Net] Both ladders fail because of White's support stones. Use a Net (Geta) instead!" },
-
-        { book: 2, chZh: "第5-2章:对杀先收外气", chEn: "B2 Ch5-2: Outside Liberties",
-          b: [[1,6],[2,6],[2,7],[2,8],[3,8],[3,5],[4,5],[5,5],[5,6],[5,7]], w: [[0,5],[1,5],[2,5],[0,7],[1,7],[1,8],[3,6],[4,6],[4,7],[4,8]], ans: [[5,8]],
-          zh: "【入门中·第5-2章 先收外气】在对杀中如果先走公气会自撞一气！请先从外面一线收紧白棋的外气。",
-          en: "[Book 2 · Ch.5-2 Outside Liberties] Do not fill the shared liberty! Tighten White's outside liberty first." },
-
-        { book: 2, chZh: "第5-3章:收连着棋子的气", chEn: "B2 Ch5-3: Attack Key Stones",
-          b: [[0,6],[0,7],[0,8],[1,8],[1,5],[2,5],[3,5],[3,6],[4,7],[3,8],[4,8],[5,5],[6,4],[7,5]], w: [[1,6],[2,6],[2,7],[0,4],[6,5]], ans: [[3,7]],
-          zh: "【入门中·第5-3章 先收连着棋子的气】不要去抓孤立的废子，先从外侧紧住包住黑棋的3颗重要白棋的气！",
-          en: "[Book 2 · Ch.5-3 Key Stones] Ignore the isolated stone! Tighten the outside liberty of the 3 White key stones." },
-
-        { book: 2, chZh: "第7章:制造假眼", chEn: "B2 Ch7: Make False Eye",
-          b: [[0,5],[1,5],[2,5],[3,5],[4,5],[4,6],[5,7],[5,8]], w: [[0,6],[1,6],[2,6],[3,6],[0,7],[2,7],[4,7],[0,8],[1,8],[2,8],[3,8]], ans: [[4,8]],
-          zh: "【入门中·第7章 假眼】眼角被对方占住就会变成假眼！请在一线打吃破掉白棋第二只眼的眼角。",
-          en: "[Book 2 · Ch.7 False Eye] Play on the 1st-line diagonal to put White in Atari and falsify the second eye!" },
-
-        { book: 2, chZh: "第8-1章:四目死活(丁四)", chEn: "B2 Ch8-1: Pyramid Four",
-          b: [[0,6],[0,7],[0,8],[1,5],[2,5],[3,5],[4,5],[5,5],[6,6],[6,7],[6,8]], w: [[1,6],[2,6],[3,6],[4,6],[5,6],[1,7],[2,7],[4,7],[5,7],[1,8],[5,8]], ans: [[3,8]],
-          zh: "【入门中·第8-1章 四目死活】“丁四”之形，正中间交叉点是点杀白棋的唯一急所！",
-          en: "[Book 2 · Ch.8-1 Pyramid Four] In a Pyramid-Four shape, the center vital point kills White!" },
-
-        { book: 2, chZh: "第10-1章:扑后接不归(连环)", chEn: "B2 Ch10-1: Throw-In & Connect-Die",
-          b: [[2,5],[3,5],[4,5],[0,6],[1,6],[2,6],[5,6],[4,7],[3,8]], w: [[3,6],[0,7],[1,7],[2,7],[2,8]],
-          ans: [[1,8]],
-          nextW: [0,8],
-          ans2: [[4,6]],
-          zh: "【入门中·第10-1章 送吃后的接不归】直接叫吃白会连回！第1步：请先在一线“扑（送吃）”缩减白气，再叫吃形成接不归！",
-          en: "[Book 2 · Ch.10-1 Throw-In] Step 1: Throw in on the 1st line to reduce liberties, then Atari for Connect-and-Die!" },
-
-        { book: 2, chZh: "第11章:吃重要的棋子", chEn: "B2 Ch11: Capture Key Stone",
-          b: [[0,5],[1,4],[2,5],[2,6],[0,6],[4,4],[4,5],[6,4],[6,5],[5,6]], w: [[1,5],[5,4],[5,5],[3,4],[3,5],[4,3],[6,3]], ans: [[5,3]],
-          zh: "【入门中·第11章 吃重要的棋子】孤立的白一子无关紧要，请先提掉分断黑棋的两颗重要白子（棋筋）！",
-          en: "[Book 2 · Ch.11 Key Stone] Ignore the isolated junk stone! Capture the two cutting White key stones first." },
-
-        { book: 2, chZh: "第12-2章:死活的见合", chEn: "B2 Ch12-2: Miai for Life",
-          b: [[1,6],[2,6],[2,7],[0,7],[1,8]], w: [[0,5],[1,5],[2,5],[3,5],[3,6],[3,7],[3,8],[0,6]], ans: [[2,8]],
-          zh: "【入门中·第12-2章 死活的见合】白棋从外侧破眼压缩空间，请在一线占住眼角要点，确保做出两只真眼活棋！",
-          en: "[Book 2 · Ch.12-2 Living Shape] White reduced your eye space. Secure the 1st-line corner point to make two true eyes!" },
-
-        { book: 2, chZh: "第14章:一间跳好形", chEn: "B2 Ch14: Good Shape Jump",
-          b: [[2,4],[2,5],[3,6],[4,6]], w: [[1,5],[2,6],[1,7],[3,7]], ans: [[4,4]],
-          zh: "【入门中·第14章 好形与坏形】不要下成凝形或愚形三角！请用轻灵的“一间跳”做出好形出头。",
-          en: "[Book 2 · Ch.14 Good Shape] Avoid heavy clumps! Play a One-Point Jump to make good shape into the center." },
-
-        // ==================== 📙 第三册：《速成围棋：入门篇（下）》（第97～144题，共12个核心章节） ====================
-        { book: 3, chZh: "第1章:互相叫吃实战", chEn: "B3 Ch1: Mutual Atari in Combat",
-          b: [[3,2],[4,3],[4,4],[1,4],[2,4],[3,5],[3,6],[4,6],[4,7],[5,7],[6,6]],
-          w: [[3,3],[3,4],[2,5],[2,6],[2,7],[3,8],[4,5],[5,5],[6,5],[5,6]], ans: [[2,3]],
-          zh: "【入门下·第1章 实战吃棋筋】不要错过一击制胜的机会！请果断提掉只剩一口气的两颗白棋棋筋。",
-          en: "[Book 3 · Ch.1 Combat Capture] Seize the decisive blow! Capture the two cutting White key stones in Atari." },
-
-        { book: 3, chZh: "第3-3章:征和罩选择", chEn: "B3 Ch3-3: Ladder vs Net",
-          b: [[2,4],[2,5],[3,6],[4,6]], w: [[3,5],[1,6],[2,6],[3,7],[7,2]], ans: [[4,4]],
-          zh: "【入门下·第3-3章 征和罩选择哪个】远方角部有白棋引征子，征吃不成立！请改选“罩（枷）”吃住白子。",
-          en: "[Book 3 · Ch.3-3 Ladder vs Net] White has a ladder-breaker in the far corner. Choose the Net (Geta)!" },
-
-        { book: 3, chZh: "第4章:连和断反击", chEn: "B3 Ch4: Cut & Counter",
-          b: [[1,4],[2,4],[3,5],[4,5],[5,5],[6,5]], w: [[1,5],[2,5],[3,4],[3,6],[4,6],[5,6]], ans: [[3,3]],
-          zh: "【入门下·第4章 连和断】白棋冲断黑棋看似严厉，黑棋只需选对方向打吃，就能把切断的白子沿黑墙一路征死！",
-          en: "[Book 3 · Ch.4 Connect & Cut] White cut your group—Atari from the open side to drive the cutting stone into a capture!" },
-
-        { book: 3, chZh: "第5章:叫吃的要领", chEn: "B3 Ch5: Atari Mastery",
-          b: [[3,5],[3,6],[3,7],[5,5],[5,6],[5,7],[4,8]], w: [[4,5],[4,6]], ans: [[4,4]],
-          zh: "【入门下·第5章 叫吃的要领】迎头向己方厚势口袋方向叫吃两颗白棋，绝不给白棋逃向中腹的机会！",
-          en: "[Book 3 · Ch.5 Atari Mastery] Atari from the center side to drive both White stones into your Black pocket!" },
-
-        { book: 3, chZh: "第6章:守空围地", chEn: "B3 Ch6: Defend Territory",
-          b: [[2,5],[4,6],[4,7]], w: [[3,5],[3,4]], ans: [[3,6]],
-          zh: "【入门下·第6章 地(守空)】白棋侵入黑棋角空，请黑棋果断挡住，守护完整的角地！",
-          en: "[Book 3 · Ch.6 Territory] White is invading your corner. Block firmly to protect your territory!" },
-
-        { book: 3, chZh: "第7章:三目死活急所", chEn: "B3 Ch7: Bent-Three Vital Point",
-          b: [[1,6],[2,6],[3,6],[4,6],[1,7],[2,7],[4,7],[1,8],[4,8]], w: [[1,5],[2,5],[3,5],[4,5],[0,6],[0,7],[0,8],[5,6],[5,7],[5,8]], ans: [[3,8]],
-          zh: "【入门下·第7章 死活】“曲线三目（曲三）”与“直三”一样，正中间交叉点是做活两只真眼的唯一急所！",
-          en: "[Book 3 · Ch.7 Life & Death] In a Bent-Three eye shape, the center point is the vital point to make two true eyes!" },
-
-        { book: 3, chZh: "第8章:避免撞气", chEn: "B3 Ch8: Self-Shortage of Liberties",
-          b: [[3,6],[4,6],[4,7],[1,7],[2,7]], w: [[0,6],[1,6],[2,6],[0,7],[0,8],[3,7],[3,8]], ans: [[4,8]],
-          zh: "【入门下·第8章 撞气】如果黑棋从内侧叫吃会“自撞一气”被白反杀！请从外侧一线立下吃掉白棋二子。",
-          en: "[Book 3 · Ch.8 Liberty Shortage] Playing inside causes self-atari! Descend on the 1st line outside to capture White." },
-
-        { book: 3, chZh: "第9-2章:对杀与做活", chEn: "B3 Ch9-2: Semeai & Eye",
-          b: [[0,4],[1,4],[2,4],[1,5],[1,6],[1,7],[3,3],[4,3],[5,4],[5,5],[4,6],[4,7],[4,8]],
-          w: [[0,3],[1,3],[2,3],[2,2],[3,2],[2,5],[3,5],[2,6],[2,7],[2,8]], ans: [[0,6]],
-          zh: "【入门下·第9-2章 对杀与死活】单纯收气黑棋气不够！请在一线做出两只眼活棋，直接战胜白棋。",
-          en: "[Book 3 · Ch.9-2 Semeai & Life] A direct liberty race fails! Play on the 1st line to live with two eyes." },
-
-        { book: 3, chZh: "第9-3章:对杀与长气", chEn: "B3 Ch9-3: Extend Liberties",
-          b: [[2,5],[3,5],[4,4],[5,4],[5,5],[5,6],[5,7],[5,8],[2,7],[3,8]],
-          w: [[2,3],[3,4],[2,6],[3,6],[4,6],[4,5],[4,7]], ans: [[1,5]],
-          zh: "【入门下·第9-3章 对杀与长气】黑二子只有2气，包围它的白棋有3气。请黑棋往开阔处延气，把气长到4气获胜！",
-          en: "[Book 3 · Ch.9-3 Extend Liberties] Black has 2 liberties vs White's 3. Extend into open space to reach 4 liberties!" },
-
-        { book: 3, chZh: "第10-2章:扳阻出头", chEn: "B3 Ch10-2: Hane at Head",
-          b: [[3,4],[3,5]], w: [[4,4],[4,5]], ans: [[4,3]],
-          zh: "【入门下·第10-2章 扳】围棋格言：“逢靠必扳”、“扳二子头”！请向中腹方向迎头扳住白棋，阻其出头。",
-          en: "[Book 3 · Ch.10-2 Hane] 'Hane at the head of two stones!' Block White from extending toward the center." },
-
-        { book: 3, chZh: "第11章:长和长气", chEn: "B3 Ch11: Extend for Strength",
-          b: [[2,4],[3,4],[6,4]], w: [[2,3],[1,4],[2,5],[3,5]], ans: [[4,4]],
-          zh: "【入门下·第11章 长和长气】黑棋只有两口气，若乱扳会被断死！请向远处己方同伴方向稳健“长”出长气。",
-          en: "[Book 3 · Ch.11 Extend] Your two stones only have 2 liberties—extend solidly toward your friendly stone!" },
-
-        { book: 3, chZh: "第13/17章:扳吃与收官", chEn: "B3 Ch13/17: Hane Capture",
-          b: [[3,6],[4,6],[5,6],[6,6],[6,7],[6,8],[4,8]], w: [[4,7],[5,7]], ans: [[3,7]],
-          zh: "【入门下·第13章 扳吃技术】二线白棋二子有逃跑企图，请黑棋在二线迎头一扳，把白棋赶进绝境一举吃住！",
-          en: "[Book 3 · Ch.13 Hane Capture] Play a sharp Hane on the 2nd line to trap and capture both White stones!" }
+        // ==================== 📕 第四阶段：第19–24课 真假眼、死活与对杀收官（第55～72题） ====================
+        { book: 4, lesson: 19, chZh: "第19课:找出边上假眼", chEn: "L19: Edge False Eye",
+          b: [[3,7],[4,7],[5,7],[6,7],[2,8],[4,8],[6,8]], w: [[2,5],[3,6],[4,6],[5,6],[6,6],[7,6],[1,7],[2,7],[7,7]], ans: [[3,8]],
+          zh: "【第19课·真假眼与死活】边上眼的虎口角只要被对方占1个就是假眼！请点击找出黑棋唯一的“假眼”。",
+          en: "[L19 · True & False Eyes] On the edge, 1 enemy diagonal makes a False Eye. Click Black's false eye!" },
+        { book: 4, lesson: 19, chZh: "第19课:找出中腹假眼", chEn: "L19: Center False Eye",
+          b: [[3,2],[4,2],[5,2],[3,3],[5,3],[4,4],[3,5],[5,5],[3,6],[4,6],[5,6]], w: [[2,1],[3,1],[5,1],[6,1],[2,2],[6,2],[2,3],[6,3],[2,4],[3,4],[5,4],[6,4],[2,5],[2,6],[6,6],[2,7],[4,7],[5,7],[6,7]], ans: [[4,3],[4,5]],
+          zh: "【第19课·真假眼与死活】中腹眼的四个斜角若有2个被白棋占领就是假眼！请点击找出黑棋的一个假眼。",
+          en: "[L19 · True & False Eyes] In the center, 2 enemy diagonals make a False Eye. Click one of Black's false eyes!" },
+        { book: 4, lesson: 19, chZh: "第19课:角部假眼辨别", chEn: "L19: Corner False Eye",
+          b: [[1,6],[2,6],[0,7],[2,7],[1,8]], w: [[2,4],[0,5],[1,5],[3,5],[0,6],[3,6],[3,7],[2,8],[3,8]], ans: [[1,7]],
+          zh: "【第19课·真假眼与死活】仔细观察黑棋眼位的斜角是否被白棋占领，请点击找出黑棋的“假眼”！",
+          en: "[L19 · True & False Eyes] Check the diagonals of Black's eye space and click the False Eye!" },
+        { book: 4, lesson: 20, chZh: "第20课:角部做两眼做活", chEn: "L20: Make Two Eyes to Live",
+          b: [[7,1],[8,1],[7,2],[7,3],[8,3]], w: [[6,1],[6,2],[6,3],[6,4],[7,4],[8,4]], ans: [[7,0]],
+          zh: "【第20课·做眼与破眼】两只真眼才能永远活棋！黑先，请占住角上要点做出两只真眼做活黑棋。",
+          en: "[L20 · Make & Break Eyes] Two true eyes guarantee life! Play the vital corner point to make two eyes." },
+        { book: 4, lesson: 20, chZh: "第20课:破眼杀白(一)", chEn: "L20: Break Eye to Kill I",
+          b: [[2,3],[3,3],[4,3],[5,3],[6,3],[1,4],[7,4],[1,5],[7,5],[1,6],[7,6],[2,7],[3,7],[4,7],[5,7],[6,7]], w: [[2,4],[3,4],[5,4],[6,4],[2,5],[4,5],[2,6],[3,6],[4,6],[5,6],[6,6]], ans: [[6,5]],
+          zh: "【第20课·做眼与破眼】对方只有一只眼就会死！黑先，请果断破掉白棋右侧的第二只眼吃掉白棋。",
+          en: "[L20 · Make & Break Eyes] Play at the right side to destroy White's second eye and kill the group!" },
+        { book: 4, lesson: 20, chZh: "第20课:破眼杀白(二)", chEn: "L20: Break Eye to Kill II",
+          b: [[2,0],[2,1],[8,1],[2,2],[3,2],[4,2],[7,2],[5,3],[6,3],[7,4]], w: [[3,0],[5,0],[7,0],[3,1],[4,1],[5,1],[7,1]], ans: [[6,1]],
+          zh: "【第20课·做眼与破眼】白棋在上方已有一只真眼，请抢先点破右侧眼位并打吃白棋，不让白棋活棋！",
+          en: "[L20 · Make & Break Eyes] Destroy White's second eye on the top-right to kill the entire White group!" },
+        { book: 4, lesson: 21, chZh: "第21课:两气对杀紧气", chEn: "L21: Basic Semeai I",
+          b: [[2,6],[3,6],[4,6],[5,7],[5,8],[6,8]], w: [[5,6],[6,6],[4,7],[7,7],[3,8],[4,8]], ans: [[2,8],[3,7]],
+          zh: "【第21课·对杀基础①】黑白两块棋各剩2口气正在对杀！黑先紧住白棋一口气就能抢先提吃白棋获胜。",
+          en: "[L21 · Liberty Race I] Both groups have 2 liberties! Reduce White's liberties to 1 first to win the race." },
+        { book: 4, lesson: 21, chZh: "第21课:边角对杀获胜", chEn: "L21: Basic Semeai II",
+          b: [[4,0],[1,1],[4,1],[2,2],[3,2]], w: [[3,0],[3,1],[6,1],[4,2],[5,2]], ans: [[2,0],[2,1]],
+          zh: "【第21课·对杀基础①】上方黑白两块各2气对杀！黑先，立刻紧住白棋的气取得对杀胜利。",
+          en: "[L21 · Liberty Race I] Both sides have 2 liberties on the top edge. Tighten White's liberties first!" },
+        { book: 4, lesson: 21, chZh: "第21课:对杀先手紧气", chEn: "L21: Basic Semeai III",
+          b: [[5,6],[6,6],[4,7],[4,8]], w: [[3,6],[4,6],[5,7],[5,8]], ans: [[6,7],[6,8]],
+          zh: "【第21课·对杀基础①】双方各2口气对杀，先紧对方气的一方获胜！请下出紧住白棋气的一手。",
+          en: "[L21 · Liberty Race I] In a 2-vs-2 liberty race, the first player to Atari wins. Reduce White's liberties!" },
+        { book: 4, lesson: 22, chZh: "第22课:对杀先收外气(一)", chEn: "L22: Outside Liberty First I",
+          b: [[1,6],[2,6],[1,7],[3,7],[4,7]], w: [[3,6],[4,6],[5,6],[2,7],[5,7],[2,8]], ans: [[1,8]],
+          zh: "【第22课·对杀基础②】有公气时若先填公气会自撞一气！黑先，请务必先从左侧一线收紧白棋的“外气”！",
+          en: "[L22 · Liberty Race II] Never fill the shared liberty first! Tighten White's outside liberty on the 1st line." },
+        { book: 4, lesson: 22, chZh: "第22课:对杀先收外气(二)", chEn: "L22: Outside Liberty First II",
+          b: [[5,6],[6,6],[3,7],[4,7],[6,7]], w: [[3,6],[4,6],[2,7],[5,7],[5,8]], ans: [[6,8]],
+          zh: "【第22课·对杀基础②】双方共享一口公气！请先收紧右侧一线白棋的唯一外气，赢得对杀！",
+          en: "[L22 · Liberty Race II] Leave the shared liberty alone and play White's outside liberty on the 1st line!" },
+        { book: 4, lesson: 22, chZh: "第22课:紧外气胜对杀", chEn: "L22: Outside Liberty First III",
+          b: [[7,4],[6,6],[7,6],[8,6],[4,7],[5,7],[5,8]], w: [[5,5],[3,6],[5,6],[3,7],[6,7],[7,7],[3,8],[7,8]], ans: [[8,7]],
+          zh: "【第22课·对杀基础②】角部对杀存在公气，黑棋先从最右侧外气打吃白棋，避免自撞气一举获胜！",
+          en: "[L22 · Liberty Race II] Play White's outside liberty on the right edge to put White in Atari and win!" },
+        { book: 4, lesson: 23, chZh: "第23课:收官围地(一)", chEn: "L23: Endgame Sealing I",
+          b: [[4,5],[5,5],[6,5],[7,5],[8,5],[6,6],[4,7],[6,7],[4,8],[6,8]], w: [[0,5],[1,5],[2,5],[3,5],[3,6],[7,6],[8,6],[3,7],[7,7],[3,8],[7,8]], ans: [[4,6]],
+          zh: "【第23课·围地数目】终局前要把自己的围地边界封严实（收官）才能数目！请补住边界唯一缺口把官子收完。",
+          en: "[L23 · Territory & Endgame] Seal the final boundary gap so White cannot invade your territory!" },
+        { book: 4, lesson: 23, chZh: "第23课:收官围地(二)", chEn: "L23: Endgame Sealing II",
+          b: [[3,0],[1,1],[3,2],[0,3],[1,3],[2,3],[3,3]], w: [[4,0],[4,1],[4,2],[4,3],[0,4],[1,4],[2,4],[3,4],[4,4]], ans: [[3,1]],
+          zh: "【第23课·围地数目】左上角黑地还差最后一手官子没封口！请把黑棋最后一个官子收完。",
+          en: "[L23 · Territory & Endgame] Play the final endgame move to completely close your upper-left territory!" },
+        { book: 4, lesson: 23, chZh: "第23课:收官围地(三)", chEn: "L23: Endgame Sealing III",
+          b: [[6,5],[7,5],[8,5],[4,6],[5,6],[7,7],[4,8],[5,8]], w: [[2,2],[7,3],[8,3],[4,4],[5,4],[6,4],[3,5],[3,6],[3,7],[3,8]], ans: [[4,7]],
+          zh: "【第23课·围地数目】右下角黑棋围地的边界还有一个缺口，请把最后一个官子收完守住整块空！",
+          en: "[L23 · Territory & Endgame] Close the last gap on the boundary of your lower-right territory!" },
+        { book: 4, lesson: 24, chZh: "第24课:总复习·一线对杀", chEn: "L24: Final Review · Semeai",
+          b: [[4,5],[5,5],[6,5],[4,6],[7,6],[8,6],[4,7],[4,8]], w: [[6,4],[7,4],[7,5],[5,6],[6,6],[5,7],[7,7],[6,8]], ans: [[5,8]],
+          zh: "【第24课·综合练习④】毕业总复习！右下角黑白对杀，内侧是禁入点，请从一线外气打吃三颗白棋获胜！",
+          en: "[L24 · Final Review] Semeai finale! Atari White's 3 stones from the 1st-line outside liberty to win!" },
+        { book: 4, lesson: 24, chZh: "第24课:总复习·提子救命", chEn: "L24: Final Review · Capture & Win",
+          b: [[0,1],[1,1],[3,1],[4,1],[1,2],[1,3],[3,3],[0,4],[2,4],[3,4]], w: [[1,0],[2,0],[2,1],[2,2],[0,3],[2,3],[1,4],[1,5]], ans: [[0,2]],
+          zh: "【第24课·综合练习④】毕业总复习！左上角黑棋只剩2口气，请立刻在一线提掉白子增加气数赢得对杀！",
+          en: "[L24 · Final Review] Capture the 1-liberty White stone on the left edge immediately to gain liberties and win!" },
+        { book: 4, lesson: 24, chZh: "第24课:总复习·角部杀白", chEn: "L24: Final Review · Kill Corner",
+          b: [[1,0],[4,1],[4,2],[2,3],[3,3],[0,4],[1,4]], w: [[3,0],[0,1],[1,1],[2,1],[3,1],[0,3],[1,3]], ans: [[1,2]],
+          zh: "【第24课·综合练习④】毕业压轴题！黑先杀白：抢占角部破眼兼打吃的唯一急所，让白棋无法做出两只真眼！",
+          en: "[L24 · Final Review] Final boss! Play the vital point that both breaks White's eye and puts two stones in Atari!" }
       ];
 
       let idCounter = 1;
       for (let sIdx = 0; sIdx < seeds.length; sIdx++) {
         const seed = seeds[sIdx];
-        for (let v = 0; v < 4; v++) {
-          const t = (sIdx + v * 2) % 8;
-          const bTrans = seed.b.map(p => tfPt(p[0], p[1], t));
-          const wTrans = seed.w.map(p => tfPt(p[0], p[1], t));
-          const ansTrans = seed.ans.map(p => tfPt(p[0], p[1], t));
-          const nextWTrans = seed.nextW ? tfPt(seed.nextW[0], seed.nextW[1], t) : null;
-          const ans2Trans = seed.ans2 ? seed.ans2.map(p => tfPt(p[0], p[1], t)) : null;
+        const bList = seed.b.map(p => [p[0], p[1]]);
+        const wList = seed.w.map(p => [p[0], p[1]]);
+        const ansList = seed.ans.map(p => [p[0], p[1]]);
+        const nextW = seed.nextW ? [seed.nextW[0], seed.nextW[1]] : null;
+        const ans2List = seed.ans2 ? seed.ans2.map(p => [p[0], p[1]]) : null;
 
-          if (!isValidPuzzleSetup(bTrans, wTrans, ansTrans, nextWTrans, ans2Trans)) continue;
+        if (!isValidPuzzleSetup(bList, wList, ansList, nextW, ans2List)) continue;
 
-          PUZZLE_BANK.push({
-            id: idCounter++,
-            book: seed.book,
-            chZh: seed.chZh,
-            chEn: seed.chEn,
-            b: bTrans,
-            w: wTrans,
-            ans: ansTrans,
-            nextW: nextWTrans,
-            ans2: ans2Trans,
-            zh: seed.zh,
-            en: seed.en
-          });
-        }
+        PUZZLE_BANK.push({
+          id: idCounter++,
+          book: seed.book,
+          lesson: seed.lesson,
+          chZh: seed.chZh,
+          chEn: seed.chEn,
+          b: bList,
+          w: wList,
+          ans: ansList,
+          nextW: nextW,
+          ans2: ans2List,
+          zh: seed.zh,
+          en: seed.en
+        });
       }
       PUZZLE_BANK.forEach((p, idx) => { p.num = idx + 1; });
     }
@@ -4771,17 +4869,19 @@
       const bookSel = document.getElementById('puzzleBookSelect');
       if (!bookSel) return;
       const opts = bookSel.options;
-      if (opts.length >= 4) {
+      if (opts.length >= 5) {
         if (currentLang === 'zh') {
-          opts[0].text = "📚 全部三册 (1-144题)";
-          opts[1].text = "📘 入门篇(上) (1-48题)";
-          opts[2].text = "📗 入门篇(中) (49-96题)";
-          opts[3].text = "📙 入门篇(下) (97-144题)";
+          opts[0].text = "📚 全部 24 课 (1-72题)";
+          opts[1].text = "📘 第一阶段：第1-6课 规则与吃子逃跑 (1-18题)";
+          opts[2].text = "📗 第二阶段：第7-12课 虎口、连断与吃子技巧 (19-36题)";
+          opts[3].text = "📙 第三阶段：第13-18课 征枷扑接与打劫 (37-54题)";
+          opts[4].text = "📕 第四阶段：第19-24课 真假眼、死活与对杀收官 (55-72题)";
         } else {
-          opts[0].text = "📚 All 3 Books (1-144)";
-          opts[1].text = "📘 Book 1: Upper (1-48)";
-          opts[2].text = "📗 Book 2: Middle (49-96)";
-          opts[3].text = "📙 Book 3: Lower (97-144)";
+          opts[0].text = "📚 All 24 Lessons (1-72)";
+          opts[1].text = "📘 Stage 1: L1-L6 Rules, Capture & Escape (1-18)";
+          opts[2].text = "📗 Stage 2: L7-L12 Tiger's Mouth, Cut & Tactics (19-36)";
+          opts[3].text = "📙 Stage 3: L13-L18 Ladder, Net, Snapback & Ko (37-54)";
+          opts[4].text = "📕 Stage 4: L19-L24 Eyes, Life/Death & Semeai (55-72)";
         }
       }
     }
@@ -4801,16 +4901,14 @@
       const sel = document.getElementById('puzzleSelect');
       if (!sel) return;
       sel.innerHTML = "";
-      const bookTagZh = ["", "上册", "中册", "下册"];
-      const bookTagEn = ["", "B1", "B2", "B3"];
 
       PUZZLE_BANK.forEach((p, idx) => {
         if (curBookFilter !== 'all' && String(p.book) !== String(curBookFilter)) return;
         const opt = document.createElement('option');
         opt.value = idx;
         opt.textContent = currentLang === 'zh'
-          ? `第 ${p.num} 题 [${bookTagZh[p.book]}] ${p.chZh}`
-          : `#${p.num} [${bookTagEn[p.book]}] ${p.chEn}`;
+          ? `第 ${p.num} 题 · ${p.chZh}`
+          : `#${p.num} · ${p.chEn}`;
         sel.appendChild(opt);
       });
       sel.value = curPuzzleIdx;
@@ -4821,8 +4919,8 @@
       const pz = PUZZLE_BANK[curPuzzleIdx];
       const badge = document.getElementById('pzStageBadge');
       if (badge) {
-        const bNamesZh = ["", "📘 入门篇(上)", "📗 入门篇(中)", "📙 入门篇(下)"];
-        const bNamesEn = ["", "📘 Book 1 (Upper)", "📗 Book 2 (Middle)", "📙 Book 3 (Lower)"];
+        const bNamesZh = ["", "📘 第1阶段 (1-6课)", "📗 第2阶段 (7-12课)", "📙 第3阶段 (13-18课)", "📕 第4阶段 (19-24课)"];
+        const bNamesEn = ["", "📘 Stage 1 (L1-L6)", "📗 Stage 2 (L7-L12)", "📙 Stage 3 (L13-L18)", "📕 Stage 4 (L19-L24)"];
         badge.textContent = currentLang === 'zh' ? bNamesZh[pz.book] : bNamesEn[pz.book];
       }
       const promptEl = document.getElementById('puzzlePromptText');
@@ -4830,8 +4928,8 @@
         promptEl.style.color = "var(--text-main)";
         if (curPuzzleStep === 1) {
           promptEl.textContent = currentLang === 'zh'
-            ? "🔥 好棋！白棋提掉了你的扑子，现在请下出第 2 步反提/叫吃白棋！"
-            : "🔥 Great sacrifice! White captured your stone—now play Step 2 to finish it!";
+            ? "🔥 好棋！白棋提掉了你的扑子，现在请下出第 2 步反提白棋！"
+            : "🔥 Great sacrifice! White captured your stone—now play Step 2 to recapture!";
         } else {
           promptEl.textContent = "🎯 " + (currentLang === 'zh' ? pz.zh : pz.en);
         }
